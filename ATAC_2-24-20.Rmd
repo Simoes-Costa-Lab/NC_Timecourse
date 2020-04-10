@@ -1,5 +1,5 @@
 ---
-title: "2-24-20 Timecourse ATAC-Seq of Neural Crest"
+title: "Timecourse ATAC-Seq of Neural Crest"
 output: html_notebook
 editor_options: 
   chunk_output_type: console
