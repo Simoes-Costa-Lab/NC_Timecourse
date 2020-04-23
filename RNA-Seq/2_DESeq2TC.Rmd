@@ -2,17 +2,7 @@
 title: "NC Timecourse RNA-Seq: DESeq2"
 output: html_notebook
 ---
-# Step 1: Quality Control
-
-The First RMD notebook for the NC Timecourse RNA-Seq analysis. This document is the first of the series.
-In this document, we will start from the output of 'process_RNASeq.sh', with BAMs aligned to the ENSEMBL
-galGal6 genome.
-
-
-
-Check out the MultiQC report that was generated to identify any outliers in sequence or alignment quality.
-
-
+# Step 2: Timecourse DESeq2 Design
 ### Load the libraries required
 This analysis was performed on a 16 core machine running Ubuntu 18.04 LTS. Certain parameters may need to be updated based on your operating system and available CPUs.
 ```{r Loading Libraries, message=FALSE, include=TRUE}
