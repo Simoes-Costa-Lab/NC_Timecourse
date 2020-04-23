@@ -87,7 +87,6 @@ resultsNames(dds)
 
 #Check out the counts
 bp1 <-boxplot(log10(counts(dds,normalized=TRUE)+1))
-bp1
 
 #What does the dispersion look like?
 disp_est <- plotDispEsts(dds)
