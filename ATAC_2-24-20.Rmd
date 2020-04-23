@@ -47,6 +47,7 @@ all_ATAC_400bp_fixed.gr <- trim(all_ATAC_400bp_fixed.gr)
 write.table(as.data.frame(all_ATAC_400bp_fixed.gr), col.names = F, row.names = F, quote = F, file = "/home/ash274/workdir/Server_R_Code/bulk_NC_ATAC/all_ATAC_400bp_fixed.bed", sep = "\t")
 ```
 
+For some reason, adding from the sample sheet isn't working. So we are reading in all the samples inline.
 ```{r Trying diffbind with adding inline.}
 setwd("~/workdir/Server_R_Code/bulk_NC_ATAC")
 experiment <- dba.peakset(peaks = all_ATAC_400bp_fixed.gr, sampID = "HH10_1_TGGTCA", tissue = "NC", factor = "HH10",
