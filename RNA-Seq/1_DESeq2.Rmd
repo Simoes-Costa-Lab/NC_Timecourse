@@ -233,3 +233,49 @@ DESeq2_Analyze("14", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1
 DESeq2_Analyze("16", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
 ```
 
+```{r Export Rlog Counts}
+#log transform and normalize the data so it is comparable between samples.
+rld <- assay(rlog(dds, blind = F))
+rld <- as.data.frame(rld)
+
+colnames(rld) <- paste0(colData(dds)$Group, "_", colData(dds)$data)
+
+rld$Chick_ENSEMBL <- rownames(rld)
+
+rld <- merge(rld, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
+rld <- rld[!duplicated(rld$Chick_ENSEMBL),]
+
+summary(word(colnames(rld),sep = "_",1,1)=="NC")
+
+rld_positives <- rld[,(word(colnames(rld),sep = "_",1,1)=="NC")]
+
+HH6 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="6")]
+HH6$mean6 <- rowMeans(HH6[1:3])
+
+HH8 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="8")]
+HH8$mean8 <- rowMeans(HH8[1:3])
+
+HH10 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="10")]
+HH10$mean10 <- rowMeans(HH10[1:3])
+
+HH12 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="12")]
+HH12$mean12 <- rowMeans(HH12[1:4])
+
+HH14 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="14")]
+HH14$mean14 <- rowMeans(HH14[1:3])
+
+HH16 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="16")]
+HH16$mean16 <- rowMeans(HH16[1:5])
+
+rlog_positive_averages <-data.frame(Chick_ENSEMBL = rld$Chick_ENSEMBL,
+                                       HH6 = HH6$mean6, HH8 = HH8$mean8,
+                                       HH10 = HH10$mean10, HH12 = HH12$mean12,
+                                       HH14 = HH14$mean14, HH16 = HH16$mean16,
+                                       Chick_Symbol = rld$Chick_Symbol,
+                                       Chick_Entrezid = rld$Chick_Entrezid,
+                                       TF_Status = rld$TF_Status)
+
+write.csv(rlog_positive_averages, file = "./Exports/Annotated_Rlog_Positive_Averages.csv")
+
+```
+
