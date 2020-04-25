@@ -3,6 +3,8 @@ title: "NC Timecourse RNA-Seq: DESeq2"
 output: html_notebook
 ---
 # Step 2: Timecourse DESeq2 Design
+In addition to pairwise comparison, we want to test if we can detect things that are enriched in NC, regaurdless of time. To do this, we make the DESeq2 object as normal, but instead call results using LRT and reducing the model.
+
 ### Load the libraries required
 This analysis was performed on a 16 core machine running Ubuntu 18.04 LTS. Certain parameters may need to be updated based on your operating system and available CPUs.
 ```{r Loading Libraries, message=FALSE, include=TRUE}

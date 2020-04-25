@@ -199,7 +199,7 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
       restest3 <- restest2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc, "A", ifelse(log2FoldChange <= -L2fc, "B", "C")))
       g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
-        geom_text_repel(data=subset(restest2, padj< labelPadj & abs(log2FoldChange) >=L2fc),aes(label = Human_Symbol), box.padding = 0.2) +
+        geom_text_repel(data=subset(restest2, padj< labelPadj & abs(log2FoldChange) >=L2fc),aes(label = Symbol), box.padding = 0.2) +
         scale_color_manual(values = c("A" = "#C42126", "B" = "#212CC4", "C" = "#D4D2D1")) +
         ggtitle(restest_title) +
         scale_x_continuous(limits = c(-4.5,4.5)) +
@@ -221,20 +221,17 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
 ```{r Retrieve Pairwise Comparisons}
 genes.universe <- read_csv(file = "./Imports/GenesUniverse.csv")
 
-HH6_compare <- DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-
-#HH6_compare$layers[[2]] <- NULL
-HH6_compare
-
-DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
+DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
+DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.00001)
 DESeq2_Analyze("10", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-DESeq2_Analyze("12", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-DESeq2_Analyze("14", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
+DESeq2_Analyze("12", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.0001)
+DESeq2_Analyze("14", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.0005)
 DESeq2_Analyze("16", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
 ```
 
 ```{r Export Rlog Counts}
 #log transform and normalize the data so it is comparable between samples.
+genes.universe <- read_csv(file = "./Imports/GenesUniverse.csv")
 rld <- assay(rlog(dds, blind = F))
 rld <- as.data.frame(rld)
 
@@ -244,8 +241,6 @@ rld$Chick_ENSEMBL <- rownames(rld)
 
 rld <- merge(rld, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
 rld <- rld[!duplicated(rld$Chick_ENSEMBL),]
-
-summary(word(colnames(rld),sep = "_",1,1)=="NC")
 
 rld_positives <- rld[,(word(colnames(rld),sep = "_",1,1)=="NC")]
 
@@ -271,11 +266,12 @@ rlog_positive_averages <-data.frame(Chick_ENSEMBL = rld$Chick_ENSEMBL,
                                        HH6 = HH6$mean6, HH8 = HH8$mean8,
                                        HH10 = HH10$mean10, HH12 = HH12$mean12,
                                        HH14 = HH14$mean14, HH16 = HH16$mean16,
-                                       Chick_Symbol = rld$Chick_Symbol,
+                                       Symbol = rld$Symbol,
                                        Chick_Entrezid = rld$Chick_Entrezid,
+                                       Human_Entrezid = rld$Human_Entrezid,
                                        TF_Status = rld$TF_Status)
 
 write.csv(rlog_positive_averages, file = "./Exports/Annotated_Rlog_Positive_Averages.csv")
-
+head(rlog_positive_averages)
 ```
 
