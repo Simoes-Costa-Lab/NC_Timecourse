@@ -1,0 +1,21 @@
+---
+title: "NC Timecourse RNA-Seq: ImpulseDE2"
+output: html_notebook
+---
+
+# ImpulseDE2 Analaysis
+While DESeq2 is a powerful way to analyze both pairwise and timecourse experiments, we wanted to explore the possibility of using alternative methods to analyze our data. ImpulseDE2 uses a negative binomial model as the backbone of it's differential testing for count-based data. It uses an impulse model to create a smoothed expression trajectory for each gene, and tests these trajectories to identify enriched genes.
+
+## Loading libraries
+```{r Loading Libraries, message=FALSE, include=TRUE}
+library(ImpulseDE2)
+```
+
+## Loading data
+```{r}
+dds <- readRDS(file = "Exports/dds.RDS")
+
+impulse_obj <- 
+
+```
+

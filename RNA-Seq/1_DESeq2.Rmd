@@ -94,6 +94,9 @@ dds <- dds[,!(colnames(dds) %in% bad_samples)]
 keep <- rowSums(counts(dds)) >= 25
 dds <- dds[keep,]
 
+#save this object for use in other tools
+saveRDS(dds, file = "Exports/dds.RDS")
+
 dds <- DESeq(dds, parallel = TRUE)
 
 #Check out the counts

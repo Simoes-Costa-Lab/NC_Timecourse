@@ -36,6 +36,7 @@ library(org.Gg.eg.db)
 library(clusterProfiler)
 library(viridis)
 library(qdapTools)
+library(pheatmap)
 register(MulticoreParam(16)) # Set this to number of CPUs.
 ```
 
@@ -43,7 +44,7 @@ register(MulticoreParam(16)) # Set this to number of CPUs.
 ```{r Reading in featureCounts results}
 counts_summary <- read.delim("./Imports/featureCounts.txt.summary", row.names = 1)
 counts_summary <- rbind(counts_summary, percent_aligned = (counts_summary[1,]/colSums(counts_summary))*100)
-
+genes.universe <- read.csv("~/local_git/NC_Timecourse/RNA-Seq/Imports/GenesUniverse.csv")
 featureCounts <- read.delim("~/local_git/NC_Timecourse/RNA-Seq/Imports/featureCounts.txt", comment.char="#")
 
 #Remove the gene information to just get the counts matrix.
@@ -69,131 +70,65 @@ head(colData)
 ```
 
 ### Begin DESeq2 Analysis
-Note, this is pairwise comparison between NC and WE cells at each timepoint, additional analysis will be done for detecting genes varying through time. [ImpulseDE2](https://bioconductor.org/packages/release/bioc/vignettes/ImpulseDE2/inst/doc/ImpulseDE2_Tutorial.html)
+
+Trying to use LRT to determine differences in NC vs WE independent of the time effect.
+Additionally will try using [ImpulseDE2](https://bioconductor.org/packages/release/bioc/vignettes/ImpulseDE2/inst/doc/ImpulseDE2_Tutorial.html)
 ```{r DESeq2}
-dds <- DESeqDataSetFromMatrix(countData = dat,
+ddsTC <- DESeqDataSetFromMatrix(countData = dat,
                               colData = colData,
-                              design= ~0 + Group)
+                              design= ~ Condition + Time + Condition:Time)
 
 #Filter out bad samples (from PCA analysis)
 bad_samples <- c("6_pos_lib_ATCACG", "8_pos_lib_CGATGT",
                  "12_pos_ASH_CGTACG","10_pos_lib_TTAGGC",
                  "HH10_mGFP_1_ATGTCA", "6_neg_lib_TGACCA",
                  "8_neg_lib_ACAGTG", "HH12_mGFP_1_GTGAAA")
-dds <- dds[,!(colnames(dds) %in% bad_samples)]
+ddsTC <- ddsTC[,!(colnames(ddsTC) %in% bad_samples)]
                               
 #Filter out genes lowly detected.
-keep <- rowSums(counts(dds)) >= 25
-dds <- dds[keep,]
+keep <- rowSums(counts(ddsTC)) >= 25
+ddsTC <- ddsTC[keep,]
 
-dds <- DESeq(dds, parallel = TRUE)
+ddsTC <- DESeq(ddsTC, reduced = ~ Time, test = "LRT" ,parallel = TRUE)
+resultsNames(ddsTC)
 
-#Check out the counts
-bp1 <-boxplot(log10(counts(dds,normalized=TRUE)+1))
 
-#What does the dispersion look like?
-disp_est <- plotDispEsts(dds)
-```
+res <- as.data.frame(results(ddsTC, name = "Condition_WE_vs_NC"))
+res$Chick_ENSEMBL <- rownames(res)
+res2 <- merge(res, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
 
-## Check sample quality via PCA.
-```{r}
-# Variance stabilize DESeq data set
-vstDds <- varianceStabilizingTransformation(dds)
+res2 <- res2[!duplicated(res2$Chick_ENSEMBL),]
+res2$log2FoldChange <- res2$log2FoldChange * -1
 
-# Subset the transformed DDS to only plus and minus conditions
-vstDdsPlus <- vstDds[ , vstDds$Condition %in% c("NC") ]
-vstDdsMinus <- vstDds[ , vstDds$Condition %in% c("WE") ]
+Padj = 0.05
+L2fc = 1.5
+labelPadj = 0.000001
 
-# Generate PCA data for entire set and subsets
-pcaAll <- plotPCA(vstDds, intgroup = c("Condition", "Time"), returnData=TRUE)
-pcaPlus <- plotPCA(vstDdsPlus, intgroup = c("Time"), returnData=TRUE)
-pcaMinus <- plotPCA(vstDdsMinus, intgroup = c("Time"), returnData=TRUE)
+res2.DE.enriched <-as.data.frame(subset(res2, padj<Padj & log2FoldChange >= L2fc))
+write.csv(res2.DE.enriched, file = "./Exports/ddsTC_Condition_WE_vc_NC_Enriched.csv", row.names = FALSE)
+write.csv(res2, file = "./Exports/ddsTC_Condition_WE_vc_NC_All.csv", row.names = FALSE)
 
-pcaAllVar <- attr(pcaAll, "percentVar")
-pcaPlusVar <- attr(pcaPlus, "percentVar")
-pcaMinusVar <- attr(pcaMinus, "percentVar")
+ego.res2.DE <- enrichGO(gene = as.character(res2.DE.enriched$Human_Entrezid), universe = as.character(res2$Human_Entrezid), OrgDb = org.Hs.eg.db, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = Padj, pvalueCutoff = 0.05, readable = TRUE)
+ego.res2.DE.simplify <-simplify(ego.res2.DE)
+write.csv(ego.res2.DE.simplify@result, file = paste0("./Exports/ddsTC_Condition_WE_vc_NC_Enriched_GO_MF.csv"))
+dotplot(ego.res2.DE.simplify, showCategory = 10, title = paste0("Condition_WE_vs_NC", " GO MF")) +scale_color_viridis(direction=-1)
 
-# Plot PCAs
-g <- ggplot(pcaAll, aes(x=PC1, y=PC2, color=Time, shape = Condition)) + 
-  geom_point(size = 4, alpha = .75) + 
-  scale_color_npg() +
-  ggtitle("pcaALL") +
-  labs(x = paste(c("PC1","%"),round(pcaAllVar[1]*100)) ,y = paste(c("PC2","%"), round(pcaAllVar[2]*100))) +
-  theme(text=element_text(color="black", size = 10, face = "bold"),
-        line=element_line(color="black", size = 2),
-        axis.ticks = element_line(color = "black", size = 1),
-        panel.background = element_blank(),
-        panel.border = element_rect(fill=NA, color = "black", size = 2),
-        axis.text = element_text(color="black", size = 10, face = "bold")
-        #legend.key = element_blank()
-  )
-g
-ggsave(filename = "./Exports/pcaAll_1.pdf", units = 'in', height = 4, width = 6)
+ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_Enriched_GO_MF.png"), width = 12, height = 6)
 
-g2 <- ggplot(pcaPlus, aes(x=PC1, y=PC2, color=Time)) + 
-  geom_point(size = 4, alpha = .75, shape = 17) + 
-  scale_color_npg() +
-  ggtitle("pcaPlus") +
-  labs(x = paste(c("PC1 "),round(pcaPlusVar[1]*100), c("%")) ,y = paste(c("PC2 "), round(pcaPlusVar[2]*100), c("%"))) +
-  theme(text=element_text(color="black", size = 10, face = "bold"),
-        line=element_line(color="black", size = 2),
-        axis.ticks = element_line(color = "black", size = 1),
-        panel.background = element_blank(),
-        panel.border = element_rect(fill=NA, color = "black", size = 2),
-        axis.text = element_text(color="black", size = 10, face = "bold"),
-        legend.key = element_blank()
-  )
-g2
-ggsave('./Exports/pcaPlus_1.pdf', units = 'in', height = 4, width = 6)
+ego.res2.DE <- enrichGO(gene = as.character(res2.DE.enriched$Human_Entrezid), universe = as.character(res2$Human_Entrezid), OrgDb = org.Hs.eg.db, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = Padj, pvalueCutoff = 0.05, readable = TRUE)
 
-g3 <- ggplot(pcaMinus, aes(x=PC1, y=PC2, color=Time)) + 
-  geom_point(size = 4, alpha = .75) + 
-  scale_color_npg() +
-  ggtitle("pcaMinus") +
-  labs(x = paste(c("PC1 "),round(pcaMinusVar[1]*100), c("%")) ,y = paste(c("PC2 "), round(pcaMinusVar[2]*100), c("%"))) +
-  theme(text=element_text(color="black", size = 10, face = "bold"),
-        line=element_line(color="black", size = 2),
-        axis.ticks = element_line(color = "black", size = 1),
-        panel.background = element_blank(),
-        panel.border = element_rect(fill=NA, color = "black", size = 2),
-        axis.text = element_text(color="black", size = 10, face = "bold"),
-        legend.key = element_blank()
-  )
-g3
-ggsave('./Exports/pcaMinus_1.pdf', units = 'in', height = 4, width = 6)
-```
+ego.res2.DE.simplify <-simplify(ego.res2.DE)
+write.csv(ego.res2.DE.simplify@result, file = paste0("./Exports/ddsTC_Condition_WE_vc_NC_Enriched_GO_BP.csv"))
+dotplot(ego.res2.DE.simplify, showCategory = 10, title = paste0("Condition_WE_vs_NC", " GO MF")) + scale_color_viridis(direction=-1)
 
-```{r echo=FALSE}
-DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj = 0.1, L2fc = 1, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001) {
-  testcontrast <- c("Group",paste0("NC_",timepoint),paste0("WE_", timepoint))
-  restest_title <- c(paste0(timepoint, "Positive vs Negative DESeq2"))
-  restest <- as.data.frame(results(dds, contrast = testcontrast, parallel = TRUE))
-  restest$Chick_ENSEMBL <- rownames(restest)
-  restest2 <- merge(restest, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
-  restest2 <- restest2[!duplicated(restest2$Chick_ENSEMBL),]
-  restest2.DE.enriched <-as.data.frame(subset(restest2, padj<Padj & log2FoldChange >= L2fc))
-  write.csv(restest2.DE.enriched, file = paste0("./Exports/",timepoint,"_Enriched.csv"), row.names = FALSE)
-  write.csv(restest2, file = paste0("./Exports/",timepoint, "_AllGenes.csv"), row.names = FALSE)
-  if (testMF == TRUE) {
-    ego.restest2.DE <- enrichGO(gene = as.character(restest2.DE.enriched$Human_Entrezid), universe = as.character(restest2$Human_Entrezid), OrgDb = org.Hs.eg.db, ont = "MF", pAdjustMethod = "BH", qvalueCutoff = Padj, pvalueCutoff = 0.05, readable = TRUE)
-    ego.restest2.DE.simplify <-simplify(ego.restest2.DE)
-    write.csv(ego.restest2.DE.simplify@result, file = paste0("./Exports/",timepoint,"_Enriched_GO_MF.csv"))
-    dotplot(ego.restest2.DE.simplify, showCategory = 10, title = paste0(timepoint, " Enriched GO MF")) +scale_color_viridis(direction=-1)
-    ggsave(filename = paste0("./Exports/",timepoint, "_Enriched_GO_MF.png"), width = 12, height = 6)
-  }
-  if (testBP == TRUE) {
-    ego.restest2.DE <- enrichGO(gene = as.character(restest2.DE.enriched$Human_Entrezid), universe = as.character(restest2$Human_Entrezid), OrgDb = org.Hs.eg.db, ont = "BP", pAdjustMethod = "BH", qvalueCutoff = Padj, pvalueCutoff = 0.05, readable = TRUE)
-    ego.restest2.DE.simplify <-simplify(ego.restest2.DE)
-    write.csv(ego.restest2.DE.simplify@result, file = paste0("./Exports/",timepoint, "_Enriched_GO_BP.csv"))
-    dotplot(ego.restest2.DE.simplify, showCategory = 10, title = paste0(timepoint, " Enriched GO BP")) +scale_color_viridis(direction=-1)
-    ggsave(filename = paste0("./Exports/",timepoint, "_Enriched_GO_BP.png"), width = 12, height = 6) }
-  if (plotVolc == TRUE){
-      restest3 <- restest2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc, "A", ifelse(log2FoldChange <= -L2fc, "B", "C")))
-      g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
+ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_Enriched_GO_BP.png"), width = 12, height = 6)
+
+restest3 <- res2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc, "A", ifelse(log2FoldChange <= -L2fc, "B", "C")))
+g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
-        geom_text_repel(data=subset(restest2, padj< labelPadj & abs(log2FoldChange) >=L2fc),aes(label = Human_Symbol), box.padding = 0.2) +
+        geom_text_repel(data=subset(res2, padj< labelPadj & abs(log2FoldChange) >=L2fc & TF_Status == "Transcription Factor"),aes(label = Symbol), box.padding = 0.2) +
         scale_color_manual(values = c("A" = "#C42126", "B" = "#212CC4", "C" = "#D4D2D1")) +
-        ggtitle(restest_title) +
+        ggtitle("Condition_WE_vs_NC") +
         scale_x_continuous(limits = c(-4.5,4.5)) +
         geom_vline(xintercept = c(-L2fc,L2fc), linetype = "longdash", color = "black", size = 0.4) +
         theme_classic() +
@@ -203,25 +138,24 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
               axis.text = element_blank(),
               axis.ticks = element_blank(),
               plot.title = element_blank()) #plot.title = element_text(hjust = 0.5))
-      ggsave(filename = paste0("./Exports/",restest_title,"_labeled.png"), plot = g, width = 5, height = 5, device = "png")
-      return(g)
-    }
-}
+ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_volcano_labeled.png"), plot = g, width = 5, height = 5, device = "png")
+
+g
+
+#We also can investigate the differences in each gene for different tests.
+betas <- coef(ddsTC)
+colnames(betas)
+topGenes <- head(order(res2$padj),20)
+mat <- betas[topGenes,-1]
+thr <- 2 
+mat[mat < -thr] <- -thr
+mat[mat > thr] <- thr
+pheatmap(mat, breaks=seq(from=-thr, to=thr, length=101),
+         cluster_col=FALSE)
+
+# Condition WE vs NC higher scores are enriched in WE
+#In this case, the third gene is enriched over time but isn't 
+#really enriched in Neural Crest,
+# While the first gene is strongly depeleted in NC and depeleted over time.
+
 ```
-
-## Retrieve Specific comparisons using this function
-```{r Retrieve Pairwise Comparisons}
-genes.universe <- read_csv(file = "./Imports/GenesUniverse.csv")
-
-HH6_compare <- DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-
-#HH6_compare$layers[[2]] <- NULL
-HH6_compare
-
-DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-DESeq2_Analyze("10", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-DESeq2_Analyze("12", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-DESeq2_Analyze("14", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-DESeq2_Analyze("16", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
-```
-
