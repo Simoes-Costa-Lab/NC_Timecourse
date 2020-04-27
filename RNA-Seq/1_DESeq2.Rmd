@@ -245,6 +245,7 @@ rld$Chick_ENSEMBL <- rownames(rld)
 
 rld <- merge(rld, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
 rld <- rld[!duplicated(rld$Chick_ENSEMBL),]
+write.csv(rld, file = "./Exports/Annotated_Rlog_All.csv")
 
 rld_positives <- rld[,(word(colnames(rld),sep = "_",1,1)=="NC")]
 rownames(rld_positives) <- rld$Chick_ENSEMBL

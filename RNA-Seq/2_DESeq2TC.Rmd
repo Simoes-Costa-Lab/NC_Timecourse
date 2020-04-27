@@ -160,5 +160,31 @@ pheatmap(mat, breaks=seq(from=-thr, to=thr, length=101),
 
 ```
 
+## Export for RNA-Seq App
+We have Rlog counts from the previous analysis, but it does not display the significance and fold difference between the two conditions. To update our RNA-Seq App, let's add the log2FC and Padj from this test.
 
+### We also could grab WGCNA results to make an explorer for that data.
+```{r}
+Annotated_Rlog_All <- read.csv("./Exports/Annotated_Rlog_All.csv", row.names=1, stringsAsFactors=FALSE)
+rownames(Annotated_Rlog_All) <- Annotated_Rlog_All$Chick_ENSEMBL
+
+summary(Annotated_Rlog_All$Chick_ENSEMBL == res2$Chick_ENSEMBL)
+Annotated_Rlog_All$NC_Enrichment_log2FC <- res2$log2FoldChange
+Annotated_Rlog_All$NC_Enrichment_padj <- res2$padj
+Annotated_Rlog_All$ENSEMBL_and_Symbol <- paste0(Annotated_Rlog_All$Chick_ENSEMBL,
+                                                              "_", Annotated_Rlog_All$Symbol)
+# Now let's format it for the App.
+
+Rlog_app <- Annotated_Rlog_All %>% dplyr::select(ENSEMBL_and_Symbol, c(2:43),48,49)
+Rlog_app <- Rlog_app %>% pivot_longer(-c(ENSEMBL_and_Symbol, NC_Enrichment_log2FC, NC_Enrichment_padj), names_to = "columnName", values_to = "Rlog")
+Rlog_app <- Rlog_app %>% separate(col = "columnName", into = c('condition', 'time','UniqueID'),
+                                  sep = "_", extra = "merge")
+Rlog_app$time <- as.numeric(Rlog_app$time)
+
+Rlog_app$condition <- factor(Rlog_app$condition, levels = c("NC","WE"))
+
+# Save as feather for fast loading!
+library(feather)
+write_feather(Rlog_app, path = "./Exports/Rlog_for_RNA-Seq-App.feather")
+```
 
