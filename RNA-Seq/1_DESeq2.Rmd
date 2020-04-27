@@ -73,6 +73,7 @@ colData <- colData %>% mutate(Condition = factor(ifelse(grepl(pattern = "pos|pGF
 colData <- colData %>% mutate(Time = factor(x = str_extract(word(colData$data, sep = "_",1,1), pattern ="[0-9]+"), levels = c(6,8,10,12,14,16)))
 colData <- colData %>% mutate(Group = factor(paste0(Condition,"_",Time)))
 
+write.csv(colData, file = "./Exports/colData.csv")
 head(colData)
 ```
 
@@ -199,7 +200,7 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
     dotplot(ego.restest2.DE.simplify, showCategory = 10, title = paste0(timepoint, " Enriched GO BP")) +scale_color_viridis(direction=-1)
     ggsave(filename = paste0("./Exports/",timepoint, "_Enriched_GO_BP.png"), width = 12, height = 6) }
   if (plotVolc == TRUE){
-      restest3 <- restest2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc, "A", ifelse(log2FoldChange <= -L2fc, "B", "C")))
+      restest3 <- restest2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc & padj < Padj, "A", ifelse(log2FoldChange <= -L2fc & padj < Padj, "B", "C")))
       g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
         geom_text_repel(data=subset(restest2, padj< labelPadj & abs(log2FoldChange) >=L2fc),aes(label = Symbol), box.padding = 0.2) +
@@ -246,6 +247,8 @@ rld <- merge(rld, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
 rld <- rld[!duplicated(rld$Chick_ENSEMBL),]
 
 rld_positives <- rld[,(word(colnames(rld),sep = "_",1,1)=="NC")]
+rownames(rld_positives) <- rld$Chick_ENSEMBL
+write.csv(rld_positives, file = "./Exports/Annotated_Rlog_Positives.csv")
 
 HH6 <- rld_positives[,(word(colnames(rld_positives),sep = "_",2,2)=="6")]
 HH6$mean6 <- rowMeans(HH6[1:3])

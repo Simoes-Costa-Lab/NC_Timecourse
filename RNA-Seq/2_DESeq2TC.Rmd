@@ -47,11 +47,11 @@ counts_summary <- rbind(counts_summary, percent_aligned = (counts_summary[1,]/co
 genes.universe <- read.csv("~/local_git/NC_Timecourse/RNA-Seq/Imports/GenesUniverse.csv")
 featureCounts <- read.delim("~/local_git/NC_Timecourse/RNA-Seq/Imports/featureCounts.txt", comment.char="#")
 
-#Remove the gene information to just get the counts matrix.
+# Remove the gene information to just get the counts matrix.
 dat <- featureCounts[,7:56]
 rownames(dat) <- featureCounts$Geneid
 
-#Clean sample names
+# Clean sample names
 sample_names <- colnames(featureCounts[7:56])
 sample_names <- str_sub(sample_names, 7,-5)
 sample_names <- word(sample_names, sep = "_", 5, -3)
@@ -78,14 +78,14 @@ ddsTC <- DESeqDataSetFromMatrix(countData = dat,
                               colData = colData,
                               design= ~ Condition + Time + Condition:Time)
 
-#Filter out bad samples (from PCA analysis)
+# Filter out bad samples (from PCA analysis)
 bad_samples <- c("6_pos_lib_ATCACG", "8_pos_lib_CGATGT",
                  "12_pos_ASH_CGTACG","10_pos_lib_TTAGGC",
                  "HH10_mGFP_1_ATGTCA", "6_neg_lib_TGACCA",
                  "8_neg_lib_ACAGTG", "HH12_mGFP_1_GTGAAA")
 ddsTC <- ddsTC[,!(colnames(ddsTC) %in% bad_samples)]
                               
-#Filter out genes lowly detected.
+# Filter out genes lowly detected.
 keep <- rowSums(counts(ddsTC)) >= 25
 ddsTC <- ddsTC[keep,]
 
@@ -142,7 +142,7 @@ ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_volcano_labeled.png
 
 g
 
-#We also can investigate the differences in each gene for different tests.
+# We also can investigate the differences in each gene for different tests.
 betas <- coef(ddsTC)
 colnames(betas)
 topGenes <- head(order(res2$padj),20)
@@ -154,8 +154,11 @@ pheatmap(mat, breaks=seq(from=-thr, to=thr, length=101),
          cluster_col=FALSE)
 
 # Condition WE vs NC higher scores are enriched in WE
-#In this case, the third gene is enriched over time but isn't 
-#really enriched in Neural Crest,
+# In this case, the third gene is enriched over time but isn't 
+# really enriched in Neural Crest,
 # While the first gene is strongly depeleted in NC and depeleted over time.
 
 ```
+
+
+

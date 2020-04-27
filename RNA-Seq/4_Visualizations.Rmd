@@ -6,7 +6,7 @@ output: html_notebook
 # Step 4: Visualizations
 
 From our analysis, we want to highlight dynamic transcription factors.
-Let's first start with reading in the data from prev. analysis.
+Let's first start with reading in the data from prev. analysis. Beginning with factors that were identified from pairwise comparisons.
 
 ```{r}
 library(dplyr)
@@ -52,19 +52,49 @@ All_Enriched_TFs <- c(as.character(TF_HH6$Chick_ENSEMBL), as.character(TF_HH8$Ch
                            as.character(TF_HH14$Chick_ENSEMBL), as.character(TF_HH16$Chick_ENSEMBL))
 
 All_Enriched_TFs <- unique(All_Enriched_TFs)
+
+
+ddsTC_Condition_WE_vc_NC_All <- read.csv("./Exports/ddsTC_Condition_WE_vc_NC_All.csv", stringsAsFactors=FALSE)
+
+TF_Condition_Enriched <- ddsTC_Condition_WE_vc_NC_All %>% dplyr::filter(log2FoldChange > 0.5 & padj < 0.05 & TF_Status == "Transcription Factor") %>%  dplyr::select(Chick_ENSEMBL, log2FoldChange, padj)
+
 ```
 
-## Enriched TF Heatmap
-We find that a Z-score of Rlog normalized counts from DESeq2 looks best.
+## Enriched Genes Overall
+We find that a Z-score of Rlog normalized counts from DESeq2 looks best. Using the ddsTC results, we find 513 genes differentially expressed in neural crest.
+```{r}
+colors <- colorRampPalette(c("#212CC4","#FFFFFF","#C42126"))(250)
+
+All_Enriched_Genes <- ddsTC_Condition_WE_vc_NC_All %>% dplyr::filter(log2FoldChange > 0.5 & padj < 0.05)
+enriched_1 <- Annotated_Rlog_Positive_Averages[All_Enriched_Genes$Chick_ENSEMBL,2:7]
+
+enriched <- pheatmap(enriched_1, scale = "row", cluster_cols = F,
+                     show_rownames = F, cellwidth = 20, color = colors,
+                     filename = "./Exports/ddsTC_All_Enriched_Genes.pdf", width = 6, height = 8)
+
+```
+
+
+## Enriched TF Heatmaps
+p1 is from pairwise comparisons and p2 is from the 2_DESeq2TC results.
 ```{r}
 #looking at normalized counts
 mat <- Annotated_Rlog_Positive_Averages[All_Enriched_TFs,2:7]
 rownames(mat) <- paste0(as.character(Annotated_Rlog_Positive_Averages[All_Enriched_TFs,8]), "_"
                         ,rownames(mat))
-colorRampPalette(c("#C42126","#D4D2D1","#212CC4"))(20)
 
 p1 <- pheatmap(mat, cluster_cols = F, scale = "row", show_rownames = T, cellwidth = 15,
-               color = colorRampPalette(c("#212CC4","#FFFFFF","#C42126"))(250),
+               color = colors,
                filename = "./Exports/TF_Heatmap_Rlog_Counts.pdf", width = 6, height = 8)
-```
 
+mat2 <- Annotated_Rlog_Positive_Averages[TF_Condition_Enriched$Chick_ENSEMBL,2:7]
+rownames(mat2) <- paste0(as.character(Annotated_Rlog_Positive_Averages[TF_Condition_Enriched$Chick_ENSEMBL,8]), "_"
+                        ,rownames(mat2))
+p2 <- pheatmap(mat2, cluster_cols = F, scale = "row", show_rownames = T, cellwidth = 15,
+               color = colors,
+               filename = "./Exports/TF_Heatmap_Condition_Rlog_Counts.pdf", width = 6, height = 8)
+
+All_Enriched_TFs[!(All_Enriched_TFs %in% TF_Condition_Enriched$Chick_ENSEMBL)]
+# Notably Gained CSRNP1, POU4F1, MAFB, LMO4, and LMX1A
+
+```
