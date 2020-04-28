@@ -25,6 +25,7 @@ genes = unique(data.frame(value = dat$gene, label = dat$gene))
 
 # Defining function to calculate SEM
 sem <- function(x) sd(x)/sqrt(length(x))
+get_geneinfo <- function(x) filter(dat, gene %in% x) %>% top_n(n = 1, wt = gene)
 
 # Define UI for application that plots
 ui <- fluidPage(
@@ -61,7 +62,7 @@ server <- function(input, output, session) {
   output$expressionPlot <- renderPlot( height = 500,{
     
     # Plot the expression plot
-    ggplot(
+    g <- ggplot(
       if (!input$c) {
         filter(dat, condition != 'WE' & gene %in% input$g)
       } else {
@@ -72,9 +73,17 @@ server <- function(input, output, session) {
           color = gene,
           fill = gene
       )
-    ) + 
+    )
+    g + 
       
       {if (length(input$g) != 0) stat_summary(fun = mean, geom = 'line', size=1.5)} +
+      
+      
+      {if (input$log & length(input$g) != 0)
+        annotate("text", label = paste0("Log2FC ", round(get_geneinfo(input$g[[1]])[1,2],2),
+                                        " Padj ", round(get_geneinfo(input$g[[1]])[1,3],4)),
+                 x = 11, y = as.numeric(max(get_geneinfo(input$g[[1]])[,7])) + 2) 
+        }+
       
       {if (input$c & input$f & length(input$g) != 0) facet_grid(condition ~ gene, scales = 'fixed')}+
       
@@ -82,9 +91,7 @@ server <- function(input, output, session) {
       
       {if (!input$c & input$f & length(input$g) != 0) facet_grid(. ~ gene, scales = 'fixed')} +
       
-      {if (input$log & !input$f & length(input$g) != 0) annotate("text", label = paste0("Log2FC ", round(head(dat[dat$gene == input$g,2],1),2),
-                                                                             " Padj ", round(head(dat[dat$gene == input$g,3],1),4)), x = 11, y = 
-                                                        as.numeric(head(dat[dat$gene == input$g,7],1)) + 3)}+
+      
       
       {if (input$p & length(input$g) != 0) geom_point(size = 2)}+
       
