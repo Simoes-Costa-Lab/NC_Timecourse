@@ -14,6 +14,7 @@ Check out the MultiQC report that was generated to identify any outliers in sequ
 
 
 ### Load the libraries required
+
 This analysis was performed on a 16 core machine running Ubuntu 18.04 LTS. Certain parameters may need to be updated based on your operating system and available CPUs.
 ```{r Loading Libraries, message=FALSE, include=TRUE}
 library(tidyr)
@@ -44,7 +45,7 @@ library(org.Gg.eg.db)
 library(clusterProfiler)
 library(viridis)
 library(qdapTools)
-register(MulticoreParam(16)) # Set this to number of CPUs.
+register(MulticoreParam(4)) # Set this to number of CPUs.
 ```
 
 ### Read in the results of the featureCounts
@@ -203,10 +204,13 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
       restest3 <- restest2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc & padj < Padj, "A", ifelse(log2FoldChange <= -L2fc & padj < Padj, "B", "C")))
       g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
-        geom_text_repel(data=subset(restest2, padj< labelPadj & abs(log2FoldChange) >=L2fc),aes(label = Symbol), box.padding = 0.2) +
+        geom_text_repel(data=subset(restest2, padj< labelPadj & 
+                                      abs(log2FoldChange) >=L2fc & 
+                                      Symbol %in% Multipotency_set),aes(label = Symbol), box.padding = 0.2) +
         scale_color_manual(values = c("A" = "#C42126", "B" = "#212CC4", "C" = "#D4D2D1")) +
         ggtitle(restest_title) +
         scale_x_continuous(limits = c(-4.5,4.5)) +
+        coord_trans(x = "log2") +
         geom_vline(xintercept = c(-L2fc,L2fc), linetype = "longdash", color = "black", size = 0.4) +
         theme_classic() +
         xlab("Log2 Fold Change") +
@@ -224,6 +228,11 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
 ## Retrieve Specific comparisons using this function
 ```{r Retrieve Pairwise Comparisons}
 genes.universe <- read_csv(file = "./Imports/GenesUniverse.csv")
+
+# Import multipotency gene sets
+Mueller <- read.delim(file = "Imports/Mueller_Plurinet.grp", skip = 1)
+Wong <- read.delim(file = "Imports/Wong_stemcellcore.grp", skip = 1)
+Multipotency_set <- unique(c(as.character(Mueller[,1]), as.character(Wong[,1])))
 
 DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
 DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.00001)
