@@ -57,7 +57,7 @@ moduleColors = mergedColors
 colorOrder = c("grey", standardColors(50))
 moduleLabels = match(moduleColors, colorOrder)-1
 MEs = mergedMEs
-colors <- colorRampPalette(c("#212CC4","#FFFFFF","#C42126"))(250)
+colors <- colorRampPalette(c("#0584bc","#FFFFFF", "#e45649"))(250)
 
 pheatmap::pheatmap(MEs, cluster_rows = F, color = colors,
                    filename = "./Exports/WGCNA_Sample_Color_Heatmap.pdf")

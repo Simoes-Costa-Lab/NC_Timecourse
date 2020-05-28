@@ -102,7 +102,7 @@ res2$log2FoldChange <- res2$log2FoldChange * -1
 
 Padj = 0.05
 L2fc = 1.5
-labelPadj = 0.000001
+labelPadj = 1e-8
 
 res2.DE.enriched <-as.data.frame(subset(res2, padj<Padj & log2FoldChange >= L2fc))
 write.csv(res2.DE.enriched, file = "./Exports/ddsTC_Condition_WE_vc_NC_Enriched.csv", row.names = FALSE)
@@ -126,19 +126,21 @@ ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_Enriched_GO_BP.png"
 restest3 <- res2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc, "A", ifelse(log2FoldChange <= -L2fc, "B", "C")))
 g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
-        geom_text_repel(data=subset(res2, padj< labelPadj & abs(log2FoldChange) >=L2fc & TF_Status == "Transcription Factor"),aes(label = Symbol), box.padding = 0.2) +
-        scale_color_manual(values = c("A" = "#C42126", "B" = "#212CC4", "C" = "#D4D2D1")) +
+        geom_text_repel(data=subset(res2, padj< labelPadj & abs(log2FoldChange) >=L2fc & TF_Status == "Transcription Factor"),aes(label = Symbol), box.padding = 0.2, segment.color = "#393a42", segment.size = 0.5, color = "#393a42") +
+        scale_color_manual(values = c("A" = "#e45649", "B" = "#0584bc", "C" = "#d3d2d6")) +
         ggtitle("Condition_WE_vs_NC") +
-        scale_x_continuous(limits = c(-4.5,4.5)) +
         geom_vline(xintercept = c(-L2fc,L2fc), linetype = "longdash", color = "black", size = 0.4) +
         theme_classic() +
+        scale_x_continuous(limits = c(-11,11)) +
         xlab("Log2 Fold Change") +
         ylab(paste0("-Log10 Adj. p value, ", labelPadj," Labeled")) +
-        theme(legend.position = "none", axis.title = element_blank(),
-              axis.text = element_blank(),
-              axis.ticks = element_blank(),
-              plot.title = element_blank()) #plot.title = element_text(hjust = 0.5))
-ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_volcano_labeled.png"), plot = g, width = 5, height = 5, device = "png")
+        theme(legend.position = "none")
+        #      , axis.title = element_blank(),
+        #      axis.text = element_blank(),
+        #      axis.ticks = element_blank(),
+        #      plot.title = element_blank()) #plot.title = element_text(hjust = 0.5))
+ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_volcano_labeled.png"), plot = g, width = 4, height = 4, device = "png")
+ggsave(filename = paste0("./Exports/ddsTC_Condition_WE_vc_NC_volcano_labeled.svg"), plot = g, width = 4, height = 4, device = "svg")
 
 g
 

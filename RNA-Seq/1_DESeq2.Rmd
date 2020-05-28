@@ -52,7 +52,7 @@ register(MulticoreParam(4)) # Set this to number of CPUs.
 ```{r Reading in featureCounts results}
 counts_summary <- read.delim("./Imports/featureCounts.txt.summary", row.names = 1)
 counts_summary <- rbind(counts_summary, percent_aligned = (counts_summary[1,]/colSums(counts_summary))*100)
-
+genes.universe <- read_csv(file = "./Imports/GenesUniverse.csv")
 featureCounts <- read.delim("~/local_git/NC_Timecourse/RNA-Seq/Imports/featureCounts.txt", comment.char="#")
 
 #Remove the gene information to just get the counts matrix.
@@ -177,9 +177,16 @@ ggsave('./Exports/pcaMinus_1.pdf', units = 'in', height = 4, width = 6)
 ```
 
 ```{r echo=FALSE}
-DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj = 0.1, L2fc = 1, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001) {
-  testcontrast <- c("Group",paste0("NC_",timepoint),paste0("WE_", timepoint))
-  restest_title <- c(paste0(timepoint, "Positive vs Negative DESeq2"))
+DESeq2_Analyze <- function(timepoint = "", dds, genes.universe = genes.universe, versusWE = TRUE, second_timepoint = "", Padj = 0.1, L2fc = 1, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001) {
+  if (versusWE){
+    testcontrast <- c("Group",paste0("NC_",timepoint),paste0("WE_", timepoint))
+    restest_title <- c(paste0(timepoint, "Positive vs Negative DESeq2"))
+  }
+  
+  if (!versusWE){
+    testcontrast <- c("Group",paste0("NC_",timepoint),paste0("NC_", second_timepoint))
+    restest_title <- c(paste0(timepoint, " vs ", second_timepoint," DESeq2"))
+  }
   restest <- as.data.frame(results(dds, contrast = testcontrast, parallel = TRUE))
   restest$Chick_ENSEMBL <- rownames(restest)
   restest2 <- merge(restest, genes.universe, by = "Chick_ENSEMBL", all.x = TRUE)
@@ -204,37 +211,33 @@ DESeq2_Analyze <- function(timepoint, dds, genes.universe = genes.universe, Padj
       restest3 <- restest2 %>% mutate(threshold = ifelse(log2FoldChange >= L2fc & padj < Padj, "A", ifelse(log2FoldChange <= -L2fc & padj < Padj, "B", "C")))
       g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
-        geom_text_repel(data=subset(restest2, padj< labelPadj & 
-                                      abs(log2FoldChange) >=L2fc & 
-                                      Symbol %in% Multipotency_set),aes(label = Symbol), box.padding = 0.2) +
-        scale_color_manual(values = c("A" = "#C42126", "B" = "#212CC4", "C" = "#D4D2D1")) +
+        scale_color_manual(values = c("A" = "#e45649", "B" = "#0584bc", "C" = "#d3d2d6")) +
+        geom_text_repel(data=subset(restest2, padj<labelPadj & TF_Status=="Transcription Factor"),
+                        aes(label = Symbol), box.padding = 0.2, segment.color = "#393a42", segment.size = 0.5, color = "#393a42") +
         ggtitle(restest_title) +
-        scale_x_continuous(limits = c(-4.5,4.5)) +
-        coord_trans(x = "log2") +
+        #scale_x_continuous(limits = c(-6,6)) +
         geom_vline(xintercept = c(-L2fc,L2fc), linetype = "longdash", color = "black", size = 0.4) +
         theme_classic() +
         xlab("Log2 Fold Change") +
         ylab(paste0("-Log10 Adj. p value, ", labelPadj," Labeled")) +
-        theme(legend.position = "none", axis.title = element_blank(),
-              axis.text = element_blank(),
-              axis.ticks = element_blank(),
-              plot.title = element_blank()) #plot.title = element_text(hjust = 0.5))
-      ggsave(filename = paste0("./Exports/",restest_title,"_labeled.png"), plot = g, width = 5, height = 5, device = "png")
-      return(g)
+        theme(legend.position = "none")
+        # , axis.title = element_blank(),
+        #      axis.text = element_blank(),
+        #      axis.ticks = element_blank(),
+        #      plot.title = element_blank()) #plot.title = element_text(hjust = 0.5))
+      ggsave(filename = paste0("./Exports/",restest_title,"_labeled.png"), plot = g, width = 4, height = 4, device = "png")
+      ggsave(filename = paste0("./Exports/",restest_title,"_labeled.svg"), plot = g, width = 4, height = 4, device = "svg")
+      return(list(g, restest3))
     }
 }
 ```
 
 ## Retrieve Specific comparisons using this function
 ```{r Retrieve Pairwise Comparisons}
-genes.universe <- read_csv(file = "./Imports/GenesUniverse.csv")
+DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 0.1)
 
-# Import multipotency gene sets
-Mueller <- read.delim(file = "Imports/Mueller_Plurinet.grp", skip = 1)
-Wong <- read.delim(file = "Imports/Wong_stemcellcore.grp", skip = 1)
-Multipotency_set <- unique(c(as.character(Mueller[,1]), as.character(Wong[,1])))
-
-DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
+NC6_NC16 <- DESeq2_Analyze(timepoint = "6", second_timepoint = "16", versusWE = F, dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 1e-8)
+NC6_NC16[[1]]
 DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.00001)
 DESeq2_Analyze("10", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
 DESeq2_Analyze("12", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.0001)

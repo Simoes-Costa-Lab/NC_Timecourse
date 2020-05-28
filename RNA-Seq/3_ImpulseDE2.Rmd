@@ -57,4 +57,11 @@ lsgplotsGenes <- plotGenes(
 lsgplotsGenes[[1]]
 
 ```
+Let's try making a plot with the impulse DE results. We have Rlog counts and a list of genes and p values.
+
+```{r}
+Impulse_Results <- read_csv("Exports/Impulse_Results.csv")
+
+
+```
 
