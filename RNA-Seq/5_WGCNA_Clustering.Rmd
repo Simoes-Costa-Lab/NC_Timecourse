@@ -76,6 +76,8 @@ library(viridis)
 library(ggplot2)
 data <- Annotated_Rlog_Positive_Averages[names(mergedColors),c(1,8:11)]
 data$Group <- mergedColors
+summary(as.factor(data$Group))
+write.csv(data, file = "Exports/WGCNA_Gene_Modules.csv")
 
 GO_Results <- compareCluster(Human_Entrezid~Group, fun = "enrichGO", data = data, ont = "BP", qvalueCutoff = 0.05, readable = T,
                              OrgDb = org.Hs.eg.db)
