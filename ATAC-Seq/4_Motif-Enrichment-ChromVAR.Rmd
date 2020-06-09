@@ -1,0 +1,73 @@
+---
+title: "ATAC-Seq Chromvar"
+output: html_notebook
+---
+
+```{r}
+#ChromVar(Used for generating PCA of motifs)
+BiocManager::install("chromVAR")
+BiocManager::install("motifmatchr")
+BiocManager::install("JASPAR2018")
+install.packages("remotes")
+remotes::install_github("da-bar/JASPAR2020")
+library(chromVAR)
+library(motifmatchr)
+library(Matrix)
+library(SummarizedExperiment)
+library(BiocParallel)
+library(TFBSTools)
+register(BPPARAM = MulticoreParam( workers = 1, progressbar = TRUE))
+library(BSgenome.Ggallus.ENSEMBL.galGal6)
+library(JASPAR2020)
+library(ggsci)
+
+#Using dba.oject Samples_ATAC
+var_obj <- dba(samples_ATAC, bSummarizedExperiment = T)
+names(var_obj@assays) <- c("scores", "RPKM", "counts","cRPKM","cReads")
+var_obj <- addGCBias(var_obj, genome = BSgenome.Ggallus.ENSEMBL.galGal6)
+head(rowData(var_obj))
+opts <- list()
+opts["tax_group"] <- "vertebrates"
+opts["collection"] <- "CORE"
+motifs <- getMatrixSet(JASPAR2020, opts = opts)
+
+motif_ix <- matchMotifs(motifs, var_obj, genome = BSgenome.Ggallus.ENSEMBL.galGal6)
+dev <- computeDeviations(var_obj, motif_ix)
+dev@NAMES <- paste0(dev@NAMES,"_",TFBSTools::name(motifs))
+variability <- computeVariability(dev)
+plotVariability(variability, n = 5)
+tsne_dev <- deviationsTsne(dev, shiny = T)
+pca <- dba.plotPCA(samples_ATAC, attributes = DBA_CONDITION)
+x <- pca$panel.args[[1]]$x
+y <- pca$panel.args[[1]]$y
+pca_mat <- matrix(c(x,y), nrow = 14, ncol = 2, byrow = F)
+rownames(pca_mat) <- rownames(var_obj@colData)
+pca_mat
+
+# Generate PCA data for entire set and subsets
+dst <- DESeq2::DESeqTransform(var_obj)
+pcaAll <- plotPCA(dst, intgroup = c("Condition"), returnData=TRUE)
+pcaAllVar <- attr(pcaAll, "percentVar")
+# Plot PCAs
+g <- ggplot(pcaAll, aes(x=PC1, y=PC2, color=group)) + 
+  geom_point(size = 2, alpha = 1) + 
+  scale_color_npg() +
+  labs(x = paste(c("PC1","%"),round(pcaAllVar[1]*100)) ,y = paste(c("PC2","%"), round(pcaAllVar[2]*100))) + chromVAR_theme()
+g$data <- data.frame(row.names = rownames(g$data), PC1 = pca_mat[,1], PC2 = pca_mat[,2], color = g$data$group, Factor = g$data, name = g$data$name)
+#relevel for ordering.
+g$data$Condition <- factor(g$data$Condition, levels = c("early","mid","late"))
+g$labels$x <- "PC1 47%"
+g$labels$y <- "PC2 11%"
+
+sox2 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "SOX2", shiny=F, var_df = variability)
+oct4_sox2 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "Pou5f1::Sox2", shiny=F, var_df = variability)
+POU5F1 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "POU5F1", shiny=F, var_df = variability)
+MITF<- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "MITF", shiny=F, var_df = variability) 
+TWIST1 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "TWIST1", shiny=F, var_df = variability)
+NR2F2 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "NR2F2", shiny=F, var_df = variability)
+cowplot::plot_grid(sox2$SOX2, oct4_sox2$`Pou5f1::Sox2`, POU5F1$POU5F1, NR2F2$NR2F2, MITF$MITF, TWIST1$TWIST1)
+
+
+
+
+```
