@@ -208,18 +208,22 @@ write.table(rld_df_avg, file = "./Exports/Rlog_counts_avergae_All_ATAC_Peaks", q
 
 ATAC_clusters = pheatmap(subset(rld_df_avg, rownames(rld_df_avg) %in% top_18k_differential$peakID),
                          cluster_cols = F, scale = "row", show_rownames = F, show_colnames = T,
-                         color = colorRampPalette(colors = c("#4FA14E","#FFFFFF","#0797B3"))(250),
+                         color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250),
                          filename = "./Exports/top_18k_peaks_heatmap.pdf", width = 6, height = 5)
 
 ATAC_clusters
 ```
 
-```{bash}
-# making unique peaksets
-bedtools intersect -wa -a early_peaks.bed -b mid_peaks.bed late_peaks.bed -v | uniq > early_peaks_uniq.bed |4836
-bedtools intersect -wa -a mid_peaks.bed -b early_peaks.bed late_peaks.bed -v | uniq > mid_peaks_uniq.bed | 4334
-bedtools intersect -wa -a late_peaks.bed -b early_peaks.bed mid_peaks.bed -v | uniq > late_peaks_uniq.bed | 4641
+While we generated early, mid, and late, peaks. There are some overlaping regions.
+To generate unique peaksets, we use bedtools.
+```{bash bedtools uniq, echo=TRUE}
+cd ~/local_git/NC_Timecourse/ATAC-Seq/Exports
+bedtools intersect -wa -a early_peaks.bed -b mid_peaks.bed late_peaks.bed -v | uniq > early_peaks_uniq.bed
+bedtools intersect -wa -a mid_peaks.bed -b early_peaks.bed late_peaks.bed -v | uniq > mid_peaks_uniq.bed
+bedtools intersect -wa -a late_peaks.bed -b early_peaks.bed mid_peaks.bed -v | uniq > late_peaks_uniq.bed
+```
 
+```{bash computeMatrix and plotHeatmap}
 #making heatmaps
 #RPKM normalized bw files
 computeMatrix reference-point -S HH6_1.bw HH10_1.bw HH14_1.bw HH18_1.bw -R early_peaks_uniq.bed -b 1000 -a 1000 -bs 5 -o early_peaks_alt_timepoints.mat.gz  --missingDataAsZero --referencePoint center
@@ -231,3 +235,10 @@ plotHeatmap -m late_peaks_alt_timepoints.mat.gz -out late_peaks_alt_timepoints.p
 computeMatrix reference-point -S HH6_1.bw HH10_1.bw HH14_1.bw HH18_1.bw -R mid_peaks_uniq.bed -b 1000 -a 1000 -bs 5 -o mid_peaks_alt_timepoints.mat.gz  --missingDataAsZero --referencePoint center
 plotHeatmap -m mid_peaks_alt_timepoints.mat.gz -out mid_peaks_alt_timepoints_2.png --colorMap Blues --dpi 600 --heatmapHeight 5 --yMax 450
 ```
+
+```{bash replotting with color changes}
+plotHeatmap -m ./Exports/early_peaks_alt_timepoints.mat.gz -out ./Exports/early_peaks_alt_timepoints_2.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5
+plotHeatmap -m ./Exports/late_peaks_alt_timepoints.mat.gz -out ./Exports/late_peaks_alt_timepoints.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5
+plotHeatmap -m ./Exports/mid_peaks_alt_timepoints.mat.gz -out ./Exports/mid_peaks_alt_timepoints_2.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5 --yMax 450
+```
+
