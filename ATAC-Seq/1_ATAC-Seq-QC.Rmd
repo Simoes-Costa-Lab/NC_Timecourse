@@ -4,7 +4,7 @@ output: html_notebook
 ---
 ## ATAC-Seq Step 1: QC
 Our first step in evaluating ATAC-Seq data is by running a variety of QC measures. We will operate on the dba object from diffbind to store the reads (bams) from our samples. For simplicity of github, we will just be working with the final object, but the bams can be found at `/data/Debbie/Sox2_Oct4_project/exports/Fig1/BAM`
-```{r Libraries-1, echo=FALSE}
+```{r Libraries-1, echo=FALSE, warning=FALSE}
 library(GenomicRanges)
 library(DiffBind)
 library(BiocParallel)
@@ -18,10 +18,13 @@ library(ggplot2)
 library(ggrepel)
 library(pheatmap)
 library(ggsci)
+library(Rsamtools)
+library(GenomicAlignments)
+library(ChIPQC)
 ```
 
 Due to a bug with loading this information from a sample sheet, we are forced to add samples one at a time.
-```{r creating db object, echo=TRUE}
+```{r creating db object, echo=TRUE, eval=FALSE}
 samples_ATAC <- dba.peakset(NULL,peaks="all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH6_1",tissue="NC",
                             factor="ATAC",condition="early",replicate=1, bamReads="HH6_1.bam")
@@ -74,6 +77,47 @@ saveRDS(samples_ATAC, file = "/data/Debbie/Organized_NC_ATAC_and_Sox2-Oct4//ATAC
 samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
 ```
 
+Let's generate some QC metrics for these BAMs.
+We will show one of the results as a demonstration, but this has been done for all libraries.
+```{r, message=FALSE, collapse=TRUE}
+TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 99)
+#create a list of files that end with .noDupsSort.bam ($ specifies that the file ends there.)
+setwd("/home/ash274/workdir/BAM")
+bamFiles <- list.files(pattern = ".bam$")
+Perform_ATAC_QC <- function(bam = ""){
+      reads1 <- readGAlignmentPairs(bam, param = ScanBamParam(mapqFilter = 1, 
+                flag = scanBamFlag(isPaired = TRUE, isProperPair = TRUE), what = c("qname","mapq", "isize")))
+      idx_tb <- idxstatsBam(bam)
+      idx_tb_filt <- idx_tb[0:35,]
+      read_dist <-idx_tb_filt %>% ggplot(aes(seqnames, mapped, fill = seqnames)) + 
+        geom_bar(stat = "identity") + coord_flip()
+      idx_tb_filt$mapped[35] # number of mitochondrial reads
+      percent.mito <- (idx_tb_filt$mapped[35]/sum(idx_tb_filt$mapped))*100
+      #getting insert sizes
+      atacReads_read1 <- GenomicAlignments::first(reads1)
+      insertSizes <- abs(elementMetadata(atacReads_read1)$isize)
+      fragLenPlot <- table(insertSizes) %>% data.frame %>% rename(InsertSize = insertSizes, 
+                     Count = Freq) %>% mutate(InsertSize = as.numeric(as.vector(InsertSize)), 
+                     Count = as.numeric(as.vector(Count))) %>% ggplot(aes(x = InsertSize, y = Count)) + 
+                     geom_line() + xlim(c(0,800)) + theme_bw()
+      openRegionPeaks <- samples_ATAC$peaks[[1]]
+      qcRes <- ChIPQCsample(bam, peaks = openRegionPeaks, chromosomes = "2")
+      MacsCalls_1_filteredAnno <- annotatePeak(qcRes, TxDb = TxDb_galGal6)
+      output <- list(idx_tb,read_dist,percent.mito,fragLenPlot,MacsCalls_1_filteredAnno)
+      return(output)
+      }
+#Perform QC on all bam files. Easiest is to run one per bam, but could do for file in bamFiles and return those results in one big list.
+ATAC_QC_List_1 <- Perform_ATAC_QC(bamFiles[5])
+ATAC_QC_List_1[[1]]
+ATAC_QC_List_1[[2]]
+ATAC_QC_List_1[[3]]
+ATAC_QC_List_1[[4]]
+ATAC_QC_List_1[[5]]
+
+
+```
+
+
 ### PCA Plot
 To ensure that our data reveals a time-resolved pattern, let's do PCA plots.
 ```{r PCA, echo=TRUE}
@@ -122,10 +166,6 @@ early_enriched_5k <- top_n(early_enriched, n = 5000, desc(Fold))
 
 late_enriched_3k <- top_n(late_enriched, n = 3000, Fold) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
 late_enriched_5k <- top_n(late_enriched, n = 5000, Fold)
-
-
-export(late_enriched, con = "./Exports/late_enriched_all.bed", format= "BED")
-export(early_enriched, con = "./Exports/early_enriched_all.bed", format= "BED")
 
 ############ early vs mid ----------------------------
 early_vs_mid <- dba.report(samples_ATAC, contrast = 1, bUsePval = F)
@@ -211,19 +251,23 @@ ATAC_clusters = pheatmap(subset(rld_df_avg, rownames(rld_df_avg) %in% top_18k_di
                          color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250),
                          filename = "./Exports/top_18k_peaks_heatmap.pdf", width = 6, height = 5)
 
-ATAC_clusters
+#So it renders properly in html doc
+pheatmap(subset(rld_df_avg, rownames(rld_df_avg) %in% top_18k_differential$peakID),
+                         cluster_cols = F, scale = "row", show_rownames = F, show_colnames = T,
+                         color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250))
 ```
 
 While we generated early, mid, and late, peaks. There are some overlaping regions.
 To generate unique peaksets, we use bedtools.
-```{bash bedtools uniq, echo=TRUE}
+```{bash bedtools uniq, eval=FALSE}
 cd ~/local_git/NC_Timecourse/ATAC-Seq/Exports
 bedtools intersect -wa -a early_peaks.bed -b mid_peaks.bed late_peaks.bed -v | uniq > early_peaks_uniq.bed
 bedtools intersect -wa -a mid_peaks.bed -b early_peaks.bed late_peaks.bed -v | uniq > mid_peaks_uniq.bed
 bedtools intersect -wa -a late_peaks.bed -b early_peaks.bed mid_peaks.bed -v | uniq > late_peaks_uniq.bed
 ```
 
-```{bash computeMatrix and plotHeatmap}
+Let's visualize the signal at these peak sets across our samples.
+```{bash computeMatrix and plotHeatmap, eval=FALSE}
 #making heatmaps
 #RPKM normalized bw files
 computeMatrix reference-point -S HH6_1.bw HH10_1.bw HH14_1.bw HH18_1.bw -R early_peaks_uniq.bed -b 1000 -a 1000 -bs 5 -o early_peaks_alt_timepoints.mat.gz  --missingDataAsZero --referencePoint center
@@ -236,9 +280,19 @@ computeMatrix reference-point -S HH6_1.bw HH10_1.bw HH14_1.bw HH18_1.bw -R mid_p
 plotHeatmap -m mid_peaks_alt_timepoints.mat.gz -out mid_peaks_alt_timepoints_2.png --colorMap Blues --dpi 600 --heatmapHeight 5 --yMax 450
 ```
 
-```{bash replotting with color changes}
+```{bash replotting with color changes, eval=FALSE}
 plotHeatmap -m ./Exports/early_peaks_alt_timepoints.mat.gz -out ./Exports/early_peaks_alt_timepoints_2.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5
 plotHeatmap -m ./Exports/late_peaks_alt_timepoints.mat.gz -out ./Exports/late_peaks_alt_timepoints.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5
 plotHeatmap -m ./Exports/mid_peaks_alt_timepoints.mat.gz -out ./Exports/mid_peaks_alt_timepoints_2.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5 --yMax 450
+
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ./Exports/early_peaks_alt_timepoints_2.png ./Exports/early_peaks_alt_timepoints_2.eps
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ./Exports/late_peaks_alt_timepoints.png ./Exports/late_peaks_alt_timepoints.eps
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ./Exports/mid_peaks_alt_timepoints_2.png ./Exports/mid_peaks_alt_timepoints_2.eps
+
 ```
+
+![early](./Exports/early_peaks_alt_timepoints_2.png)
+![late](./Exports/mid_peaks_alt_timepoints_2.png)
+![mid](./Exports/late_peaks_alt_timepoints.png)
+
 
