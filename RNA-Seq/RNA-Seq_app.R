@@ -17,6 +17,7 @@ library(Hmisc)
 library(extrafont)
 library(dplyr)
 library(feather)
+loadfonts(device = "pdf")
 #Loading and manipulating data
 dat <- read_feather(path = "./Exports/Rlog_for_RNA-Seq-App.feather")
 # Getting a vector of gene names to populate autocomplete
@@ -44,7 +45,8 @@ ui <- fluidPage(
       checkboxInput(inputId = "ci", label = "Loess Smoothed 80% Confidence Interval", value = FALSE),
       checkboxInput(inputId = "p", label = "Display data points", value = FALSE),
       checkboxInput(inputId = "eb", label = "Display error bars", value = FALSE),
-      checkboxInput(inputId = "log", label = "Display Log2FC Enrichment in NC", value = TRUE)
+      checkboxInput(inputId = "log", label = "Display Log2FC Enrichment in NC", value = TRUE),
+      downloadLink("save", "Download Plot")
     ),
     
     # Plot (see below)
@@ -56,10 +58,10 @@ ui <- fluidPage(
 
 # Define server logic for plotting
 server <- function(input, output, session) {
+  options(shiny.usecairo=T)
   updateSelectizeInput(session, inputId = 'g', choices = genes, server = TRUE, options = list(create=FALSE))
   
-  
-  output$expressionPlot <- renderPlot( height = 500,{
+  output$expressionPlot <- renderPlot(height = 350, {
     
     # Plot the expression plot
     g <- ggplot(
@@ -74,7 +76,7 @@ server <- function(input, output, session) {
           fill = gene
       )
     )
-    g + 
+    g <- g + 
       
       {if (length(input$g) != 0) stat_summary(fun = mean, geom = 'line', size=1.5)} +
       
@@ -118,18 +120,26 @@ server <- function(input, output, session) {
       ylab('Rlog_CPM') +
       
       theme(
-        text = element_text(color = 'black', family = 'Arial', size = 12),
-        axis.title = element_text(color = 'black', family = 'Arial', size = 14, face = 'bold'),
+        text = element_text(color = 'black', size = 12),
+        axis.title = element_text(color = 'black', size = 14, face = 'bold'),
         panel.background = element_blank(),
         panel.border = element_rect(fill = NA, size = 2, color = 'black'),
         axis.line = element_blank(),
         axis.ticks = element_line(size = 1, color = 'black'),
-        axis.text = element_text(size = 12, color = 'black', family = 'Arial'),
+        axis.text = element_text(size = 12, color = 'black'),
         panel.grid.major.y = element_line(colour = "gray")
         
       )
+    ggsave("plot.pdf")
+    g
   })
-}
+  output$save <- downloadHandler(
+    filename = function(){"plot.pdf"},
+    content = function(file){
+      file.copy("plot.pdf",file, overwrite = T)
+    }
+  )
 
+}
 # Run the application 
 shinyApp(ui = ui, server = server)
