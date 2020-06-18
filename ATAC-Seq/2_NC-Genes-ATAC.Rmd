@@ -18,7 +18,7 @@ library(GenomicFeatures)
 #Annotating all ATAC peaks
 ATAC_all_peaks = readPeakFile("all_ATAC_400bp_fixed.bed")
 TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 99)
-ATAC_all_peaks_anno =annotatePeak(ATAC_all_peaks, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db")
+ATAC_all_peaks_anno = annotatePeak(ATAC_all_peaks, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db")
 ATAC_all_peaks_anno.df = data.frame(ATAC_all_peaks_anno)
 #combining with counts peaks
 #rerun dba.peakset for all ATAC bam files as done previously

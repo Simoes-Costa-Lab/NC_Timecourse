@@ -295,4 +295,3 @@ gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ./Exports/mid_peaks_alt_timepoin
 ![late](./Exports/mid_peaks_alt_timepoints_2.png)
 ![mid](./Exports/late_peaks_alt_timepoints.png)
 
-
