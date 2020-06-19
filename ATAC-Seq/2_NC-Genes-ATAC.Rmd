@@ -1,0 +1,60 @@
+---
+title: "NC Genes ATAC-Seq Signal"
+output: html_notebook
+---
+
+## Running Annotation on diffbind
+```{r Annotated peakset}
+library(ChIPseeker)
+library(RMariaDB)
+library(org.Gg.eg.db)
+library(clusterProfiler)
+library(ReactomePA)
+library(tidyr)
+library(rtracklayer)
+library(clusterProfiler)
+library(GenomicFeatures)
+
+#Annotating all ATAC peaks
+ATAC_all_peaks = readPeakFile("all_ATAC_400bp_fixed.bed")
+TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 99)
+ATAC_all_peaks_anno = annotatePeak(ATAC_all_peaks, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db")
+ATAC_all_peaks_anno.df = data.frame(ATAC_all_peaks_anno)
+#combining with counts peaks
+#rerun dba.peakset for all ATAC bam files as done previously
+samples_ATAC_2 = dba.count(samples_ATAC, score = DBA_SCORE_RPKM)
+counts_ATAC_RPKM.mat =dba.peakset(samples_ATAC_2,bRetrieve = T,DataType = DBA_DATA_FRAME)
+counts_ATAC_RPKM.mat$START = counts_ATAC_RPKM.mat$START + 1
+colnames(counts_ATAC_RPKM.mat) = c("seqnames", "start", "end", "HH6_1", "HH6_2", "HH8_1", "HH8_2", "HH10_1", "HH10_2", "HH12_1", "HH12_2", "HH14_1", "HH14_2", "HH16_1","HH16_2", "HH18_1", "HH18_2")
+ATAC_all_score_anno = merge(counts_ATAC_RPKM.mat, ATAC_all_peaks_anno.df, by = c("seqnames", "start", "end"))
+#Determining ATAC peaks around NC genes
+NC_peaks = subset(ATAC_all_score_anno, ATAC_all_score_anno$geneId %in% GRN_Genes$X2)
+NC_peaks$number = c(1:1239)
+NC_peaks_score = data.frame(NC_peaks[,4:17], NC_peaks$SYMBOL, NC_peaks$number, NC_peaks$distanceToTSS/1000)
+rownames(NC_peaks_score) <- paste0(NC_peaks_score$NC_peaks.SYMBOL,"_",NC_peaks_score$NC_peaks.number,"_",NC_peaks_score$NC_peaks.distanceToTSS)
+
+NC_peaks_avg <- data.frame(HH6 = rowMeans(NC_peaks_score[c('HH6_1', 'HH6_2')], na.rm=TRUE),
+                         HH8 = rowMeans(NC_peaks_score[c('HH8_1', 'HH8_2')], na.rm=TRUE),
+                         HH10 = rowMeans(NC_peaks_score[c('HH10_1', 'HH10_2')], na.rm=TRUE),
+                         HH12 = rowMeans(NC_peaks_score[c('HH12_1', 'HH12_2')], na.rm=TRUE),
+                         HH14 = rowMeans(NC_peaks_score[c('HH14_1', 'HH14_2')], na.rm=TRUE),
+                         HH16 = rowMeans(NC_peaks_score[c('HH16_2', 'HH16_1')], na.rm=TRUE),
+                         HH18 = rowMeans(NC_peaks_score[c('HH18_1', 'HH18_2')], na.rm=TRUE))
+rownames(NC_peaks_avg) = NC_peaks_avg$Gene
+library(pheatmap)
+pheatmap(NC_peaks_avg, cluster_cols = F, scale = "row",
+       show_rownames = T, fontsize_row = 7, cellheight = 10)
+early_module = c("MSX1_985","PAX7_690","SALL1_251","PAX7_695","OTX2_1021","LIN28A_715","SALL1_238","NANOG_122","POU4F3_925","SP5_1055","DMBX1_1118","GATA3_42","HAND2_933","TFAP2C_672","PAX7_709","MSX2_390","ZIC3_952", "ZIC1_1168","GBX2_1080","PAX3_1210","PRDM1_838","LHX5_479", "Pou5f3_490")
+early_module_avg = subset(NC_peaks_avg, rownames(NC_peaks_avg) %in% early_module)
+
+pheatmap(early_module_avg, cluster_cols = F, scale = "row", show_rownames = T, fontsize_row = 10, cellheight = 10)
+ middle_module = c("SNAI2_559", "SNAI2_560","FOXD3_1141","FOXD3_1142","CSRNP1_659","SOX1O_64","RXRG_1159","SOX10_62","MYC_570","MYC_571","ZEB2_1065","MYCN_898","ETS1_749","MEF2C_1236","SOX5_86","TFAP2B_780","LMO4_1112","COL2A1_910","SOX9_540", "TWIST2_1093","TFAP2A_665","SLIT3_403","SLIT3_410","SNAI2_550")
+ middle_module_avg = subset(NC_peaks_avg, rownames(NC_peaks_avg) %in% middle_module)        
+ pheatmap(middle_module_avg, cluster_cols = F, scale = "row",
+         show_rownames = T, fontsize_row = 8, cellheight = 10)
+Late_module = c("MITF_270","TYR_20","TYR_19","TH_1009","TWIST2_1101","PHOX2B_973","MEF2C_1235","DCT_1","EBF1_328")
+
+Late_module_avg = subset(NC_peaks_avg, rownames(NC_peaks_avg) %in% Late_module) 
+pheatmap(Late_module_avg, cluster_cols = F, scale = "row",
+         show_rownames = T, fontsize_row = 8, cellheight = 10)
+```

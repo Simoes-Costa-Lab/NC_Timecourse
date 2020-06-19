@@ -14,7 +14,6 @@ library(ggplot2)
 library(ggprepel)
 library(pheatmap)
 
-#change 2
 samples_ATAC <- dba.peakset(NULL,peaks="all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH6_1",tissue="NC",
                             factor="ATAC",condition="early",replicate=1, bamReads="HH6_1.bam")
