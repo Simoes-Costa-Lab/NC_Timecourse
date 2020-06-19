@@ -1,0 +1,37 @@
+---
+title: "Step 2: Heatmaps and Clustering"
+output: html_notebook
+---
+
+Debbie's Prev. Code.
+```{r}
+library(rtracklayer)
+library(GenomicRanges)
+
+Oct4_peaks = import("Oct4_CR_RD_peaks.bed", format = "bed")
+Sox2_peaks2 = import("Sox2_Rep1_peaks.bed", format = "bed")
+combined_Sox2_Oct4_peaks2 = c(Sox2_peaks2, Oct4_peaks)
+export(combined_Sox2_Oct4_peaks2, "combined_Sox2_Oct4_peaks2.bed", format ="bed")
+
+```
+
+```{bash}
+bedtools merge -i combined_Sox2_Oct4_peaks2_sorted.bed | wc -l 31269
+bedtools merge -i combined_Sox2_Oct4_peaks2_sorted.bed > consensus_sox2_oct4_peaks2.bed 
+#clustered heatmap with consensus peakset
+computeMatrix reference-point -S Sox2_Rep1.bam.bw Oct4_CR_RD.bam.bw -R consensus_sox2_oct4_peaks2.bed -b 1000 -a 1000 -bs 5 -o CR_Oct4_Sox2_combined.mat.gz --missingDataAsZero --referencePoint center
+plotHeatmap -m CR_Oct4_Sox2_combined.mat.gz -out CR_Oct4_Sox2_combined_2.png --colorMap Blues --dpi 600 --kmeans 6
+
+#Finding shared and unique Sox2/Oct4 peaks
+bedtools intersect -wa -a Sox2_Rep1_peaks.bed -b Oct4_CR_RD_peaks.bed | uniq > Sox2_Oct4_CR_peaks.bed | 6157
+bedtools intersect -wa -a Sox2_Rep1_peaks.bed -b Oct4_CR_RD_peaks.bed -v | uniq > Sox2_only_CR_peaks.bed| 18318
+bedtools intersect -wa -a Oct4_CR_RD_peaks.bed -b Sox2_Rep1_peaks.bed -v | uniq > Oct4_only_CR_peaks.bed | 7398
+
+#Plotheapmap profile at shared and uniq Sox2/Oct4 peaks
+computeMatrix reference-point -S Sox2_Rep1.bw Oct4_RD.bw -R Sox2_Oct4_CR_peaks.bed Sox2_only_CR_peaks.bed Oct4_only_CR_peaks.bed -b 1000 -a 1000 -bs 5 -o Oct4_Sox2_distinct_peaks.mat.gz --missingDataAsZero --referencePoint center
+plotProfile -m Oct4_Sox2_distinct_peaks.mat.gz -out Oct4_Sox2_distinct_peaks.png --plotType heatmap 
+
+#Plotprolifile at early, mid and late ATAC peaks
+computeMatrix reference-point -S Sox2_Rep1.bw  Oct4_RD.bw -R early_enriched_all.bed mid_peaks_uniq.bed late_enriched_all.bed  -b 2000 -a 2000 --skipZeros -o Sox2_Oct4_enriched_rep2.mat.gz --referencePoint center
+plotProfile -m Sox2_Oct4_enriched_rep2.mat.gz -out Sox2_Oct4_enriched_rep.png
+```
