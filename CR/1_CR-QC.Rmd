@@ -108,8 +108,7 @@ Looks like the Sox2 set is great, but the Oct4_NF_RD_R1/ASH_Oct4_peaks isn't pul
 Oct4_only_CR_peaks <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Sox2_Oct4_CR/Debbie_Files/Oct4_only_CR_peaks.bed")
 Oct4_CR_RD_peaks <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Sox2_Oct4_CR/Debbie_Files/Oct4_CR_RD_peaks.bed")
 
-res10 <- makeVennDiagram(Peaks=list(Oct4_CR_RD_peaks, ASH_Oct4_peaks),
-                       NameOfPeaks=c("Oct4_CR_RD_peaks","ASH_Oct4_peaks"))
+res10 <- makeVennDiagram(Peaks=list(Oct4_CR_RD_peaks, ASH_Oct4_peaks),NameOfPeaks=c("Oct4_CR_RD_peaks","ASH_Oct4_peaks"))
 export.bed(Oct4_CR_RD_peaks, con = "./Exports/Oct4_CR_RD_peaks.bed")
 export.bed(Oct4_only_CR_peaks, con = "./Exports/Oct4_only_CR_peaks.bed")
 ```
@@ -119,3 +118,54 @@ findMotifsGenome.pl ./Exports/Oct4_CR_RD_peaks.bed ENSEMBL_galGal6_99 ./Exports/
 findMotifsGenome.pl ./Exports/Oct4_only_CR_peaks.bed ENSEMBL_galGal6_99 ./Exports/Oct4_only_CR_peaks_homer -size 200 -p 60 -nomotif
 ```
 Yeah, so... that does not pull the OCT4 motif. This is not good. 
+
+```{r}
+Sox10 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Igg_control/Sox10.narrowPeak")
+Sox10 <- reduce(Sox10)
+
+rbFoxD3 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Igg_control/rbFoxD3_HH8.narrowPeak")
+rbFoxD3 <- reduce(rbFoxD3)
+
+res10 <- makeVennDiagram(Peaks=list(Sox10, Oct4_NF_RD_R1),NameOfPeaks=c("Sox10","Oct4_NF_RD_R1"))
+
+res10 <- makeVennDiagram(Peaks=list(Sox10, ASH_Sox2_peaks),NameOfPeaks=c("Sox10","ASH_Sox2_peaks"))
+
+res10 <- makeVennDiagram(Peaks=list(rbFoxD3, ASH_Sox2_peaks),NameOfPeaks=c("rbFoxD3","ASH_Sox2_peaks"))
+
+res10 <- makeVennDiagram(Peaks=list(rbFoxD3, Oct4_NF_RD_R1, ASH_Sox2_peaks),NameOfPeaks=c("rbFoxD3","Oct4_NF_RD_R1","ASH_Sox2_peaks"))
+
+IGG_HH9A1 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Igg_control/BAM/10360_10099_87771_HM23LBGX9_IgG_HH9A1_GCCAAT_R1_toGalGal6.BAM_peaks.narrowPeak")
+IGG_HH9A1 <- reduce(IGG_HH9A1)
+IGG_2_CCGTCC <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Igg_control/BAM/9591_10055_75003_HW5JKBGX5_CR-IgG-2_CCGTCC_R1_toGalGal6.BAM_peaks.narrowPeak")
+IGG_2_CCGTCC <- reduce(IGG_2_CCGTCC)
+IGG_1_GTGGCC <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Igg_control/BAM/9398_10055_73295_HKNGHBGX5_M_IgG1_GTGGCC_R1_toGalGal6.BAM_peaks.narrowPeak")
+IGG_1_GTGGCC <- reduce(IGG_1_GTGGCC)
+
+res10 <- makeVennDiagram(Peaks=list(IGG_HH9A1, IGG_2_CCGTCC,IGG_1_GTGGCC),NameOfPeaks=c("IGG_HH9A1","IGG_2_CCGTCC","IGG_1_GTGGCC"))
+
+res10 <- makeVennDiagram(Peaks=list(IGG_HH9A1, IGG_2_CCGTCC,IGG_1_GTGGCC, Oct4_NF_RD_R1),NameOfPeaks=c("IGG_HH9A1","IGG_2_CCGTCC","IGG_1_GTGGCC","Oct4_NF_RD_R1"))
+
+IGG_total <- reduce(c(IGG_HH9A1,IGG_2_CCGTCC,IGG_1_GTGGCC))
+
+res10 <- makeVennDiagram(Peaks=list(IGG_total,Oct4_NF_RD_R1),NameOfPeaks=c("IGG_total","Oct4_NF_RD_R1"))
+
+Oct4_NF_RD_IGGFilt <- Oct4_NF_RD_R1[!Oct4_NF_RD_R1 %over% IGG_total]
+ASH_Sox2_peaks_IGGFilt <- ASH_Sox2_peaks[!ASH_Sox2_peaks %over% IGG_total]
+# A concatenation of both Sox2 and Oct4 peaks filtered
+ASH_Combined_Sox2_Oct4_peaks_Filt <- reduce(c(ASH_Sox2_peaks_IGGFilt, Oct4_NF_RD_IGGFilt))
+# A set of shared Sox2 and Oct4 peaks filtered
+ASH_Shared_Sox2_Oct4_peaks_Filt <- ASH_Sox2_peaks_IGGFilt[ASH_Sox2_peaks_IGGFilt %over% Oct4_NF_RD_IGGFilt]
+
+export.bed(Oct4_NF_RD_IGGFilt, con = "./Exports/Oct4_NF_RD_IGGFilt.bed")
+export.bed(ASH_Sox2_peaks_IGGFilt, con = "./Exports/ASH_Sox2_peaks_IGGFilt.bed")
+export.bed(ASH_Combined_Sox2_Oct4_peaks_Filt, con = "./Exports/ASH_Combined_Sox2_Oct4_peaks_Filt.bed")
+export.bed(ASH_Shared_Sox2_Oct4_peaks_Filt, con = "./Exports/ASH_Shared_Sox2_Oct4_peaks_Filt.bed")
+```
+
+```{bash}
+findMotifsGenome.pl ./Exports/Oct4_NF_RD_IGGFilt.bed ENSEMBL_galGal6_99 ./Exports/Oct4_NF_RD_IGGFilt_homer -size 200 -p 60 -nomotif
+
+findMotifsGenome.pl ./Exports/ASH_Sox2_peaks_IGGFilt.bed ENSEMBL_galGal6_99 ./Exports/ASH_Sox2_peaks_IGGFilt_homer -size 200 -p 60 -nomotif
+```
+
+After this, it boosted the Oct4-Sox2 Motif to 1e-30, which is a good improvement. Discussions in the lab about how to use a blacklist/IgG regions was good. We need to try to develop a couple different use cases. 
