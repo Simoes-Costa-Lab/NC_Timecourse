@@ -292,5 +292,12 @@ rlog_positive_averages <-data.frame(Chick_ENSEMBL = rld$Chick_ENSEMBL,
 
 write.csv(rlog_positive_averages, file = "./Exports/Annotated_Rlog_Positive_Averages.csv")
 head(rlog_positive_averages)
+
+rlog_positive_averages <- read.csv("./Exports/Annotated_Rlog_Positive_Averages.csv", row.names = 1)
+
+z_score_pos_averages <- as.data.frame(scale(rlog_positive_averages[,2:7]))
+
+z_score_pos_averages <- cbind(z_score_pos_averages, rlog_positive_averages$Chick_ENSEMBL, rlog_positive_averages$Symbol, rlog_positive_averages$Chick_Entrezid, rlog_positive_averages$Human_Entrezid, rlog_positive_averages$TF_Status)
+write.csv(z_score_pos_averages, file = "./Exports/Annotated_Z-score_Positive_Averages.csv")
 ```
 
