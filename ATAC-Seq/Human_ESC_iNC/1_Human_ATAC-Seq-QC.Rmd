@@ -84,7 +84,8 @@ for (i in seq(length(bamFiles))){
 # Let's check the bigwigs
 # They all looks prety great!
 ```
-Due to a bug with loading this information from a sample sheet, we are forced to add samples one at a time.
+
+# ESC vs D5 NC Analysis
 ```{r creating db object, echo=TRUE, eval=FALSE}
 NC_dba <- dba(sampleSheet="ESC_SampleSheet_NC.csv")
 NC_dba <- dba.count(NC_dba)
@@ -93,45 +94,32 @@ NC_dba <- dba.count(NC_dba)
 # ESC vs D3
 #NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D3)
 # ESC vs D5 
+# Negative fold change is enriched in D5, positive is enriched in ESC
 NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D5)
 # D3 vs D5
 #NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$D5)
 NC_dba <- dba.analyze(NC_dba, bParallel = T)
 NC_res <- dba.report(NC_dba)
 
-NC_pca <- dba.plotPCA(NC_dba)
-NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
-
-library(qdapTools)
-NC_res_ann_df <- as.data.frame(NC_res_ann)
-txs <- as.data.frame(transcripts(ensembl_human_annotation))
-genes <- as.data.frame(genes(ensembl_human_annotation))
-txs_lookup <- txs[,c("tx_id_version","gene_id")]
-genes_lookup <- genes[,c("gene_id","gene_name")]
-NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
-NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
-```
 
 
-### PCA Plot
-To ensure that our data reveals a time-resolved pattern, let's do PCA plots.
-```{r PCA, echo=TRUE}
+# Make other PCA plot
+dba.plotPCA(NC_dba)
 meta_dataframe <- as.data.frame(NC_dba$class)
-pca <- dba.plotPCA(samples_ATAC)
+pca <- dba.plotPCA(NC_dba)
 x <- pca$panel.args[[1]]$x
 y <- pca$panel.args[[1]]$y
-pca_mat <- as.data.frame(matrix(c(x,y), nrow = 14, ncol = 2, byrow = F))
+pca_mat <- as.data.frame(matrix(c(x,y), nrow = 6, ncol = 2, byrow = F))
 colnames(pca_mat) <- c("PC1","PC2")
 rownames(pca_mat) <- colnames(meta_dataframe)
 
-pca_mat$timepoint <- factor(c("HH6","HH6","HH8","HH8",
-                       "HH10","HH10","HH12","HH12",
-                       "HH14","HH14","HH16","HH16","HH18","HH18"),
-                       levels = c("HH6","HH8","HH10","HH12","HH14","HH16","HH18"))
+pca_mat$timepoint <- factor(c("ES","ES","NC3","NC3",
+                       "NC5","NC5"),
+                       levels = c("ES","NC3","NC5"))
 g <- ggplot(pca_mat, aes(x=PC1, y=PC2, color=timepoint)) + 
   geom_point(size = 4, alpha = 1) + 
   scale_color_npg() +
-  labs(x = "PC1 51%" ,y = "PC2 17%") +
+  labs(x = "PC1 64%" ,y = "PC2 22%") +
   theme(text=element_text(color="black", size = 10, face = "bold"),
         line=element_line(color="black", size = 2),
         axis.ticks = element_line(color = "black", size = 1),
@@ -143,72 +131,118 @@ g <- ggplot(pca_mat, aes(x=PC1, y=PC2, color=timepoint)) +
 
 g
 
-ggsave('./Exports/ATAC_PCA.eps', units = 'in', height = 4, width = 6, device = "eps")
+ggsave('./Exports/Human_ESC-to-iNC-PCA.eps', units = 'in', height = 4, width = 6, device = "eps")
 ```
 
-## Generating Peaksets
-```{r Generating Peaksets, echo=TRUE}
-#exporting filesets
-early_vs_late <- dba.report(samples_ATAC, contrast = 2, bUsePval = F)
-#enriched_peaks
-early_enriched <- as.data.frame(subset(early_vs_late, Fold > 0))
-early_enriched$peakID <- paste0(early_enriched$seqnames,"_",early_enriched$start,"_", early_enriched$end)
-late_enriched <- as.data.frame(subset(early_vs_late, Fold < 0))
-late_enriched$peakID <- paste0(late_enriched$seqnames,"_",late_enriched$start,"_", late_enriched$end)
+## Exporting enriched peaksets.
+```{r}
+NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
 
-early_enriched_3k <- top_n(early_enriched, n = 3000, desc(Fold)) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
-early_enriched_5k <- top_n(early_enriched, n = 5000, desc(Fold)) 
-
-late_enriched_3k <- top_n(late_enriched, n = 3000, Fold) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
-late_enriched_5k <- top_n(late_enriched, n = 5000, Fold)
-
-############ early vs mid ----------------------------
-early_vs_mid <- dba.report(samples_ATAC, contrast = 1, bUsePval = F)
-early_vs_mid_enriched <- as.data.frame(subset(early_vs_mid, Fold > 0))
-early_vs_mid_enriched$peakID <- paste0(early_vs_mid_enriched$seqnames,"_",early_vs_mid_enriched$start,"_", early_vs_mid_enriched$end)
-early_vs_mid_enriched_3k <- top_n(early_vs_mid_enriched, n = 3000, desc(Fold)) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
-early_vs_mid_enriched_5k <- top_n(early_vs_mid_enriched, n = 5000, desc(Fold))
-early_vs_mid_depleted <- as.data.frame(subset(early_vs_mid, Fold < 0))
-early_vs_mid_depleted$peakID <- paste0(early_vs_mid_depleted$seqnames,"_",early_vs_mid_depleted$start,"_", early_vs_mid_depleted$end)
-early_vs_mid_depleted_3k <- top_n(early_vs_mid_depleted, n = 3000, Fold) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
-early_vs_mid_depleted_5k <- top_n(early_vs_mid_depleted, n = 5000, Fold)
+library(qdapTools)
+NC_res_ann_df <- as.data.frame(NC_res_ann)
+txs <- as.data.frame(transcripts(ensembl_human_annotation))
+genes <- as.data.frame(genes(ensembl_human_annotation))
+txs_lookup <- txs[,c("tx_id_version","gene_id")]
+genes_lookup <- genes[,c("gene_id","gene_name")]
+NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
+NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
+NC_res_ann_df$peakID <- paste0(NC_res_ann_df$seqnames, "_",NC_res_ann_df$start,"_",NC_res_ann_df$end)
 
 
-########### mid vs late ------------------------------
-late_vs_mid <- dba.report(samples_ATAC, contrast = 3, bUsePval = F)
-late_vs_mid_enriched <- as.data.frame(subset(late_vs_mid, Fold < 0))
-late_vs_mid_enriched$peakID <- paste0(late_vs_mid_enriched$seqnames,"_",late_vs_mid_enriched$start,"_", late_vs_mid_enriched$end)
-late_vs_mid_enriched_3k <- top_n(late_vs_mid_enriched, n = 3000, desc(Fold)) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
-late_vs_mid_enriched_5k <- top_n(late_vs_mid_enriched, n = 5000, desc(Fold))
-late_vs_mid_depleted <- as.data.frame(subset(late_vs_mid, Fold > 0))
-late_vs_mid_depleted$peakID <- paste0(late_vs_mid_depleted$seqnames,"_",late_vs_mid_depleted$start,"_", late_vs_mid_depleted$end)
-late_vs_mid_depleted_3k <- top_n(late_vs_mid_depleted, n = 3000, Fold) %>% dplyr::select(peakID, seqnames, start, end) %>% mutate(strand = rep("*"))
-late_vs_mid_depleted_5k <- top_n(late_vs_mid_depleted, n = 5000, Fold)
+D5_NC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, desc(Fold)) 
+D5_ESC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, Fold) 
 
-top_18k_differential <- rbind(early_enriched_3k, late_enriched_3k, early_vs_mid_depleted_3k, early_vs_mid_enriched_3k, late_vs_mid_depleted_3k, late_vs_mid_enriched_3k)
+D5_NC_Enriched_5k.gr <- makeGRangesFromDataFrame(D5_NC_Enriched_5k)
+D5_ESC_Enriched_5k.gr <- makeGRangesFromDataFrame(D5_ESC_Enriched_5k)
 
+export.bed(D5_NC_Enriched_5k.gr, con = "Exports/D5_NC_Enriched_5k.bed")
+export.bed(D5_ESC_Enriched_5k.gr, con = "Exports/D5_ESC_Enriched_5k.bed")
 ```
 
-We also want to generate peaksets definitive early, mid, and late peaksets.
-```{r Unique Peaksets, echo=TRUE}
-peaks_list <- as.data.frame(samples_ATAC$peaks)
-peaks_list$peakID <- paste0(peaks_list$Chr, "_", peaks_list$Start, "_", peaks_list$End)
+## Run homer on ESC and NC enriched peaks
+```{bash}
+findMotifsGenome.pl D5_ESC_Enriched_5k.bed hg38 D5_ESC_Enriched_5k_HOMER -p 31
 
-  
-early_peaks <- unique(c(early_enriched_3k$peakID, early_vs_mid_enriched_3k$peakID))
+findMotifsGenome.pl D5_NC_Enriched_5k.bed hg38 D5_NC_Enriched_5k_HOMER -p 31
+```
 
-early_peaks_bed <- subset(peaks_list, peaks_list$peakID %in% early_peaks)  %>% dplyr::select(peakID, Chr, Start, End) %>% mutate(strand = rep("*"))
+Results of this show strong Oct4, Sox2, and Oct4::Sox2 enrichment in ESC, good.
+And a lot of GATA2 results in D5 NC.
 
-mid_peaks <- unique(c(early_vs_mid_depleted_3k$peakID, late_vs_mid_depleted_3k$peakID))
-mid_peaks_bed <- subset(peaks_list, peaks_list$peakID %in% mid_peaks)  %>% dplyr::select(peakID, Chr, Start, End) %>% mutate(strand = rep("*"))
+# ESC vs D3 NC Analysis
+```{r}
+# ESC vs D3
+NC_dba$contrasts=NULL
+# ESC Enriched positive LogFC, D3 enriched Negative.
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D3)
+NC_dba <- dba.analyze(NC_dba, bParallel = T)
+NC_res <- dba.report(NC_dba)
 
-late_peaks <- unique(c(late_enriched_3k$peakID, late_vs_mid_enriched_3k$peakID))
-late_peaks_bed <- subset(peaks_list, peaks_list$peakID %in% late_peaks)  %>% dplyr::select(peakID, Chr, Start, End) %>% mutate(strand = rep("*"))
+NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
 
-export(early_peaks_bed, con = "./Exports/early_peaks.bed", format= "BED")
-export(mid_peaks_bed, con = "./Exports/mid_peaks.bed", format= "BED")
-export(late_peaks_bed, con = "./Exports/late_peaks.bed", format= "BED")
+library(qdapTools)
+NC_res_ann_df <- as.data.frame(NC_res_ann)
+txs <- as.data.frame(transcripts(ensembl_human_annotation))
+genes <- as.data.frame(genes(ensembl_human_annotation))
+txs_lookup <- txs[,c("tx_id_version","gene_id")]
+genes_lookup <- genes[,c("gene_id","gene_name")]
+NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
+NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
+NC_res_ann_df$peakID <- paste0(NC_res_ann_df$seqnames, "_",NC_res_ann_df$start,"_",NC_res_ann_df$end)
 
+D3_NC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, desc(Fold)) 
+D3_ESC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, Fold) 
+
+D3_NC_Enriched_5k.gr <- makeGRangesFromDataFrame(D3_NC_Enriched_5k)
+D3_ESC_Enriched_5k.gr <- makeGRangesFromDataFrame(D3_ESC_Enriched_5k)
+
+export.bed(D3_NC_Enriched_5k.gr, con = "Exports/D3_NC_Enriched_5k.bed")
+export.bed(D3_ESC_Enriched_5k.gr, con = "Exports/D3_ESC_Enriched_5k.bed")
+```
+
+## Run homer on ESC and NC enriched peaks
+```{bash}
+findMotifsGenome.pl D3_NC_Enriched_5k.bed hg38 D3_NC_Enriched_5k_HOMER -p 31
+
+findMotifsGenome.pl D3_ESC_Enriched_5k.bed hg38 D3_ESC_Enriched_5k_HOMER -p 31
+```
+
+# D3 vs D5 NC Analysis
+```{r}
+# ESC vs D3
+NC_dba$contrasts=NULL
+# D3 Enriched positive LogFC, D5 enriched Negative.
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$D5)
+NC_dba <- dba.analyze(NC_dba, bParallel = T)
+NC_res <- dba.report(NC_dba)
+
+NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
+
+library(qdapTools)
+NC_res_ann_df <- as.data.frame(NC_res_ann)
+txs <- as.data.frame(transcripts(ensembl_human_annotation))
+genes <- as.data.frame(genes(ensembl_human_annotation))
+txs_lookup <- txs[,c("tx_id_version","gene_id")]
+genes_lookup <- genes[,c("gene_id","gene_name")]
+NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
+NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
+NC_res_ann_df$peakID <- paste0(NC_res_ann_df$seqnames, "_",NC_res_ann_df$start,"_",NC_res_ann_df$end)
+
+D3_vs_D5_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, desc(Fold)) 
+D5_vs_D3_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, Fold) 
+
+D3_vs_D5_Enriched_5k.gr <- makeGRangesFromDataFrame(D3_vs_D5_Enriched_5k)
+D5_vs_D3_Enriched_5k.gr <- makeGRangesFromDataFrame(D5_vs_D3_Enriched_5k)
+
+export.bed(D3_vs_D5_Enriched_5k.gr, con = "Exports/D3_vs_D5_Enriched_5k.bed")
+export.bed(D5_vs_D3_Enriched_5k.gr, con = "Exports/D5_vs_D3_Enriched_5k.bed")
+```
+
+## Run homer on ESC and NC enriched peaks
+```{bash}
+findMotifsGenome.pl D3_NC_Enriched_5k.bed hg38 D3_NC_Enriched_5k_HOMER -p 31
+
+findMotifsGenome.pl D3_ESC_Enriched_5k.bed hg38 D3_ESC_Enriched_5k_HOMER -p 31
 ```
 
 ## Normalized counts via DESeq2

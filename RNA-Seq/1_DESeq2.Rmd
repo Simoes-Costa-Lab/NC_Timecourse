@@ -45,7 +45,7 @@ library(org.Gg.eg.db)
 library(clusterProfiler)
 library(viridis)
 library(qdapTools)
-register(MulticoreParam(4)) # Set this to number of CPUs.
+register(MulticoreParam(16)) # Set this to number of CPUs.
 ```
 
 ### Read in the results of the featureCounts
