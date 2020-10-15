@@ -14,25 +14,47 @@ library(tidyr)
 library(rtracklayer)
 library(GenomicFeatures)
 library(DiffBind)
+library(pheatmap)
+library(stringr)
+library(dplyr)
+library(ggplot2)
 
 #Annotating all ATAC peaks
 samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
 ATAC_all_peaks = readPeakFile("Imports/all_ATAC_400bp_fixed.bed")
 TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 101)
+
 ATAC_all_peaks_anno = annotatePeak(ATAC_all_peaks, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db")
 ATAC_all_peaks_anno.df = data.frame(ATAC_all_peaks_anno)
+
+samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
+GRN_Genes <- read.csv(file = "./Imports/GRN_Genes.csv", header = F)
+colnames(GRN_Genes) <- c("Symbol","ENSEMBL")
 #combining with counts peaks
 #rerun dba.peakset for all ATAC bam files as done previously
-samples_ATAC_2 = dba.count(samples_ATAC, score = DBA_SCORE_RPKM, peaks = ATAC_all_peaks)
-counts_ATAC_RPKM.mat =dba.peakset(samples_ATAC_2,bRetrieve = T,DataType = DBA_DATA_FRAME)
-counts_ATAC_RPKM.mat$START = counts_ATAC_RPKM.mat$START + 1
-colnames(counts_ATAC_RPKM.mat) = c("seqnames", "start", "end", "HH6_1", "HH6_2", "HH8_1", "HH8_2", "HH10_1", "HH10_2", "HH12_1", "HH12_2", "HH14_1", "HH14_2", "HH16_1","HH16_2", "HH18_1", "HH18_2")
-ATAC_all_score_anno = merge(counts_ATAC_RPKM.mat, ATAC_all_peaks_anno.df, by = c("seqnames", "start", "end"))
+
+# TMM Normalized counts
+normCounts <- dba.peakset(samples_ATAC, bRetrieve=TRUE, DataType=DBA_DATA_FRAME)
+normCounts$START = normCounts$START +1
+
+colnames(normCounts)[1:3] = c("seqnames", "start", "end")
+
+ATAC_all_score_anno = merge(normCounts, ATAC_all_peaks_anno.df, by = c("seqnames", "start", "end"))
+
 #Determining ATAC peaks around NC genes
-NC_peaks = subset(ATAC_all_score_anno, ATAC_all_score_anno$geneId %in% GRN_Genes$X2)
-NC_peaks$number = c(1:1239)
-NC_peaks_score = data.frame(NC_peaks[,4:17], NC_peaks$SYMBOL, NC_peaks$number, NC_peaks$distanceToTSS/1000)
-rownames(NC_peaks_score) <- paste0(NC_peaks_score$NC_peaks.SYMBOL,"_",NC_peaks_score$NC_peaks.number,"_",NC_peaks_score$NC_peaks.distanceToTSS)
+NC_peaks = subset(ATAC_all_score_anno, ATAC_all_score_anno$geneId %in% GRN_Genes$ENSEMBL)
+
+
+NC_peaks$number = c(1:461)
+NC_peaks_score = data.frame(NC_peaks[,4:17],
+                            SYMBOL = NC_peaks$SYMBOL,
+                            number = NC_peaks$number,
+                            distance = round(NC_peaks$distanceToTSS/1000, digits = 1)
+                            )
+
+rownames(NC_peaks_score) <- paste0(NC_peaks_score$SYMBOL,"_",NC_peaks_score$number,"_",NC_peaks_score$distance)
+
+boxplot(abs(NC_peaks_score$distance))
 
 NC_peaks_avg <- data.frame(HH6 = rowMeans(NC_peaks_score[c('HH6_1', 'HH6_2')], na.rm=TRUE),
                          HH8 = rowMeans(NC_peaks_score[c('HH8_1', 'HH8_2')], na.rm=TRUE),
@@ -41,14 +63,56 @@ NC_peaks_avg <- data.frame(HH6 = rowMeans(NC_peaks_score[c('HH6_1', 'HH6_2')], n
                          HH14 = rowMeans(NC_peaks_score[c('HH14_1', 'HH14_2')], na.rm=TRUE),
                          HH16 = rowMeans(NC_peaks_score[c('HH16_2', 'HH16_1')], na.rm=TRUE),
                          HH18 = rowMeans(NC_peaks_score[c('HH18_1', 'HH18_2')], na.rm=TRUE))
-rownames(NC_peaks_avg) = NC_peaks_avg$Gene
-library(pheatmap)
-pheatmap(NC_peaks_avg, cluster_cols = F, scale = "row",
-       show_rownames = T, fontsize_row = 7, cellheight = 10)
+
+
+pheatmap(NC_peaks_avg,
+         cluster_cols = F,
+         scale = "row",
+         show_rownames = F, 
+         cutree_rows = 6, 
+         fontsize_row = 6,
+         border_color = NA,
+         color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250),
+         width = 4.5,
+         height = 10, filename = "./Exports/NC_GRN_ATAC-Peaks.pdf")
+
+
+
+pheatmap(NC_peaks_avg[abs(NC_peaks_score$distance) < 75,],
+         cluster_cols = F,
+         scale = "row",
+         show_rownames = F, 
+         cutree_rows = 6, 
+         fontsize_row = 6,
+         border_color = NA,
+         color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250),
+         width = 4.5,
+         height = 10, filename = "./Exports/NC_GRN_ATAC-Peaks_lessthan75kb.pdf")
+
+
+# Rewrite early module
+early_genes <- c("MSX1", "PAX7", "SALL1","OTX2","LIN28A","NANOG",
+                 "POU4F3", "SP5","DMBX1","GATA3","HAND2","TFAP2C",
+                 "MSX2", "ZIC3", "ZIC1", "GBX2", "PAX3", "PRDM1",
+                 "LHX5","Pou5f3")
+
+logic <- str_split(rownames(NC_peaks_avg), pattern = "_", simplify = T)[,1] %in% early_genes
+
+early_module_avg = NC_peaks_avg[logic,]
+
 early_module = c("MSX1_985","PAX7_690","SALL1_251","PAX7_695","OTX2_1021","LIN28A_715","SALL1_238","NANOG_122","POU4F3_925","SP5_1055","DMBX1_1118","GATA3_42","HAND2_933","TFAP2C_672","PAX7_709","MSX2_390","ZIC3_952", "ZIC1_1168","GBX2_1080","PAX3_1210","PRDM1_838","LHX5_479", "Pou5f3_490")
+
 early_module_avg = subset(NC_peaks_avg, rownames(NC_peaks_avg) %in% early_module)
 
-pheatmap(early_module_avg, cluster_cols = F, scale = "row", show_rownames = T, fontsize_row = 10, cellheight = 10)
+pheatmap(early_module_avg,
+         cluster_cols = F,
+         scale = "row",
+         show_rownames = T,
+         fontsize_row = 6,
+         border_color = NA,
+         width = 5,
+         height = 12, filename = "./Exports/Early_NC_Module_ATAC-Peaks.pdf")
+
  middle_module = c("SNAI2_559", "SNAI2_560","FOXD3_1141","FOXD3_1142","CSRNP1_659","SOX1O_64","RXRG_1159","SOX10_62","MYC_570","MYC_571","ZEB2_1065","MYCN_898","ETS1_749","MEF2C_1236","SOX5_86","TFAP2B_780","LMO4_1112","COL2A1_910","SOX9_540", "TWIST2_1093","TFAP2A_665","SLIT3_403","SLIT3_410","SNAI2_550")
  middle_module_avg = subset(NC_peaks_avg, rownames(NC_peaks_avg) %in% middle_module)        
  pheatmap(middle_module_avg, cluster_cols = F, scale = "row",
@@ -60,6 +124,127 @@ pheatmap(Late_module_avg, cluster_cols = F, scale = "row",
          show_rownames = T, fontsize_row = 8, cellheight = 10)
 ```
 
+<<<<<<< HEAD
+This is looking pretty good for the previously established GRN genes, but what about TF's that we identified from our RNA-Seq analysis? It may help to link the datasets together better.
+
+Additionally, maybe throw in a promoter overlap and RNA-Seq correlation plot?
+Could compare Log2 ATAC Counts vs Log2 TPM RNA-Seq counts
+
+Summary of last time. 
+pearson correlation from tpm and rpm of RNA-Seq and ATAC-Seq is between 40-60% from what I've seen. This may differ at timepoints.
+```{r}
+setwd(dir = "/data/Debbie/Sox2_Oct4_project/exports/Fig1/BAM")
+rawCounts <- dba.count(samples_ATAC, peaks = ATAC_all_peaks,
+                       score = DBA_SCORE_READS)
+
+# Raw counts
+rawCounts_df <- dba.peakset(rawCounts, bRetrieve=TRUE, DataType=DBA_DATA_FRAME)
+colnames(rawCounts_df)[1:3] = c("seqnames", "start", "end")
+
+ATAC_Counts_Anno = merge(rawCounts_df, ATAC_all_peaks_anno.df, by = c("seqnames", "start", "end"))
+```
+
+```{r}
+# Get peak counts over promoters
+gene_promoters <- trim(promoters(TxDb_galGal6, upstream = 1000, downstream = 1000))
+
+prom_peaks <- ATAC_Counts_Anno[ATAC_all_peaks %over% gene_promoters,]
+
+prom_peak_score = data.frame(prom_peaks[,4:17],
+                            SYMBOL = prom_peaks$SYMBOL,
+                            geneID = prom_peaks$geneId,
+                            number = c(1:length(prom_peaks$geneId)),
+                            distance = round(prom_peaks$distanceToTSS/1000, digits = 1)
+                            )
+
+rownames(prom_peak_score) <- paste0(prom_peak_score$geneID,"_",prom_peak_score$number,
+                                    "_", prom_peak_score$distance)
+
+counts <- prom_peak_score[,1:14]
+counts[is.na(counts)] <- 0
+prom_peak_score[,1:14] <- counts
+
+cor(prom_peak_score$HH6_1, prom_peak_score$HH6_2)
+
+ggplot(prom_peak_score, aes(HH6_1, HH6_2)) + geom_point() + 
+  geom_smooth(method = "lm", show.legend = T) + lims(x = c(0, 1000), y = c(0,1000))
+
+prom_peak_avg <- data.frame(HH6 = rowMeans(prom_peak_score[c('HH6_1', 'HH6_2')], na.rm=TRUE),
+                         HH8 = rowMeans(prom_peak_score[c('HH8_1', 'HH8_2')], na.rm=TRUE),
+                         HH10 = rowMeans(prom_peak_score[c('HH10_1', 'HH10_2')], na.rm=TRUE),
+                         HH12 = rowMeans(prom_peak_score[c('HH12_1', 'HH12_2')], na.rm=TRUE),
+                         HH14 = rowMeans(prom_peak_score[c('HH14_1', 'HH14_2')], na.rm=TRUE),
+                         HH16 = rowMeans(prom_peak_score[c('HH16_2', 'HH16_1')], na.rm=TRUE),
+                         geneID = prom_peaks$geneId)
+
+# Get raw counts for genes.
+raw_count_genes <- read.csv(file = "~/local_git/NC_Timecourse/RNA-Seq/Exports/Raw_RNA-Seq_Counts.csv", row.names = 1)
+raw_count_genes$Chick_ENSEMBL <- rownames(raw_count_genes)
+# Remove peaks that don't have a gene from RNA-Seq.
+
+prom_peak_avg_filt <- prom_peak_avg[prom_peak_score$geneID %in% raw_count_genes$Chick_ENSEMBL,]
+
+# Collapse (mean) values for each gene
+
+prom_peak_avg_filt_2 <- prom_peak_avg_filt %>% 
+  group_by(geneID) %>% 
+  summarise(HH6_av = mean(HH6),
+            HH8_av = mean(HH8),
+            HH10_av = mean(HH10),
+            HH12_av = mean(HH12),
+            HH14_av = mean(HH14),
+            HH16_av = mean(HH16))
+
+
+raw_count_genes_filt <- subset(raw_count_genes, raw_count_genes$Chick_ENSEMBL %in% prom_peak_avg_filt_2$geneID)
+
+raw_count_genes_filt_tpm <- raw_count_genes_filt[,1:42]/(colSums(raw_count_genes_filt[,1:42])/1000000)
+raw_count_genes_filt_tpm <- raw_count_genes_filt_tpm[order(rownames(raw_count_genes_filt_tpm)),]
+# Get transcript lengths for these genes
+
+genes <- genes(TxDb_galGal6)
+ens_to_length <- data.frame(ENSEMBL = genes$gene_id,
+                            width = genes@ranges@width)
+
+raw_count_genes_filt$length <- qdapTools::lookup(terms = rownames(raw_count_genes_filt), ens_to_length)
+
+tmm_genes_filt <- as.data.frame(NOISeq::tmm(raw_count_genes_filt[,1:42],
+            long = raw_count_genes_filt$length,
+            lc = 0, k = 0, refColumn = 1,
+            logratioTrim = 0.3, sumTrim = 0.05, doWeighting = TRUE, Acutoff = -1e+10))
+
+tmm_genes_filt <- tmm_genes_filt[order(rownames(tmm_genes_filt)),]
+
+# Construct an x/y for every timepoint. Probably only need to show one but check them all? Maybe trend?
+cor(prom_peak_avg_filt_2$HH10_av, raw_count_genes_filt_tpm$HH10_mGFP_2_GTAGAG)
+
+hh6_comparison <- data.frame(rpm_atac = prom_peak_avg_filt_2$HH6_av,
+                             tpm_rna = raw_count_genes_filt_tpm$HH6v3_pos_CGATGT)
+
+cor(hh6_comparison$rpm_atac, hh6_comparison$tpm_rna)
+
+ggplot(hh6_comparison, aes(rpm_atac, tpm_rna)) + geom_point() + 
+  geom_smooth(method = "lm", show.legend = T) +
+  lims(x = c(0, 600), y = c(0,1000))
+
+# Try filtering.
+# on ATAC
+upper <- quantile(hh6_comparison$rpm_atac, 0.98)
+lower <- 1
+hh6_comparison_filt <- hh6_comparison[hh6_comparison$rpm_atac < upper,]
+hh6_comparison_filt <- hh6_comparison[hh6_comparison$rpm_atac > lower,]
+
+upper_rna <- quantile(hh6_comparison$tpm_rna, 0.98)
+lower_rna <- 1
+hh6_comparison_filt <- hh6_comparison[hh6_comparison$tpm_rna < upper_rna,]
+hh6_comparison_filt <- hh6_comparison[hh6_comparison$tpm_rna > lower_rna,]
+cor(hh6_comparison_filt$rpm_atac, hh6_comparison_filt$tpm_rna)
+
+ggplot(hh6_comparison_filt, aes(rpm_atac, tpm_rna)) + geom_point() + 
+  geom_smooth(method = "lm", show.legend = T) +
+  lims(x = c(0, 600), y = c(0,1000))
+
+=======
 ## Importing diffTF results
 I used (with great difficulty) the program diffTF to perform integration of our ATAC-Seq and RNA-Seq data. This program scans peaks for TFBS's, and then associates the accessibility of those sites in aggregate to the RNA-Seq expression levels of eligible genes. Thus, it is able to classify each transcription factor as an activator, repressor, or undetermined. Undetermined genes may have both activities, or no real specific activity.
 
@@ -123,6 +308,8 @@ Annotated_Rlog_Positive_Averages <- read_csv("../RNA-Seq/Exports/Annotated_Rlog_
 
 Rlog_counts_avergae_All_ATAC_Peaks <- read.delim("~/local_git/NC_Timecourse/ATAC-Seq/Exports/Rlog_counts_avergae_All_ATAC_Peaks")
 
+
+
 chromVAR_Z_Score <- as.data.frame(read_csv("Exports/chromVAR_Z-Score.csv"))
 rownames(chromVAR_Z_Score) <- chromVAR_Z_Score$X1
 chromVAR_Z_Score$X1 <- NULL
@@ -147,5 +334,4 @@ pheatmap(act, cluster_cols = F, scale = "row",
          main = "Activators - chromVAR")
 cowplot::plot_grid(act_hm, rep_hm) 
 ```
-
 

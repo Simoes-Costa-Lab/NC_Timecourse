@@ -45,7 +45,7 @@ library(org.Gg.eg.db)
 library(clusterProfiler)
 library(viridis)
 library(qdapTools)
-register(MulticoreParam(16)) # Set this to number of CPUs.
+register(MulticoreParam(12)) # Set this to number of CPUs.
 ```
 
 ### Read in the results of the featureCounts
@@ -104,6 +104,8 @@ dds <- DESeq(dds, parallel = TRUE)
 #Check out the counts
 bp1 <-boxplot(log10(counts(dds,normalized=TRUE)+1))
 
+write.csv(counts(dds,normalized=F), file = "~/local_git/NC_Timecourse/RNA-Seq/Exports/Raw_RNA-Seq_Counts.csv", row.names = T)
+
 #What does the dispersion look like?
 disp_est <- plotDispEsts(dds)
 ```
@@ -144,7 +146,7 @@ g
 ggsave(filename = "./Exports/pcaAll_1.pdf", units = 'in', height = 4, width = 6)
 
 g2 <- ggplot(pcaPlus, aes(x=PC1, y=PC2, color=Time)) + 
-  geom_point(size = 4, alpha = .75, shape = 17) + 
+  geom_point(size = 4, alpha = .75, shape = 19) + 
   scale_color_npg() +
   ggtitle("pcaPlus") +
   labs(x = paste(c("PC1 "),round(pcaPlusVar[1]*100), c("%")) ,y = paste(c("PC2 "), round(pcaPlusVar[2]*100), c("%"))) +
@@ -160,7 +162,7 @@ g2
 ggsave('./Exports/pcaPlus_1.pdf', units = 'in', height = 4, width = 6)
 
 g3 <- ggplot(pcaMinus, aes(x=PC1, y=PC2, color=Time)) + 
-  geom_point(size = 4, alpha = .75) + 
+  geom_point(size = 4, alpha = .75, shape = 17) + 
   scale_color_npg() +
   ggtitle("pcaMinus") +
   labs(x = paste(c("PC1 "),round(pcaMinusVar[1]*100), c("%")) ,y = paste(c("PC2 "), round(pcaMinusVar[2]*100), c("%"))) +
@@ -236,8 +238,9 @@ DESeq2_Analyze <- function(timepoint = "", dds, genes.universe = genes.universe,
 ```{r Retrieve Pairwise Comparisons}
 DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 0.1)
 
-NC6_NC16 <- DESeq2_Analyze(timepoint = "6", second_timepoint = "16", versusWE = F, dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 1e-8)
+NC6_NC16 <- DESeq2_Analyze(timepoint = "16", second_timepoint = "6", versusWE = F, dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 1e-8)
 NC6_NC16[[1]]
+ggsave()
 DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.00001)
 DESeq2_Analyze("10", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
 DESeq2_Analyze("12", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.0001)
