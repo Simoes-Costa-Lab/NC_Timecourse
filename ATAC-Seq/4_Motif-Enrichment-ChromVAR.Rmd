@@ -35,7 +35,7 @@ dev <- computeDeviations(var_obj, motif_ix)
 dev@NAMES <- paste0(dev@NAMES,"_",TFBSTools::name(motifs))
 variability <- computeVariability(dev)
 plotVariability(variability, n = 5)
-tsne_dev <- deviationsTsne(dev, shiny = T)
+tsne_dev <- deviationsTsne(dev, shiny = T, threshold = 1.5, perplexity = 4)
 pca <- dba.plotPCA(samples_ATAC, attributes = DBA_CONDITION)
 x <- pca$panel.args[[1]]$x
 y <- pca$panel.args[[1]]$y
@@ -70,3 +70,13 @@ cowplot::plot_grid(sox2$SOX2, oct4_sox2$`Pou5f1::Sox2`, POU5F1$POU5F1, NR2F2$NR2
 cowplot::plot_grid(g + theme(legend.position = "none"), sox2$SOX2 + theme(legend.position = "none"), oct4_sox2$`Pou5f1::Sox2`+ theme(legend.position = "none"), POU5F1$POU5F1+ theme(legend.position = "none")) 
 ggsave(file = "./Exports/Sox2_Oct4_chromVAR_noLegend.eps", device = "eps", width = 6, height = 4)
 ```
+
+# Working with raw chromVAR scores
+
+```{r}
+dev$timepoint <- factor(stringr::str_split(rownames(pca_mat), pattern = "_", simplify = T)[,1], levels = c("HH6","HH8","HH10","HH12","HH14","HH16","HH18")) 
+diff_acc <- differentialDeviations(dev, "timepoint")
+
+plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "MA0142.1_Pou5f1::Sox2", shiny=F, var_df = variability)
+```
+
