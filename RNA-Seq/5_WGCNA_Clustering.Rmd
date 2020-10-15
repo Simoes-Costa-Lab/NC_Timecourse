@@ -67,6 +67,13 @@ names(mergedColors) <- Annotated_Rlog_Positive_Averages[Conition_Enriched$Chick_
 
 ```
 
+We can also check out how these clusters look in a line graph. Might be better.
+
+```{r}
+MEs
+```
+
+
 ## Looking at GO In these different modules.
 
 ```{r}

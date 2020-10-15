@@ -13,7 +13,7 @@ library(dplyr)
 library(pheatmap)
 
 DESeq_1_files = list.files(path="./Exports/", pattern="*_AllGenes.csv", full.names=TRUE)
-Annotated_Rlog_Positive_Averages <- read.csv("~/local_git/NC_Timecourse/RNA-Seq/Exports/Annotated_Rlog_Positive_Averages.csv", row.names=1, stringsAsFactors=FALSE)
+Annotated_Rlog_Positive_Averages <- read.csv("~/local_git/NC_Timecourse/RNA-Seq/Exports/Annotated_Rlog_Positive_Averages2.csv", row.names=1, stringsAsFactors=FALSE)
 rownames(Annotated_Rlog_Positive_Averages) <- Annotated_Rlog_Positive_Averages$Chick_ENSEMBL
 
 HH6 <- read.csv(DESeq_1_files[5], row.names = 1)
@@ -65,13 +65,28 @@ We find that a Z-score of Rlog normalized counts from DESeq2 looks best. Using t
 ```{r}
 colors <- colorRampPalette(c("#0584bc","#ffffff","#e45649"))(250)
 
-All_Enriched_Genes <- ddsTC_Condition_WE_vc_NC_All %>% dplyr::filter(log2FoldChange > 0.5 & padj < 0.05)
-enriched_1 <- Annotated_Rlog_Positive_Averages[All_Enriched_TFs,2:7]
 
+# TF's
+# Names 
+levels(as.factor(Annotated_Rlog_Positive_Averages[All_Enriched_TFs,"Symbol"]))
+enriched_1 <- Annotated_Rlog_Positive_Averages[All_Enriched_TFs,2:7]
+rownames(enriched_1) <- ifelse(is.na(Annotated_Rlog_Positive_Averages[All_Enriched_TFs,"Symbol"]), 
+                               Annotated_Rlog_Positive_Averages[All_Enriched_TFs,"Chick_ENSEMBL"],
+                               Annotated_Rlog_Positive_Averages[All_Enriched_TFs,"Symbol"])
 enriched <- pheatmap(enriched_1, scale = "row", cluster_cols = F,
                      show_rownames = F, cellwidth = 20, color = colors,
+                     cutree_rows = 6, border_color = NA, 
+                     filename = "./Exports/DeSeq2_Enriched_TFs_p05_nonames.pdf", width = 5, height = 6)
+
+# Gene's
+All_Enriched_Genes <- ddsTC_Condition_WE_vc_NC_All %>% dplyr::filter(log2FoldChange > 0.5 & padj < 0.05)
+
+enriched_3 <- Annotated_Rlog_Positive_Averages[All_Enriched_Genes$Chick_ENSEMBL,2:7]
+
+enriched3 <- pheatmap(enriched_3, scale = "row", cluster_cols = F,
+                     show_rownames = F, cellwidth = 20, color = colors,
                      filename = "./Exports/DeSeq2_All_Enriched_Genes.pdf", width = 6, height = 8)
-enriched
+enriched3
 ```
 
 
