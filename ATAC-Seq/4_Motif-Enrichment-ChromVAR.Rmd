@@ -78,5 +78,12 @@ dev$timepoint <- factor(stringr::str_split(rownames(pca_mat), pattern = "_", sim
 diff_acc <- differentialDeviations(dev, "timepoint")
 
 plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "MA0142.1_Pou5f1::Sox2", shiny=F, var_df = variability)
+
+names(dev)
+
+chromvar_zscore <- as.data.frame(dev@assays@data$z)
+rownames(chromvar_zscore) <- names(dev)
+
+write.csv(chromvar_zscore, file = "Exports/chromVAR_Z-Score.csv", row.names = T)
 ```
 

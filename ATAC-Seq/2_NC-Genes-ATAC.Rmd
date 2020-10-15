@@ -12,17 +12,18 @@ library(clusterProfiler)
 library(ReactomePA)
 library(tidyr)
 library(rtracklayer)
-library(clusterProfiler)
 library(GenomicFeatures)
+library(DiffBind)
 
 #Annotating all ATAC peaks
-ATAC_all_peaks = readPeakFile("all_ATAC_400bp_fixed.bed")
-TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 99)
+samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
+ATAC_all_peaks = readPeakFile("Imports/all_ATAC_400bp_fixed.bed")
+TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 101)
 ATAC_all_peaks_anno = annotatePeak(ATAC_all_peaks, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db")
 ATAC_all_peaks_anno.df = data.frame(ATAC_all_peaks_anno)
 #combining with counts peaks
 #rerun dba.peakset for all ATAC bam files as done previously
-samples_ATAC_2 = dba.count(samples_ATAC, score = DBA_SCORE_RPKM)
+samples_ATAC_2 = dba.count(samples_ATAC, score = DBA_SCORE_RPKM, peaks = ATAC_all_peaks)
 counts_ATAC_RPKM.mat =dba.peakset(samples_ATAC_2,bRetrieve = T,DataType = DBA_DATA_FRAME)
 counts_ATAC_RPKM.mat$START = counts_ATAC_RPKM.mat$START + 1
 colnames(counts_ATAC_RPKM.mat) = c("seqnames", "start", "end", "HH6_1", "HH6_2", "HH8_1", "HH8_2", "HH10_1", "HH10_2", "HH12_1", "HH12_2", "HH14_1", "HH14_2", "HH16_1","HH16_2", "HH18_1", "HH18_2")
@@ -111,11 +112,40 @@ report$conflict <- ifelse(report$NC_timecourse_call == "activator" & report$rep_
 Timecourse RNA-Seq expression of the activators and repressors
 Next to the chromvar scores for each time.
 ```{r}
+library(pheatmap)
+library(stringr)
+library(ggplot2)
+library(heatmaply)
+library(RColorBrewer)
+
+
 Annotated_Rlog_Positive_Averages <- read_csv("../RNA-Seq/Exports/Annotated_Rlog_Positive_Averages.csv")
 
 Rlog_counts_avergae_All_ATAC_Peaks <- read.delim("~/local_git/NC_Timecourse/ATAC-Seq/Exports/Rlog_counts_avergae_All_ATAC_Peaks")
 
+chromVAR_Z_Score <- as.data.frame(read_csv("Exports/chromVAR_Z-Score.csv"))
+rownames(chromVAR_Z_Score) <- chromVAR_Z_Score$X1
+chromVAR_Z_Score$X1 <- NULL
 
+names <- data.frame(ID =
+str_split(rownames(chromVAR_Z_Score), "_", simplify = T)[,1],
+name = 
+str_split(rownames(chromVAR_Z_Score), "_", simplify = T)[,2]
+)
+all_timepoints_summary$TF_and_Symbol <- paste0(all_timepoints_summary$TF, "_",qdapTools::lookup(all_timepoints_summary$TF, names))
+all_timepoints_summary[all_timepoints_summary$classification_q0.1 == "activator" | all_timepoints_summary$classification_q0.1 == "repressor",]$TF
+
+timepoint_sub_1 <- all_timepoints_summary[all_timepoints_summary$classification_q0.1 == "activator",]
+timepoint_sub_2 <- all_timepoints_summary[all_timepoints_summary$classification_q0.1 == "repressor",]
+
+act <- chromVAR_Z_Score[rownames(chromVAR_Z_Score) %in% timepoint_sub_1$TF_and_Symbol,]
+rep <- chromVAR_Z_Score[rownames(chromVAR_Z_Score) %in% timepoint_sub_2$TF_and_Symbol,]
+
+pheatmap(act, cluster_cols = F, scale = "row",
+         border_color = NA, show_rownames = F,
+         color = brewer.pal(250, "PRGn"),
+         main = "Activators - chromVAR")
+cowplot::plot_grid(act_hm, rep_hm) 
 ```
 
 
