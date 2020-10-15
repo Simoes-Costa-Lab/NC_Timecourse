@@ -21,3 +21,10 @@
 
 # R Environment Variables
 .Renviron
+
+# Homer results
+*_HOMER/
+
+#Ignore images
+*.png
+*.eps
