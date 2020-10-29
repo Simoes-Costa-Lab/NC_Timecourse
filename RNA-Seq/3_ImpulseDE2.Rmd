@@ -35,6 +35,7 @@ impulse_obj$dfImpulseDE2Results
 head(impulse_obj$dfImpulseDE2Results)
 res <- impulse_obj$dfImpulseDE2Results
 
+saveRDS(impulse_obj, file = "Exports/impulse_obj.RDS")
 write.csv(res, file = "Exports/Impulse_Results.csv", row.names = F)
 
 # So this is useful to find differentially expressed gene over time, but
@@ -55,13 +56,6 @@ lsgplotsGenes <- plotGenes(
   strNameRefMethod = NULL)
 
 lsgplotsGenes[[1]]
-
-```
-Let's try making a plot with the impulse DE results. We have Rlog counts and a list of genes and p values.
-
-```{r}
-Impulse_Results <- read_csv("Exports/Impulse_Results.csv")
-
 
 ```
 

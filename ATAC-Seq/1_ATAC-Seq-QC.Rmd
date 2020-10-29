@@ -25,56 +25,57 @@ library(ChIPQC)
 
 Due to a bug with loading this information from a sample sheet, we are forced to add samples one at a time.
 ```{r creating db object, echo=TRUE, eval=FALSE}
-samples_ATAC <- dba.peakset(NULL,peaks="all_ATAC_400bp_fixed.bed",
+setwd("/data/Debbie/Sox2_Oct4_project/exports/Fig1/BAM")
+samples_ATAC <- dba.peakset(NULL,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH6_1",tissue="NC",
                             factor="ATAC",condition="early",replicate=1, bamReads="HH6_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH6_2",tissue="NC",
                             factor="ATAC",condition="early",replicate=2, bamReads="HH6_2.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH8_1",tissue="NC",
                             factor="ATAC",condition="early",replicate=1, bamReads="HH8_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH8_2",tissue="NC",
                             factor="ATAC",condition="early",replicate=2, bamReads="HH8_2.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH10_1",tissue="NC",
                             factor="ATAC",condition="mid",replicate=1, bamReads="HH10_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH10_2",tissue="NC",
                             factor="ATAC",condition="mid",replicate=2, bamReads="HH10_2.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH12_1",tissue="NC",
                             factor="ATAC",condition="mid",replicate=1, bamReads="HH12_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH12_2",tissue="NC",
                             factor="ATAC",condition="mid",replicate=2, bamReads="HH12_2.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH14_1",tissue="NC",
                             factor="ATAC",condition="mid",replicate=1, bamReads="HH14_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH14_2",tissue="NC",
                             factor="ATAC",condition="mid",replicate=1, bamReads="HH14_2.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH16_1",tissue="NC",
                             factor="ATAC",condition="late",replicate=1, bamReads="HH16_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH16_2",tissue="NC",
                             factor="ATAC",condition="late",replicate=2, bamReads="HH16_2.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH18_1",tissue="NC",
                             factor="ATAC",condition="late",replicate=1, bamReads="HH18_1.bam")
-samples_ATAC <- dba.peakset(samples_ATAC,peaks="all_ATAC_400bp_fixed.bed",
+samples_ATAC <- dba.peakset(samples_ATAC,peaks="/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/all_ATAC_400bp_fixed.bed",
                             peak.caller="macs", peak.format= "macs",sampID="HH18_2",tissue="NC",
                             factor="ATAC",condition="late",replicate=2, bamReads="HH18_2.bam")
-samples_ATAC <- dba.count(samples_ATAC, filter = 50, filterFun = mean)
+samples_ATAC <- dba.count(samples_ATAC, filter = 30, filterFun = mean)
 samples_ATAC <- dba.contrast(samples_ATAC, categories = DBA_CONDITION, minMembers = 2)
-samples_ATAC <- dba.analyze(samples_ATAC)
+samples_ATAC <- dba.analyze(samples_ATAC, bParallel = T)
 dba.plotPCA(samples_ATAC, attributes = DBA_CONDITION)
 
-saveRDS(samples_ATAC, file = "/data/Debbie/Organized_NC_ATAC_and_Sox2-Oct4//ATAC/Diffbind_data/samples_ATAC_400bp.RDS")
+saveRDS(samples_ATAC, file = "/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Exports/samples_ATAC_400bp_2.RDS")
 
-samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
+#samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
 ```
 
 Let's generate some QC metrics for these BAMs.
