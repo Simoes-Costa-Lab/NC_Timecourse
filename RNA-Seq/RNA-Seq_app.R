@@ -19,7 +19,7 @@ library(dplyr)
 library(feather)
 loadfonts(device = "pdf")
 #Loading and manipulating data
-dat <- read_feather(path = "./Exports/Rlog_for_RNA-Seq-App.feather")
+dat <- read_feather(path = "Rlog_for_RNA-Seq-App.feather")
 # Getting a vector of gene names to populate autocomplete
 colnames(dat)[1] <- "gene"
 genes = unique(data.frame(value = dat$gene, label = dat$gene))
