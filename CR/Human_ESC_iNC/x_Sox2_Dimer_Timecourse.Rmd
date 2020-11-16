@@ -1,0 +1,311 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Analysis: Identify Sox2::Oct4 Dimer peaks and track their accessibility and H3k27Ac over time.
+
+# A new bit
+So Debbie raised a great point. We expect to see this maintained in iNC at D5 because they have not differentiated yet. So we will compare the signal in this vs the differentiated Sox2 C+R she performed. As a reference we have a 14D Myo Sample in which Sox2 C+R and ATAC-Seq have been performed. Also have H3K27Ac I think.
+
+```{r}
+library(rtracklayer)
+library(ChIPpeakAnno)
+
+data_dir <- "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/"
+
+# Get all Sox2 peaks
+Sox2_NC_D0_R1 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/H1_std_Sox2hg38_filt.BAM_peaks.narrowPeak")
+Sox2_NC_D0_R2 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/H1_Sox2_auto_ACAGTG_hg38_filt.BAM_peaks.narrowPeak")
+Sox2_NC_D3_R1 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/Sox2_NC_day3_R1_gthg38_filt_nodups.BAM_peaks.narrowPeak")
+Sox2_NC_D3_R2 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/Sox2_NC_day3_R2_gthg38_filt_nodups.BAM_peaks.narrowPeak")
+Sox2_NC_D5_R1 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/Sox2_gt_NC_1hg38_filt_nodups.BAM_peaks.narrowPeak")
+Sox2_NC_D5_R2 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/Sox2_gt_NC_2hg38_filt_nodups.BAM_peaks.narrowPeak")
+Sox2_Myo_D14_R1 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/Sox2_Myo_1hg38_filt_nodups.BAM_peaks.narrowPeak")
+Sox2_Myo_D14_R2 <- import(con = "/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/Peaks/Sox2_Myo_2hg38_filt_nodups.BAM_peaks.narrowPeak")
+
+
+v1 <- makeVennDiagram(Peaks=list(Sox2_NC_D0_R1,Sox2_NC_D0_R2),
+                       NameOfPeaks=c("Sox2_NC_D0_R1","Sox2_NC_D0_R2"))
+
+v2 <- makeVennDiagram(Peaks=list(Sox2_NC_D3_R1,Sox2_NC_D3_R2),
+                       NameOfPeaks=c("Sox2_NC_D3_R1","Sox2_NC_D3_R2"))
+
+v3 <- makeVennDiagram(Peaks=list(Sox2_NC_D5_R1,Sox2_NC_D5_R2),
+                       NameOfPeaks=c("Sox2_NC_D5_R1","Sox2_NC_D5_R2"))
+
+v4 <- makeVennDiagram(Peaks=list(Sox2_Myo_D14_R1,Sox2_Myo_D14_R2),
+                       NameOfPeaks=c("Sox2_Myo_D14_R1","Sox2_Myo_D14_R2"))
+
+D0_Sox2_Peaks <- reduce(c(Sox2_NC_D0_R1, Sox2_NC_D0_R2))
+D5_Sox2_Peaks <- reduce(c(Sox2_NC_D5_R1, Sox2_NC_D5_R2))
+
+All_Sox2_Peaks <- reduce(c(Sox2_NC_D0_R1, Sox2_NC_D0_R2,
+         Sox2_NC_D3_R1, Sox2_NC_D3_R2,
+         Sox2_NC_D5_R1, Sox2_NC_D5_R2,
+         Sox2_Myo_D14_R1, Sox2_Myo_D14_R2))
+
+# Maybe do top 2k from each set to balance it out more?
+
+makeVennDiagram(Peaks=list(All_Sox2_Peaks, Sox2_Myo_D14_R1,Sox2_Myo_D14_R2),
+                       NameOfPeaks=c("All_Sox2_Peaks","Sox2_Myo_D14_R1","Sox2_Myo_D14_R2"))
+
+export.bed(object = All_Sox2_Peaks, con = "./Exports/All_Sox2_Peaks.bed")
+
+```
+
+Now annotate these peaks with the number of Oct4::Sox2 JASPAR (MA142.1) binding sites they have.
+```{bash, eval = FALSE}
+bedtools coverage -counts -a ./Exports/All_Sox2_Peaks.bed \
+-b ./Imports/MA0142.1_TFBS.bed > ./Exports/All_Dimer_Counts.bed
+```
+
+Try running motif calling with a lower stringency (p val of 1e-2 vs 1e-4. Okay because 15bp motif)
+```{bash}
+fimo --thresh 1e-2 -o MA0142.1.p.1e-2.fimo ~/workdir/diffTF/JASPAR2020_Motifs/MA0142.1.meme /data/Austin/workdir/genome/galGal6/dna/Gallus_gallus.GRCg6a.dna.toplevel.fa
+
+```
+
+```{r}
+suppressPackageStartupMessages(library(readr))
+# Read in file
+input <- read_tsv(file = "Exports/MA0142.1.p.1e-2.fimo/fimo.tsv", col_names = T, comment = "#")
+# Get motifID
+id <- as.character(input[1,1])
+# Rearrange cols
+input <- input[,c(3,4,5,1,7,6)]
+# Add chr
+input$sequence_name <- paste0("chr", input$sequence_name)
+# Remove chr MT, KZ, AADN
+input <- input[!grepl(input$sequence_name, pattern = "^chrMT"),]
+input <- input[!grepl(input$sequence_name, pattern = "^chrKZ"),]
+input <- input[!grepl(input$sequence_name, pattern = "^chrAADN"),]
+# Reorder
+input <- input[order(input$sequence_name, input$start, input$stop),]
+
+# Write out file
+write_delim(input, path = paste0("Exports/MA0142.1.p.1e-2.fimo/",id,"_TFBS.bed"), delim = "\t", col_names = F)
+```
+
+Now annotate these peaks with the number of Oct4::Sox2 JASPAR (MA142.1) binding sites they have.
+```{bash, eval = FALSE}
+bedtools coverage -counts -a ./Exports/Replicate_Sox2_Peaks.bed \
+-b ./Imports/MA0142.1_TFBS.bed > ./Exports/Replicate_Dimer_Counts.bed
+
+bedtools coverage -counts -a ./Exports/All_Sox2_Peaks.bed \
+-b ./Imports/MA0142.1_TFBS.bed > ./Exports/All_Dimer_Counts.bed
+```
+
+Let's see how many peaks have a dimer motif. Marginal increase with p val 1e-2 motifs.
+
+```{r}
+All_Dimer_Counts <- read.delim("Exports/All_Dimer_Counts.bed", header = F)
+colnames(All_Dimer_Counts) <- c("seqnames","start","stop","strand","c1","strand2","motif_count")
+summary(as.factor(All_Dimer_Counts$motif_count))
+
+All_Dimer_Counts.gr <- makeGRangesFromDataFrame(All_Dimer_Counts)
+All_Dimer_Counts.gr$motif_count <- All_Dimer_Counts$motif_count
+
+motif_peaks.gr <- All_Dimer_Counts.gr[All_Dimer_Counts.gr$motif_count >= 1]
+no_motif_peaks.gr <- All_Dimer_Counts.gr[All_Dimer_Counts.gr$motif_count == 0]
+
+D0_with_motifs <- D0_Sox2_Peaks[overlapsAny(D0_Sox2_Peaks, motif_peaks.gr)]
+D5_with_motifs <- D5_Sox2_Peaks[overlapsAny(D5_Sox2_Peaks, motif_peaks.gr)]
+
+v5 <- makeVennDiagram(Peaks = list(D0_with_motifs, D5_with_motifs), NameOfPeaks = c("D0_with_motifs", "D5_with_motifs"))
+
+v5
+
+ESC_Specific_motifs <- D0_with_motifs[!overlapsAny(D0_with_motifs, D5_with_motifs)]
+NC_Specific_motifs <- D5_with_motifs[!overlapsAny(D5_with_motifs, D0_with_motifs)]
+
+export.bed(ESC_Specific_motifs, con = "Exports/ESC_Specific_motifs.bed")
+export.bed(NC_Specific_motifs, con = "Exports/NC_Specific_motifs.bed")
+
+export.bed(motif_peaks.gr, con = "Exports/Sox2_peaks_with_dualmotif.bed")
+export.bed(no_motif_peaks.gr, con = "Exports/Sox2_peaks_with_no_dualmotif.bed")
+
+```
+
+Now let's quantify the ATAC and H3k27Ac signal at D0,3,5 at these classes of peaks.
+
+```{r}
+library(DiffBind)
+
+H3K27Ac_Signal <- dba.peakset(NULL,peaks=All_Dimer_Counts.gr,
+                            sampID="ESC_D0",tissue="ESC",factor="CR",condition="D0",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/DB_ES_H3K27ac_2hg38_filt_nodups.bam")
+
+H3K27Ac_Signal <- dba.peakset(H3K27Ac_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="NC_D5_1",tissue="NC",factor="CR",condition="D5",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/DB_NC_H3K27ac_1hg38_filt_nodups.bam")
+
+H3K27Ac_Signal <- dba.peakset(H3K27Ac_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="NC_D5_2",tissue="NC",factor="CR",condition="D5",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/DB_NC_H3K27ac_2hg38_filt_nodups.bam")
+
+H3K27Ac_Signal
+
+H3K27Ac_Signal <- dba.count(H3K27Ac_Signal, bParallel = T)
+dba.plotPCA(H3K27Ac_Signal, attributes = DBA_CONDITION)
+
+# Running DeSeq to get Rlog counts
+library(DESeq2)
+summarized_experiment2 <- dba(H3K27Ac_Signal, bSummarizedExperiment = T)
+summarized_experiment2@assays@data$scores <- summarized_experiment2@assays@data$Reads
+#order of counts not correct.
+dds_experiment2 <- DESeqDataSet(summarized_experiment2, design = ~ Condition)
+dds_experiment2 <- DESeq(dds_experiment2)
+dds_results <- results(dds_experiment2)
+rld <- rlog(dds_experiment2, blind = FALSE)
+rownames(assay(rld)) <- paste0(H3K27Ac_Signal$peaks[[1]]$Chr,"_",H3K27Ac_Signal$peaks[[1]]$Start,"_",H3K27Ac_Signal$peaks[[1]]$End)
+rld_df <- data.frame(row.names = paste0(H3K27Ac_Signal$peaks[[1]]$Chr,"_",H3K27Ac_Signal$peaks[[1]]$Start,"_",H3K27Ac_Signal$peaks[[1]]$End),
+           assay(rld))
+
+
+# Now annotate.
+All_Dimer_Counts$PeakID <- paste0(All_Dimer_Counts$seqnames, "_",All_Dimer_Counts$start,"_",All_Dimer_Counts$stop)
+
+rld_df$motif_count <- qdapTools::lookup(rownames(rld_df), All_Dimer_Counts[,c("PeakID","motif_count")])
+rld_df$NC_D5_Avg <- rowMeans(rld_df[,c(2,3)])
+
+# Plot the distribution of D0 and D5 Rlog counts of 1,2, and 0 motif occurances.
+library(ggplot2)
+library(ggpubr)
+rld_df_tomelt <- rld_df[,c(1,5)]
+rld_df_tomelt$PeakID <- rownames(rld_df_tomelt)
+rld_df_melt <- reshape2::melt(rld_df_tomelt)
+rld_df_melt$motif_count <- qdapTools::lookup(rld_df_melt$PeakID, All_Dimer_Counts[,c("PeakID","motif_count")])
+
+
+ggplot(rld_df_melt, aes(x = variable, y = value)) + geom_violin(aes(fill = as.factor(motif_count))) + stat_summary(fun = "median") + facet_grid(. ~ motif_count)
+
+
+rld_df_melt_nomotifs <- subset(rld_df_melt, rld_df_melt$motif_count == 0)
+
+nomotifs_plot <- ggplot(rld_df_melt_nomotifs, aes(x = variable, y = value)) + geom_violin() + stat_summary(fun = "median") + ylim(c(0,11))
+nomotifs_plot + stat_compare_means(method = "t.test")
+
+rld_df_melt_onemotifs <- subset(rld_df_melt, rld_df_melt$motif_count >= 1)
+
+onemotifs_plot <- ggplot(rld_df_melt_onemotifs, aes(x = variable, y = value)) + geom_violin() + stat_summary(fun = "median") + ylim(c(0,11))
+onemotifs_plot + stat_compare_means(method = "t.test")
+
+cowplot::plot_grid(nomotifs_plot + stat_compare_means(method = "t.test")
+,onemotifs_plot + stat_compare_means(method = "t.test")
+,ncol = 2, labels = c("No Motifs", "One+ Motif"))
+```
+
+Alright, so there is a statistically significant drop in the H3K27Ac signal of Sox2 peaks (like 80,000) from D0 to D5 of iNC. However, with either one or two motifs, the significance goes away. ~ 580 in the two combined. I quantified signal at Sox2 peaks, but I could also try to find overlapping regular H3K27Ac peaks, but I think it would be very similar.
+
+Let's try with ATAC.
+
+```{r}
+ATAC_Signal <- dba.peakset(NULL,peaks=All_Dimer_Counts.gr,
+                            sampID="ESC_D0_1",tissue="ESC",factor="ATAC",condition="D0",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_ES_D0_1_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="ESC_D0_2",tissue="ESC",factor="ATAC",condition="D0",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_ES_D0_2_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="NC_D3_1",tissue="NC",factor="ATAC",condition="D3",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_NC_D3_1_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="NC_D3_2",tissue="NC",factor="ATAC",condition="D3",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_NC_D3_2_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="NC_D5_1",tissue="NC",factor="ATAC",condition="D5",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_NC_D5_1_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="NC_D5_2",tissue="NC",factor="ATAC",condition="D5",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_NC_D5_2_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="Myo_D14_1",tissue="Myo",factor="ATAC",condition="D14",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_Myo_D14_1_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.peakset(ATAC_Signal,peaks=All_Dimer_Counts.gr,
+                            sampID="Myo_D14_2",tissue="Myo",factor="ATAC",condition="D14",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_Myo_D14_2_toGRCh38_sorted_nodups.bam")
+
+ATAC_Signal <- dba.count(ATAC_Signal, bParallel = T)
+ATAC_Signal <- dba.contrast(ATAC_Signal, categories = DBA_CONDITION, minMembers = 2)
+ATAC_Signal <- dba.analyze(ATAC_Signal)
+dba.plotPCA(ATAC_Signal, attributes = DBA_CONDITION)
+
+# Running DeSeq to get Rlog counts
+library(DESeq2)
+summarized_experiment2 <- dba(ATAC_Signal, bSummarizedExperiment = T)
+summarized_experiment2@assays@data$scores <- summarized_experiment2@assays@data$Reads
+#order of counts not correct.
+dds_experiment2 <- DESeqDataSet(summarized_experiment2, design = ~ Condition)
+dds_experiment2 <- DESeq(dds_experiment2)
+dds_results <- results(dds_experiment2)
+rld <- rlog(dds_experiment2, blind = FALSE)
+
+rownames(assay(rld)) <- paste0(ATAC_Signal$peaks[[1]]$Chr,"_",ATAC_Signal$peaks[[1]]$Start,"_",ATAC_Signal$peaks[[1]]$End)
+rld_df <- data.frame(row.names = paste0(ATAC_Signal$peaks[[1]]$Chr,"_",ATAC_Signal$peaks[[1]]$Start,"_",ATAC_Signal$peaks[[1]]$End),
+           assay(rld))
+
+
+# Now annotate.
+All_Dimer_Counts$PeakID <- paste0(All_Dimer_Counts$seqnames, "_",All_Dimer_Counts$start,"_",All_Dimer_Counts$stop)
+
+rld_df$motif_count <- qdapTools::lookup(rownames(rld_df), All_Dimer_Counts[,c("PeakID","motif_count")])
+rld_df$NC_D0_Avg <- rowMeans(rld_df[,c(1,2)])
+rld_df$NC_D3_Avg <- rowMeans(rld_df[,c(3,4)])
+rld_df$NC_D5_Avg <- rowMeans(rld_df[,c(5,6)])
+rld_df$NC_D14_Avg <- rowMeans(rld_df[,c(7,8)])
+
+# Plot the distribution of D0 and D5 Rlog counts of 1,2, and 0 motif occurances.
+library(ggplot2)
+library(ggpubr)
+rld_df_tomelt <- rld_df[,c(10,11,12,13)]
+rld_df_tomelt$PeakID <- rownames(rld_df_tomelt)
+rld_df_melt <- reshape2::melt(rld_df_tomelt)
+rld_df_melt$motif_count <- qdapTools::lookup(rld_df_melt$PeakID, All_Dimer_Counts[,c("PeakID","motif_count")])
+
+
+ggplot(rld_df_melt, aes(x = variable, y = value)) + geom_violin(aes(fill = as.factor(motif_count))) + stat_summary(fun = "median") + facet_grid(. ~ motif_count)
+
+
+rld_df_melt_nomotifs <- subset(rld_df_melt, rld_df_melt$motif_count == 0)
+
+nomotifs_plot <- ggplot(rld_df_melt_nomotifs, aes(x = variable, y = value)) + geom_violin() + stat_summary(fun = "median") + stat_compare_means()
+nomotifs_plot 
+
+rld_df_melt_onemotifs <- subset(rld_df_melt, rld_df_melt$motif_count >= 1)
+
+onemotifs_plot <- ggplot(rld_df_melt_onemotifs, aes(x = variable, y = value)) + geom_violin() + stat_summary(fun = "median") + stat_compare_means()
+onemotifs_plot 
+
+
+cowplot::plot_grid(nomotifs_plot,onemotifs_plot,ncol = 2, labels = c("No Motifs", "One+ Motif"))
+```
+
+So it looks like ATAC-Seq also shows that there isn't a decrease in signal over time. I want to see how the Sox2-bound peaks with motifs change over time in a tornado-plot style.
+
+```{bash eval=FALSE}
+# Let's see the Sox2 signal at Sox2 peaks with or without the motif at d0, d3, d5
+
+cd /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BW
+
+computeMatrix reference-point -S  H1_Sox2_auto_ACAGTG_hg38_filt.BAM.bw Sox2_NC_day3_R2_gthg38_filt_nodups.BAM.bw Sox2_gt_NC_2hg38_filt_nodups.BAM.bw -R ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_peaks_with_dualmotif.bed ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_peaks_with_no_dualmotif.bed -b 1000 -a 1000 -bs 10 -o ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif_2.mat.gz --missingDataAsZero --referencePoint center --numberOfProcessors 62
+
+plotProfile -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif.mat.gz -out ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif.eps --plotType heatmap --dpi 600 
+
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif.png ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif.eps
+
+plotHeatmap -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif.mat.gz -out ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif_heatmap.eps --plotType lines --dpi 600 
+
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o  ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif_heatmap.png ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif_heatmap.eps
+```
+
+```{bash eval=FALSE}
+# Let's see the ATAC signal at ESC or NC specific peaks with the dimer motif.
+
+cd /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BW
+
+computeMatrix reference-point -S  ATAC_ES_D0_1_toGRCh38_sorted_nodups.bw ATAC_NC_D3_1_toGRCh38_sorted_nodups.bw ATAC_NC_D5_2_toGRCh38_sorted_nodups.bw -R ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_Specific_motifs.bed ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/NC_Specific_motifs.bed -b 1000 -a 1000 -bs 10 -o ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif.mat.gz --missingDataAsZero --referencePoint center --numberOfProcessors 62
+
+plotProfile -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif.mat.gz -out ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_profile.eps --plotType heatmap --dpi 600 
+
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_profile.png ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_profile.eps
+
+plotHeatmap -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif.mat.gz -out ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_heatmap.eps --plotType lines --dpi 600 
+
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o  ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_heatmap.png ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_heatmap.eps
+```
