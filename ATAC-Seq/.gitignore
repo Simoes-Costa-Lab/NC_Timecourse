@@ -28,3 +28,6 @@
 #Ignore images
 *.png
 *.eps
+
+#Big Imports
+./Imports/Phastcons_77vert_25bpWindows.gr

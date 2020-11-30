@@ -396,11 +396,6 @@ compareGeneToPeaks <-
     peaks_of_interest <-
       closest_5_genes[closest_5_genes$geneId %in% gene, "PeakID"]
     
-    # Get the ATAC-Seq fit
-    peak_res <- list()
-    peak_dist <- list()
-    #peak_anno <- list()
-    
     # Make sure it's in the ATAC-Seq obj.
     peaks_of_interest <-
       peaks_of_interest[peaks_of_interest %in% impulse_obj2@vecAllIDs]
@@ -410,11 +405,16 @@ compareGeneToPeaks <-
     if (!length(peaks_of_interest)) {
       return(data.frame(
         spearman = NA,
+        distanceToTSS = NA,
         gene = gene,
-        distancetoTSS = NA,
-        annotation = NA
+        PeakID = NA
       ))
     }
+    
+    # Get the ATAC-Seq fit
+    peak_res <- as.data.frame(matrix(nrow = length(peaks_of_interest), ncol = 4))
+    colnames(peak_res) <- c("spearman","distanceToTSS", "gene", "PeakID")
+    peak_count <- 1
     
     for (peak in peaks_of_interest) {
       peak_fit <-
@@ -424,20 +424,19 @@ compareGeneToPeaks <-
           boolCaseCtrl = F,
           boolSimplePlot = T
         )
-      peak_fit <- peak_fit[, 2]
+      peak_fit <- peak_fit[,2]
       #spearman correlation
-      peak_res[peak] <- cor(gene_fit, peak_fit, method = "spearman")
-      peak_dist[peak] <-
+      peak_res[peak_count, 1] <- cor(gene_fit, peak_fit, method = "spearman")
+      peak_res[peak_count, 2] <-
         closest_5_genes[closest_5_genes$PeakID == peak &
                           closest_5_genes$geneId == gene, "distanceToTSS"]
+      peak_res[peak_count, 3] <- gene
+      peak_res[peak_count, 4] <- peak
+      
+      peak_count <- peak_count +1
       
     }
-    
-    return(data.frame(
-      spearman = unlist(peak_res),
-      gene = gene,
-      distancetoTSS = unlist(peak_dist)
-    ))
+    return(peak_res)
   }
 
 RunMultipleGenes <- function(genelist = "") {
@@ -449,13 +448,37 @@ RunMultipleGenes <- function(genelist = "") {
     length(genelist[!genelist %in% closest_5_genes$geneId])
   print(paste0("Removing ", n_missing_peaks, " genes, no associated peaks."))
   genelist <- genelist[genelist %in% closest_5_genes$geneId]
-  # Multicore implementation
-  temp <- bplapply(genelist, FUN = compareGeneToPeaks)
-  print("bplApply Done")
-  results.df <- do.call("rbind", temp)
-  results.df$PeakID <-
-    ifelse(is.na(results.df$spearman), NA, rownames(results.df))
-  results.df$Symbol <-
-    lookup(results.df$gene, key.match = as.data.frame(GenesUniverse[, c(1, 4)]))
+  # Split into 5000 item chunks if necessary.
+  if (length(genelist) > 5000) {
+    message("More than 5,000 genes detected. Chunking...")
+    chunks <- split(genelist, ceiling(seq_along(genelist)/5000))
+    chunk_res <- list()
+    for (chunk in chunks){
+      chunk_res[chunk] <- bplapply(chunk, FUN = compareGeneToPeaks)
+    }
+    
+    results.df <- do.call("rbind", chunk_res)
+    results.df$Symbol <- lookup(results.df$gene, key.match = as.data.frame(GenesUniverse[, c(1, 4)]))
+  }
+  
+  else{
+    temp <- bplapply(genelist, FUN = compareGeneToPeaks)
+    print("bplApply Done")
+    results.df <- do.call("rbind", temp)
+    results.df$Symbol <- lookup(results.df$gene, key.match = as.data.frame(GenesUniverse[, c(1, 4)]))
+  }
+  
   return(results.df)
+}
+
+get_conservation_2 <- function(x){
+  split <- str_split(x, pattern = "-", simplify = T)
+  if (split[1] %in% c("MT")){
+    return(NA)
+  }
+  else{
+    gr1 <- GRanges(seqnames = as(split[1], "Rle"), IRanges(start =seq(as.numeric(split[2]), as.numeric(split[3])), width=1))
+    return(mean((subsetByOverlaps(x = Window25bp.gr, ranges = gr1))@elementMetadata$score))
+  }
+  
 }

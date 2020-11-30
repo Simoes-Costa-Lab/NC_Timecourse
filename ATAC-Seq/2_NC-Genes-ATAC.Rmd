@@ -492,10 +492,12 @@ library(ImpulseDE2)
 library(readr)
 library(ggplot2)
 library(dplyr)
-
+library(rtracklayer)
+library(cowplot)
+library(stringr)
 source(file = "Peak-Gene-Fitting.R")
 
-register(BPPARAM = MulticoreParam(progressbar = T))
+register(BPPARAM = MulticoreParam(progressbar = T, workers = 60, stop.on.error = F))
 impulse_obj <- readRDS("../RNA-Seq/Exports/impulse_obj.RDS")
 impulse_obj2 <- readRDS("Exports/ATAC-Seq-Impulse.RDS")
 ATAC_all_peaks_anno.df <- readRDS("Exports/ATAC_all_peaks_anno.RDS")
@@ -515,29 +517,31 @@ GenesUniverse <- read_csv("../RNA-Seq/Imports/GenesUniverse.csv")
 TC_NC_Enriched <- read_csv("../RNA-Seq/Exports/ddsTC_Condition_WE_vc_NC_Enriched.csv")
 TC_NC_Enriched_TF <- subset(TC_NC_Enriched, TC_NC_Enriched$TF_Status == "Transcription Factor")
 
-
-GRN_enhancers <- RunMultipleGenes(genelist = as.character(GRN_Genes$ENSEMBL))
-
-TC_NC_Enriched_TF_enhancers <- RunMultipleGenes(genelist = as.character(TC_NC_Enriched_TF$Chick_ENSEMBL))
-TC_NC_Enriched_enhancers <- RunMultipleGenes(genelist = as.character(TC_NC_Enriched$Chick_ENSEMBL))
-
-plot(TC_NC_Enriched_enhancers$spearman)
-boxplot(TC_NC_Enriched_enhancers$spearman)
+#Window25bp.gr <- readRDS(file = "Imports/Phastcons_77vert_25bpWindows.gr.RDS")
+#GRN_enhancers <- RunMultipleGenes(genelist = as.character(GRN_Genes$ENSEMBL))
 ```
 
 ```{r eval=FALSE, include=FALSE}
-library(cowplot)
-All_Genes_1 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[1:10000])
-All_Genes_2 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[10001:24356])
+All_Genes_1 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[1:7000])
+All_Genes_2 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[5001:10000])
+All_Genes_3 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[10001:15000])
+All_Genes_4 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[15001:20000])
+All_Genes_5 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[20001:24356])
 
-All_Genes_Tests <- rbind(All_Genes_1, All_Genes_2)
-
+#All_Genes_Tests <- rbind(All_Genes_1, All_Genes_2, All_Genes_3, All_Genes_4, All_Genes_5)
 # Remove rows with NA PeakIDs.
+All_Genes_Tests <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL)
+All_Genes_Tests <- All_Genes_Tests[!is.na(All_Genes_Tests$PeakID),]
+summary(All_Genes_Tests$PeakID %in% closest_5_genes$PeakID)
 
-All_Genes_Tests <- All_Genes_Tests[!is.na(All_Genes_Tests$peakID),]
+saveRDS(All_Genes_Tests, file = "Exports/All_Genes_Tests.RDS")
+All_Genes_Tests <- readRDS(file = "Exports/All_Genes_Tests.RDS")
 
-# look at the correlation of Promoter to Genes.
 
+```
+
+
+```{r}
 # Investigate -.6 to -1 spearman to .6-1 spearman genomic annotation
 # First label Introns
 All_Genes_Tests$annotation2 <- ifelse(grepl("Intron", All_Genes_Tests$annotation), "Intron", All_Genes_Tests$annotation)
