@@ -633,17 +633,19 @@ cor(gene_fit$value[1:100], peak_fit$value, method = "spearman")
 ```
 Let's visualize the enriched TF's called by the RNA-Seq analysis and their associated potential enhancers.
 ```{r}
-TC_NC_Enriched_TF_enhancers <- TC_NC_Enriched_TF_enhancers %>% arrange(-spearman)
+TC_NC_Enriched_TF_enhancers <- subset(All_Genes_Tests, All_Genes_Tests$gene %in% TC_NC_Enriched$Chick_ENSEMBL)
+TC_NC_Enriched_TF_enhancers <- TC_NC_Enriched_TF_enhancers[!duplicated(TC_NC_Enriched_TF_enhancers$PeakID),]
 
-TC_NC_Enriched_TF_enhancers$rank <- seq(length(TC_NC_Enriched_TF_enhancers$peakID))
+TC_NC_Enriched_TF_enhancers <- TC_NC_Enriched_TF_enhancers %>% arrange(-spearman)
+TC_NC_Enriched_TF_enhancers$rank <- seq(length(TC_NC_Enriched_TF_enhancers$PeakID))
 
 # Let's plot 
 
 TC_NC_Enriched_TF_enhancers %>% ggplot(aes(x= rank, y=spearman)) + 
-  geom_rect(inherit.aes = F, aes(xmin = 1, xmax= 70, ymin=0.8, ymax = 1)) +
-  geom_rect(inherit.aes = F,aes(xmin = 71, xmax= 104, ymin=0.6, ymax = 0.8)) +
-  geom_rect(inherit.aes = F,aes(xmin = 278, xmax= 306, ymin=-0.6, ymax = -0.8)) +
-  geom_rect(inherit.aes = F,aes(xmin = 307, xmax= max(rank), ymin= -0.8, ymax = -1)) +
+  geom_rect(inherit.aes = F, aes(xmin = 1, xmax= 684, ymin=0.8, ymax = 1)) +
+  geom_rect(inherit.aes = F,aes(xmin = 685, xmax= 1059, ymin=0.6, ymax = 0.8)) +
+  geom_rect(inherit.aes = F,aes(xmin = 2719, xmax= 3033, ymin=-0.6, ymax = -0.8)) +
+  geom_rect(inherit.aes = F,aes(xmin = 3034, xmax= max(rank), ymin= -0.8, ymax = -1)) +
   geom_point(col="#0A98B4", size=1) +   # Draw points
   labs(title = "Peak-Gene Correlation", y = "Spearman Correlation", x = "Ranked Peaks") +
   theme(axis.text.x = element_blank(),
@@ -651,13 +653,78 @@ TC_NC_Enriched_TF_enhancers %>% ggplot(aes(x= rank, y=spearman)) +
         panel.background = element_rect(color = "gray40")) +
   scale_y_continuous(breaks=seq(-1,1,0.2))
 
-ggsave(filename = "Exports/Enhancer-Gene-Correlation_ddsTC_Enriched_TFs.pdf",
+ggsave(filename = "Exports/Enhancer-Gene-Correlation_ddsTC_Enriched_TFs.eps",
        width = 8, height = 6)
+
+# Strong+ (684), Moderate+ (374), Moderate- (314), Strong- (492)
+TC_NC_Enriched_TF_enhancers.gr <- Signac::StringToGRanges(TC_NC_Enriched_TF_enhancers$PeakID)
+TC_NC_Enriched_TF_enhancers.gr
+TC_NC_Enriched_TF_enhancers_anno <- annotatePeak(TC_NC_Enriched_TF_enhancers.gr, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db", assignGenomicAnnotation = T)
+
+TC_NC_Enriched_TF_enhancers_anno_df <- as.data.frame(TC_NC_Enriched_TF_enhancers_anno)
+TC_NC_Enriched_TF_enhancers_anno_df$PeakID <- paste0(TC_NC_Enriched_TF_enhancers_anno_df$seqnames,"-",TC_NC_Enriched_TF_enhancers_anno_df$start,"-",TC_NC_Enriched_TF_enhancers_anno_df$end)
+
+TC_NC_Enriched_TF_enhancers_anno_df <- TC_NC_Enriched_TF_enhancers_anno_df %>% mutate(spearman = lookup(PeakID, TC_NC_Enriched_TF_enhancers[,c("PeakID","spearman")]))
+
+
 ```
+Investigate H3K27Ac at highly correlated vs lowly correlated in Neural-crest enriched genes.
+
+Now with closest 5 genes.
+```{r}
+library(DiffBind)
+library(DESeq2)
+library(ggplot2)
+library(ggpubr)
+# Only doing with peaks > 0.8 and < -0.8
+strong_correlates <- TC_NC_Enriched_TF_enhancers[TC_NC_Enriched_TF_enhancers$spearman > 0.8 | TC_NC_Enriched_TF_enhancers$spearman < -0.8,]
+strong_correlates.gr <- Signac::StringToGRanges(strong_correlates$PeakID)
+
+H3K27Ac_corr <- dba.peakset(NULL,peaks=strong_correlates.gr,
+                            sampID="Epi_1",tissue="Epi",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Epiblast_vs_NF_CR/BAM/H3K27ac_Epi_R1_toGalGal6_nodups.bam")
+
+H3K27Ac_corr <- dba.peakset(H3K27Ac_corr,peaks=strong_correlates.gr,
+                            sampID="NF_1",tissue="NF",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104544_HVGL5BGXB_HH9WE_H3K27Ac_1_GTGAAACG_R1_toGalGal6.bam")
+H3K27Ac_corr <- dba.peakset(H3K27Ac_corr,peaks=strong_correlates.gr,
+                            sampID="NF_2",tissue="NF",factor="CR",condition="H3K27AC",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104545_HVGL5BGXB_HH9WE_H3K27Ac_2_GTGGCCTT_R1_toGalGal6.bam")
+
+H3K27Ac_corr <- dba.count(H3K27Ac_corr, bParallel = T)
+pca <- dba.plotPCA(H3K27Ac_corr, attributes = DBA_TISSUE)
+
+
+corr_summ_exp <- dba(H3K27Ac_corr, bSummarizedExperiment = T)
+corr_summ_exp@assays@data$scores <- corr_summ_exp@assays@data$Reads
+dds_corr <- DESeqDataSet(corr_summ_exp, design = ~ Tissue)
+dds_corr <- DESeq(dds_corr)
+dds_results <- results(dds_corr)
+rld <- rlog(dds_corr, blind = T)
+rld_df <- data.frame(row.names = paste0(H3K27Ac_corr$peaks[[1]]$Chr,"-",H3K27Ac_corr$peaks[[1]]$Start,"-",H3K27Ac_corr$peaks[[1]]$End),
+           assay(rld))
+search <- strong_correlates[,c("PeakID","spearman")]
+search <- search[!duplicated(search$PeakID),]
+
+
+Corr_group <- data.frame(
+  PeakID = rownames(rld_df),
+  spearman = qdapTools::lookup(terms = rownames(rld_df), key.match = search))
+Corr_group$group <- ifelse(Corr_group$spearman > 0.8, "Positive","Negative")
+
+rld_df$Corr_group <- qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")])
+rld_df$PeakID <- rownames(rld_df)
+rld_df_melt <- reshape2::melt(rld_df)
+
+ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group)) + geom_boxplot() + stat_compare_means()
+ggsave(filename = "Exports/Positive_vs_Negative_strong_correlation_H3K27Ac_Levels.eps", width = 5, height = 7)
+```
+
+No longer using annotation.
 
 ```{r}
 library(stringr)
-TC_NC_Type <- TC_NC_Enriched_TF_enhancers[TC_NC_Enriched_TF_enhancers$spearman > 0.6, "annotation"]
+
+TC_NC_Enriched_TF_enhancers_anno_df
+
+TC_NC_Type <- TC_NC_Enriched_TF_enhancers_anno_df[TC_NC_Enriched_TF_enhancers_anno_df$spearman > 0.6, "annotation"]
 
 summary(as.factor(TC_NC_Type))
 
@@ -666,8 +733,9 @@ Type_summary <- data.frame(Type = c("UTR",
                     "Downstream",
                     "Intragenic",
                     "Promoter"),
-           Count = c(3,49,3,24,15))
-
+           Count = c(21,399,31,469,139))
+# total of 1059
+#2.0%, 37.7%, 2.9%, 44.3%, 13.1%
 # Compute the position of labels
 Type_summary <- Type_summary %>% 
   arrange(desc(Type)) %>%
@@ -686,16 +754,19 @@ ggplot(Type_summary, aes(x="", y=prop, fill=Type)) +
 
 ggsave(filename = "Exports/Moderate_and_strong_pos_correlation_anno.pdf", height = 4, width = 5)
 
-TC_NC_Type2 <- TC_NC_Enriched_TF_enhancers[TC_NC_Enriched_TF_enhancers$spearman < -0.6, "annotation"]
+TC_NC_Type2 <- TC_NC_Enriched_TF_enhancers_anno_df[TC_NC_Enriched_TF_enhancers_anno_df$spearman < -0.6, "annotation"]
 
 summary(as.factor(TC_NC_Type2))
 
-Type_summary2 <- data.frame(Type = c( 
+Type_summary2 <- data.frame(Type = c(
+                    "UTR",
                     "Distal Intergenic",
                     "Downstream",
                     "Intragenic",
                     "Promoter"),
-           Count = c(32,3,31,10))
+           Count = c(12,307,22,345,122))
+# 808 total.
+# 1.5%,38%, 2.7%, 42.7%, 15.1%
 
 # Compute the position of labels
 Type_summary2 <- Type_summary2 %>% 
@@ -715,3 +786,4 @@ ggplot(Type_summary2, aes(x="", y=prop, fill=Type)) +
 
 ggsave(filename = "Exports/Moderate_and_strong_neg_correlation_anno.pdf", height = 4, width = 5)
 ```
+

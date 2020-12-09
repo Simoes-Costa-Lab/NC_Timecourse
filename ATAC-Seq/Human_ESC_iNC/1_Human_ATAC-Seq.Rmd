@@ -87,19 +87,33 @@ for (i in seq(length(bamFiles))){
 
 # ESC vs D5 NC Analysis
 ```{r creating db object, echo=TRUE, eval=FALSE}
-NC_dba <- dba(sampleSheet="ESC_SampleSheet_NC.csv")
-NC_dba <- dba.count(NC_dba)
+NC_dba <- dba(sampleSheet="ESC_SampleSheet_Master.csv")
+NC_dba <- dba.count(NC_dba, bParallel = T)
 # All ESC vs NC
 #NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$NC)
 # ESC vs D3
-#NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D3)
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D3)
 # ESC vs D5 
-# Negative fold change is enriched in D5, positive is enriched in ESC
 NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D5)
 # D3 vs D5
-#NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$D5)
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$D5)
+# ESC vs Mel
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$Mel)
+# Mel vs D3
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$Mel)
+# Mel vs D5
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$Mel, NC_dba$masks$D5)
+
 NC_dba <- dba.analyze(NC_dba, bParallel = T)
-NC_res <- dba.report(NC_dba)
+
+ESC_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 1))
+ESC_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 2))
+D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 3))
+D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 4))
+D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 5))
+D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 6))
+
+
 
 
 
@@ -248,6 +262,9 @@ findMotifsGenome.pl D3_ESC_Enriched_5k.bed hg38 D3_ESC_Enriched_5k_HOMER -p 31
 ## Normalized counts via DESeq2
 While we have used diffbind to generate peaksets, we do not have an easy way to generate normalized counts directly from the diffbind object. Therefore, we must transform it into a DESeq2 object to generate a set of normalized counts for additional analysis.
 ```{r DESeq2, echo=TRUE}
+NC_dba <- dba(sampleSheet="ESC_SampleSheet_Master.csv")
+NC_dba <- dba.count(NC_dba, bParallel = T)
+dba.plotPCA(NC_dba)
 # Running DeSeq to get Rlog counts
 library(DESeq2)
 summarized_experiment2 <- dba(NC_dba, bSummarizedExperiment = T)
@@ -269,31 +286,32 @@ library(pheatmap)
 
 rld_df_avg <- data.frame(ES_D0 = rowMeans(rld_df[c('ATAC_ES_D0_1', 'ATAC_ES_D0_2')], na.rm=TRUE),
                          NC_D3 = rowMeans(rld_df[c('ATAC_NC_D3_1', 'ATAC_NC_D3_2')], na.rm=TRUE),
-                         NC_D5 = rowMeans(rld_df[c('ATAC_NC_D5_1', 'ATAC_NC_D5_2')], na.rm=TRUE))
+                         NC_D5 = rowMeans(rld_df[c('ATAC_NC_D5_1', 'ATAC_NC_D5_2')], na.rm=TRUE),
+                         NC_D14 = rowMeans(rld_df[c('ATAC_Myo_D14_1', 'ATAC_Myo_D14_2')], na.rm=TRUE)) 
 
 write.table(rld_df_avg, file = "./Exports/Rlog_counts_Avg_All_Human_ESC-NC_ATAC_Peaks", quote = F, sep = "\t", row.names = T)
 
-deseq2_peakset <- as.data.frame(dds_results) %>% dplyr::filter(padj < 1e-5)
+deseq2_peakset <- as.data.frame(dds_results) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
 dds_results2 <- results(dds_experiment2, contrast = c("Condition","D3","D5"))
-deseq2_peakset2 <- as.data.frame(dds_results2) %>% dplyr::filter(padj < 1e-5)
+deseq2_peakset2 <- as.data.frame(dds_results2) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
 dds_results3 <- results(dds_experiment2, contrast = c("Condition","D0","D3"))
-deseq2_peakset3 <- as.data.frame(dds_results3) %>% dplyr::filter(padj < 1e-5)
+deseq2_peakset3 <- as.data.frame(dds_results3) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
+dds_results4 <- results(dds_experiment2, contrast = c("Condition","D5","Diff-14"))
+deseq2_peakset4 <- as.data.frame(dds_results4) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
+dds_results5 <- results(dds_experiment2, contrast = c("Condition","D3","Diff-14"))
+deseq2_peakset5 <- as.data.frame(dds_results5) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
+dds_results6 <- results(dds_experiment2, contrast = c("Condition","D0","Diff-14"))
+deseq2_peakset6 <- as.data.frame(dds_results6) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
 
-unique_peaks <- unique(c(rownames(deseq2_peakset),
-         rownames(deseq2_peakset2),
-         rownames(deseq2_peakset3)))
+unique_peaks <- unique(c(deseq2_peakset$rowname,deseq2_peakset2$rowname, 
+                         deseq2_peakset3$rowname, deseq2_peakset4$rowname,
+                         deseq2_peakset5$rowname, deseq2_peakset6$rowname))
 
 rld_df_subset <- subset(rld_df, rownames(rld_df) %in% unique_peaks)
-
+rld_df_subset <- rld_df_subset[,c(1,2,7,8,9,10,5,6)]
 ATAC_clusters = pheatmap(rld_df_subset,
                          cluster_cols = F, scale = "row",
                          show_rownames = F,show_colnames = T, cluster_rows = T, cutree_rows = 4,
-                         color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250))
-
-#So it renders properly in html doc
-pheatmap(rld_df_subset,
-                         cluster_cols = F, scale = "row",
-                         show_rownames = F,show_colnames = T,
                          color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250))
 
 #Re-order original data (genes) to match ordering in heatmap (top-to-bottom)
@@ -307,12 +325,13 @@ clusters_4 <- data.frame(
 # Cluster 2 is only ESC
 # Cluster 3 is D3-D5 enriched
 # Cluster 4 is ESC-D3 enriched
+
 row_annotation <- data.frame(cluster = clusters_4$cluster, row.names = clusters_4$peak)
 pheatmap(rld_df_subset, annotation_row = row_annotation, 
                          cluster_cols = F, scale = "row",
                          show_rownames = F,show_colnames = T, cluster_rows = T, cutree_rows = 4,
                          color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250),
-         filename = "./Exports/Rlog_Counts_Human_DeSeq2_ATAC_peaks.pdf", width = 6, height = 5)
+         filename = "./Exports/Rlog_Counts_Human_DeSeq2_ATAC_peaks.pdf", width = 8, height = 6)
 library(stringr)
 clusters_bed <- clusters_4 %>%
   tidyr::separate(col = peak, sep = "_", into = c("chr","start","end"))

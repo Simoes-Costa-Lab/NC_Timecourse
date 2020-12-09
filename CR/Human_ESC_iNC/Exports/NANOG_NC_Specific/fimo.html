@@ -1,0 +1,2679 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:cis="http://zlab.bu.edu/schema/cisml" xmlns:fimo="http://noble.gs.washington.edu/schema/cisml" xmlns:mem="http://noble.gs.washington.edu/meme">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>FIMO Results</title>
+<style type="text/css">
+td.left {text-align: left;}
+td.right {text-align: right; padding-right: 1cm;}
+</style>
+</head>
+<body color="#000000">
+<a name="top_buttons"></a>
+<hr>
+<table summary="buttons" align="left" cellspacing="0">
+<tr>
+<td bgcolor="#00FFFF"><a href="#database_and_motifs"><b>Database and Motifs</b></a></td>
+<td bgcolor="#DDFFDD"><a href="#sec_i"><b>High-scoring Motif Occurences</b></a></td>
+<td bgcolor="#DDDDFF"><a href="#debugging_information"><b>Debugging Information</b></a></td>
+<td bgcolor="#FFDD00"><a href="fimo.tsv""><b>Results in TSV Format</b></a></td>
+<td bgcolor="#FFDDFF"><a href="fimo.gff""><b>Results in GFF3 Format</b></a></td>
+</tr>
+</table>
+<br/>
+<br/>
+<hr/>
+<center><big><b>FIMO - Motif search tool</b></big></center>
+<hr>
+<p>
+FIMO version 5.0.5, (Release date: Mon Mar 18 20:12:19 2019 -0700)
+</p>
+<p>
+For further information on how to interpret these results please access <a href="http://meme-suite.org/doc/fimo-output-format.html">http://meme-suite.org/doc/fimo-output-format.html</a>.<br>
+To get a copy of the FIMO software please access <a href="http://meme-suite.org">http://meme-suite.org</a>
+
+</p>
+<p>If you use FIMO in your research, please cite the following paper:<br>
+Charles E. Grant, Timothy L. Bailey, and William Stafford Noble,
+"FIMO: Scanning for occurrences of a given motif",
+<i>Bioinformatics</i>, <b>27</b>(7):1017-1018, 2011.
+<a href="http://bioinformatics.oxfordjournals.org/content/27/7/1017">[full text]</a></p>
+<hr>
+<center><big><b><a name="database_and_motifs">DATABASE AND MOTIFS</a></b></big></center>
+<hr>
+<div style="padding-left: 0.75in; line-height: 1em; font-family: monospace;">
+<p>
+  DATABASE NC_Specific_motifs.fa
+  <br />
+  Database contains 229 sequences, 80254 residues
+</p>
+<p>
+  MOTIFS ../Imports/UN0383.1.meme (DNA)
+  <table>
+    <thead>
+      <tr>
+        <th style="border-bottom: 1px dashed;">MOTIF</th>
+        <th style="border-bottom: 1px dashed; padding-left: 1em;">WIDTH</th>
+        <th style="border-bottom: 1px dashed; padding-left: 1em;text-align:left;" >
+         BEST POSSIBLE MATCH
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:right;">UN0383.1</td>
+        <td style="text-align:right;padding-left: 1em;">11</td>
+        <td style="text-align:left;padding-left: 1em;">TAACAATGGAA</td>
+       </tr>
+    </tbody>
+  </table>
+</p>
+<p>
+Random model letter frequencies (--nrdb--):
+<br/>
+
+A 0.275 C 0.225 G 0.225 T 0.275 </p>
+</div>
+<hr>
+<center><big><b><a name="sec_i">SECTION I: HIGH-SCORING MOTIF OCCURENCES</a></b></big></center>
+<hr>
+<ul>
+<li>
+There were 227 motif occurences with a p-value less than 0.001.
+
+The full set of motif occurences can be seen in the
+TSV (tab-delimited values) output file
+<a href="fimo.tsv">fimo.tsv</a>, 
+the GFF3 file 
+<a href="fimo.gff">fimo.gff</a> 
+which may be suitable for uploading to the 
+<a href="http://genome.ucsc.edu/cgi-bin/hgTables">UCSC Genome Table Browser</a>
+(assuming the FASTA input sequences included genomic coordinates in UCSC or Galaxy format),
+or the XML file 
+<a href="fimo.xml">fimo.xml</a>.
+</li>
+<li>
+The <i>p</i>-value of a motif occurrence is defined as the
+probability of a random sequence of the same length as the motif
+matching that position of the sequence with as good or better a score.
+</li>
+<li>
+The score for the match of a position in a sequence to a motif
+is computed by summing the appropriate entries from each column of
+the position-dependent scoring matrix that represents the motif.
+</li>
+<li>
+The q-value of a motif occurrence is defined as the
+false discovery rate if the occurrence is accepted as significant.
+</li>
+<li>The table is sorted by increasing <i>p</i>-value.</li>
+</ul>
+<table border="1">
+<thead>
+<tr>
+<th>Motif ID</th>
+<th>Alt ID</th>
+<th>Sequence Name</th>
+<th>Strand</th>
+<th>Start</th>
+<th>End</th>
+<th>p-value</th>
+<th>q-value</th>
+<th>Matched Sequence</th>
+</tr>
+</thead>
+<tbody>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:166888721-166889242</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">158</td>
+      <td style="text-align:left;">168</td>
+      <td style="text-align:left;">2.63e-06</td>
+      <td style="text-align:left;">0.243</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:123773601-123774219</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">423</td>
+      <td style="text-align:left;">433</td>
+      <td style="text-align:left;">6.57e-06</td>
+      <td style="text-align:left;">0.243</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:34643471-34644054</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">209</td>
+      <td style="text-align:left;">219</td>
+      <td style="text-align:left;">6.87e-06</td>
+      <td style="text-align:left;">0.243</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:100819084-100819708</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">248</td>
+      <td style="text-align:left;">258</td>
+      <td style="text-align:left;">6.87e-06</td>
+      <td style="text-align:left;">0.243</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:145957969-145958169</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">48</td>
+      <td style="text-align:left;">58</td>
+      <td style="text-align:left;">1.2e-05</td>
+      <td style="text-align:left;">0.34</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:99663894-99664068</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">58</td>
+      <td style="text-align:left;">68</td>
+      <td style="text-align:left;">1.83e-05</td>
+      <td style="text-align:left;">0.384</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGACAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:11606165-11606472</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">62</td>
+      <td style="text-align:left;">72</td>
+      <td style="text-align:left;">2.17e-05</td>
+      <td style="text-align:left;">0.384</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">493</td>
+      <td style="text-align:left;">503</td>
+      <td style="text-align:left;">2.17e-05</td>
+      <td style="text-align:left;">0.384</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:18569609-18569790</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">93</td>
+      <td style="text-align:left;">103</td>
+      <td style="text-align:left;">2.49e-05</td>
+      <td style="text-align:left;">0.392</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:97877355-97877542</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">139</td>
+      <td style="text-align:left;">149</td>
+      <td style="text-align:left;">5.59e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCACAATGGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:177281719-177282427</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">671</td>
+      <td style="text-align:left;">681</td>
+      <td style="text-align:left;">7.35e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:52835021-52835520</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">148</td>
+      <td style="text-align:left;">158</td>
+      <td style="text-align:left;">7.35e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGACA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:120899031-120899357</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">180</td>
+      <td style="text-align:left;">190</td>
+      <td style="text-align:left;">7.47e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATGAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:92439228-92439376</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">107</td>
+      <td style="text-align:left;">117</td>
+      <td style="text-align:left;">7.73e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:13960515-13961169</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">296</td>
+      <td style="text-align:left;">306</td>
+      <td style="text-align:left;">7.78e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAGCC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:54486137-54486919</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">313</td>
+      <td style="text-align:left;">323</td>
+      <td style="text-align:left;">8.07e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGCAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:28558994-28559463</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">46</td>
+      <td style="text-align:left;">56</td>
+      <td style="text-align:left;">8.13e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATGACA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr13:16794026-16794391</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">203</td>
+      <td style="text-align:left;">213</td>
+      <td style="text-align:left;">9.36e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATAGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:71435611-71435964</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">182</td>
+      <td style="text-align:left;">192</td>
+      <td style="text-align:left;">9.72e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATGAAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:28622797-28623468</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">412</td>
+      <td style="text-align:left;">422</td>
+      <td style="text-align:left;">9.72e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:47297636-47297938</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">159</td>
+      <td style="text-align:left;">169</td>
+      <td style="text-align:left;">9.94e-05</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATGATA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:32251861-32252191</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">215</td>
+      <td style="text-align:left;">225</td>
+      <td style="text-align:left;">0.000115</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATAGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:140846618-140847035</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">36</td>
+      <td style="text-align:left;">46</td>
+      <td style="text-align:left;">0.000121</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATGAGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr18:5123065-5123707</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">170</td>
+      <td style="text-align:left;">180</td>
+      <td style="text-align:left;">0.000125</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATGCTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:123031686-123031883</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">25</td>
+      <td style="text-align:left;">35</td>
+      <td style="text-align:left;">0.00013</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATGAAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:131371998-131372187</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">111</td>
+      <td style="text-align:left;">121</td>
+      <td style="text-align:left;">0.000142</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATGCTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:61612221-61612562</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">259</td>
+      <td style="text-align:left;">269</td>
+      <td style="text-align:left;">0.00015</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATGACA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:70652453-70652730</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">205</td>
+      <td style="text-align:left;">215</td>
+      <td style="text-align:left;">0.000157</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGACAATGAGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:114034836-114035104</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">33</td>
+      <td style="text-align:left;">43</td>
+      <td style="text-align:left;">0.000159</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:21520236-21520514</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">62</td>
+      <td style="text-align:left;">72</td>
+      <td style="text-align:left;">0.000162</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGACT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:137775906-137776352</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">305</td>
+      <td style="text-align:left;">315</td>
+      <td style="text-align:left;">0.000162</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATAGCC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:192584751-192585266</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">358</td>
+      <td style="text-align:left;">368</td>
+      <td style="text-align:left;">0.000162</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATGACC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:114034836-114035104</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">175</td>
+      <td style="text-align:left;">185</td>
+      <td style="text-align:left;">0.000175</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGTAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr9:16828549-16829053</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">212</td>
+      <td style="text-align:left;">222</td>
+      <td style="text-align:left;">0.000176</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATAGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:4918806-4919314</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">13</td>
+      <td style="text-align:left;">23</td>
+      <td style="text-align:left;">0.000188</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATGCTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:33410085-33410737</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">287</td>
+      <td style="text-align:left;">297</td>
+      <td style="text-align:left;">0.000188</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATGCTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:36022145-36022894</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">39</td>
+      <td style="text-align:left;">49</td>
+      <td style="text-align:left;">0.000189</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATGTCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:8316211-8316580</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">80</td>
+      <td style="text-align:left;">90</td>
+      <td style="text-align:left;">0.000191</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTACAATGCAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:52835021-52835520</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">365</td>
+      <td style="text-align:left;">375</td>
+      <td style="text-align:left;">0.000196</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATGCAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:490057-490211</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">143</td>
+      <td style="text-align:left;">153</td>
+      <td style="text-align:left;">0.0002</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATGTCC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:61612221-61612562</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">236</td>
+      <td style="text-align:left;">246</td>
+      <td style="text-align:left;">0.00021</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAATGAAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr6:27838242-27838626</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">322</td>
+      <td style="text-align:left;">332</td>
+      <td style="text-align:left;">0.000211</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATGCAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:11114410-11114610</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">131</td>
+      <td style="text-align:left;">141</td>
+      <td style="text-align:left;">0.000217</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATGTGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:33410085-33410737</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">638</td>
+      <td style="text-align:left;">648</td>
+      <td style="text-align:left;">0.000223</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAATGCAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:4136230-4136749</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">140</td>
+      <td style="text-align:left;">150</td>
+      <td style="text-align:left;">0.000225</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATGTAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:146672245-146672509</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">170</td>
+      <td style="text-align:left;">180</td>
+      <td style="text-align:left;">0.000226</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATGAGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr20:12086125-12086356</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">179</td>
+      <td style="text-align:left;">189</td>
+      <td style="text-align:left;">0.000227</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGTGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr18:5123065-5123707</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">434</td>
+      <td style="text-align:left;">444</td>
+      <td style="text-align:left;">0.000227</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATGTGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:36584271-36584582</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">63</td>
+      <td style="text-align:left;">73</td>
+      <td style="text-align:left;">0.000239</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATGAGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:44016555-44016916</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">118</td>
+      <td style="text-align:left;">128</td>
+      <td style="text-align:left;">0.000242</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATAGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:13860131-13860755</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">213</td>
+      <td style="text-align:left;">223</td>
+      <td style="text-align:left;">0.000247</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATAGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:34643471-34644054</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">379</td>
+      <td style="text-align:left;">389</td>
+      <td style="text-align:left;">0.000247</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATGTAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:19138852-19139458</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">32</td>
+      <td style="text-align:left;">42</td>
+      <td style="text-align:left;">0.000249</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATGCGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr13:17255358-17255480</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">34</td>
+      <td style="text-align:left;">44</td>
+      <td style="text-align:left;">0.000255</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTACAATGCCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr9:9329776-9330325</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">165</td>
+      <td style="text-align:left;">175</td>
+      <td style="text-align:left;">0.000258</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATGTGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:56110980-56111395</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">137</td>
+      <td style="text-align:left;">147</td>
+      <td style="text-align:left;">0.000262</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGCTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:70426044-70426540</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">120</td>
+      <td style="text-align:left;">130</td>
+      <td style="text-align:left;">0.000264</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATGTTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:19138852-19139458</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">376</td>
+      <td style="text-align:left;">386</td>
+      <td style="text-align:left;">0.000279</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATGCTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:32321001-32321422</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">140</td>
+      <td style="text-align:left;">150</td>
+      <td style="text-align:left;">0.00028</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATGTCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr9:16828549-16829053</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">138</td>
+      <td style="text-align:left;">148</td>
+      <td style="text-align:left;">0.000288</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGCTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:8437016-8437234</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">98</td>
+      <td style="text-align:left;">108</td>
+      <td style="text-align:left;">0.000291</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAATGATC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:80431468-80431948</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">109</td>
+      <td style="text-align:left;">119</td>
+      <td style="text-align:left;">0.000297</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:11606165-11606472</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">121</td>
+      <td style="text-align:left;">131</td>
+      <td style="text-align:left;">0.000297</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTACAATGTAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:28558994-28559463</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">362</td>
+      <td style="text-align:left;">372</td>
+      <td style="text-align:left;">0.000297</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTACAATGTAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:39153703-39154097</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">62</td>
+      <td style="text-align:left;">72</td>
+      <td style="text-align:left;">0.000307</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGATAATGGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:18676245-18676679</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">360</td>
+      <td style="text-align:left;">370</td>
+      <td style="text-align:left;">0.000307</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAGGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:46850738-46851091</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">170</td>
+      <td style="text-align:left;">180</td>
+      <td style="text-align:left;">0.000308</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAATAATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:60436239-60436522</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">108</td>
+      <td style="text-align:left;">118</td>
+      <td style="text-align:left;">0.000309</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGACAATGTGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr18:5123065-5123707</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">137</td>
+      <td style="text-align:left;">147</td>
+      <td style="text-align:left;">0.000309</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAATAGGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr18:5414534-5415423</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">207</td>
+      <td style="text-align:left;">217</td>
+      <td style="text-align:left;">0.000312</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAATGATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:81696879-81697427</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">402</td>
+      <td style="text-align:left;">412</td>
+      <td style="text-align:left;">0.000318</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATGTGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:10068502-10069087</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">416</td>
+      <td style="text-align:left;">426</td>
+      <td style="text-align:left;">0.000318</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATGTGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:162822181-162822342</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">82</td>
+      <td style="text-align:left;">92</td>
+      <td style="text-align:left;">0.00032</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATAAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:122879601-122880186</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">63</td>
+      <td style="text-align:left;">73</td>
+      <td style="text-align:left;">0.000325</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CTACAATGAAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:97877355-97877542</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">9</td>
+      <td style="text-align:left;">19</td>
+      <td style="text-align:left;">0.000327</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATGTGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:80431468-80431948</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">154</td>
+      <td style="text-align:left;">164</td>
+      <td style="text-align:left;">0.000327</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CTACAATGACC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:79057596-79058217</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">472</td>
+      <td style="text-align:left;">482</td>
+      <td style="text-align:left;">0.000327</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATGTGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:82175-82501</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">222</td>
+      <td style="text-align:left;">232</td>
+      <td style="text-align:left;">0.000328</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGATAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:9422718-9422924</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">72</td>
+      <td style="text-align:left;">82</td>
+      <td style="text-align:left;">0.000334</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATGTTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:22326985-22327290</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">91</td>
+      <td style="text-align:left;">101</td>
+      <td style="text-align:left;">0.000335</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:61612221-61612562</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">87</td>
+      <td style="text-align:left;">97</td>
+      <td style="text-align:left;">0.000345</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCACAATGACT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:28622797-28623468</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">378</td>
+      <td style="text-align:left;">388</td>
+      <td style="text-align:left;">0.000349</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CTACAATAGCC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:21318533-21318653</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">10</td>
+      <td style="text-align:left;">20</td>
+      <td style="text-align:left;">0.000351</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCATAATGGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">539</td>
+      <td style="text-align:left;">549</td>
+      <td style="text-align:left;">0.000351</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTATAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">534</td>
+      <td style="text-align:left;">544</td>
+      <td style="text-align:left;">0.000351</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTATAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:122879601-122880186</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">431</td>
+      <td style="text-align:left;">441</td>
+      <td style="text-align:left;">0.000356</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACATAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr9:16152740-16153233</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">385</td>
+      <td style="text-align:left;">395</td>
+      <td style="text-align:left;">0.000363</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAAAGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:13860131-13860755</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">6</td>
+      <td style="text-align:left;">16</td>
+      <td style="text-align:left;">0.000365</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATGGGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:72955204-72955565</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">330</td>
+      <td style="text-align:left;">340</td>
+      <td style="text-align:left;">0.000365</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAACA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:4918806-4919314</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">5</td>
+      <td style="text-align:left;">15</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CTACAATGCAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:30492529-30493202</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">8</td>
+      <td style="text-align:left;">18</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAAAGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:120899031-120899357</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">38</td>
+      <td style="text-align:left;">48</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATATAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:33410085-33410737</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">55</td>
+      <td style="text-align:left;">65</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAAAGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:70652453-70652730</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">262</td>
+      <td style="text-align:left;">272</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CTACAATGCAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:124098537-124099145</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">371</td>
+      <td style="text-align:left;">381</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAAAGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:59406992-59407230</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">65</td>
+      <td style="text-align:left;">75</td>
+      <td style="text-align:left;">0.00037</td>
+      <td style="text-align:left;">0.546</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATAAAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:100924866-100925363</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">298</td>
+      <td style="text-align:left;">308</td>
+      <td style="text-align:left;">0.000379</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAGGGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:124514043-124514387</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">182</td>
+      <td style="text-align:left;">192</td>
+      <td style="text-align:left;">0.000385</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCACAATAGGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:8316211-8316580</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">115</td>
+      <td style="text-align:left;">125</td>
+      <td style="text-align:left;">0.000389</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACATAATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:143212829-143213364</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">295</td>
+      <td style="text-align:left;">305</td>
+      <td style="text-align:left;">0.000398</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATAAGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr6:32706473-32706643</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">89</td>
+      <td style="text-align:left;">99</td>
+      <td style="text-align:left;">0.0004</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATGGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:123773601-123774219</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">16</td>
+      <td style="text-align:left;">26</td>
+      <td style="text-align:left;">0.000402</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACATAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr9:9329776-9330325</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">482</td>
+      <td style="text-align:left;">492</td>
+      <td style="text-align:left;">0.000407</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATACAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:6511496-6512050</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">140</td>
+      <td style="text-align:left;">150</td>
+      <td style="text-align:left;">0.00041</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACTATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:8010709-8010939</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">123</td>
+      <td style="text-align:left;">133</td>
+      <td style="text-align:left;">0.000416</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATATAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:13762690-13762975</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">134</td>
+      <td style="text-align:left;">144</td>
+      <td style="text-align:left;">0.000416</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATACCC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:84938468-84938931</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">442</td>
+      <td style="text-align:left;">452</td>
+      <td style="text-align:left;">0.000418</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGATAATGGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:166888721-166889242</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">358</td>
+      <td style="text-align:left;">368</td>
+      <td style="text-align:left;">0.000419</td>
+      <td style="text-align:left;">0.549</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAAAGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:10068502-10069087</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">513</td>
+      <td style="text-align:left;">523</td>
+      <td style="text-align:left;">0.000423</td>
+      <td style="text-align:left;">0.55</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAAAGGTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:4627989-4628293</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">196</td>
+      <td style="text-align:left;">206</td>
+      <td style="text-align:left;">0.000428</td>
+      <td style="text-align:left;">0.55</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATACAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:65881533-65881964</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">51</td>
+      <td style="text-align:left;">61</td>
+      <td style="text-align:left;">0.000433</td>
+      <td style="text-align:left;">0.551</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATACAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:100924866-100925363</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">383</td>
+      <td style="text-align:left;">393</td>
+      <td style="text-align:left;">0.000439</td>
+      <td style="text-align:left;">0.551</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CTACAATGATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:76449195-76449304</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">47</td>
+      <td style="text-align:left;">57</td>
+      <td style="text-align:left;">0.000442</td>
+      <td style="text-align:left;">0.551</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATAAAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:124557131-124557331</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">187</td>
+      <td style="text-align:left;">197</td>
+      <td style="text-align:left;">0.00045</td>
+      <td style="text-align:left;">0.551</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:137775906-137776352</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">151</td>
+      <td style="text-align:left;">161</td>
+      <td style="text-align:left;">0.000451</td>
+      <td style="text-align:left;">0.551</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAAAGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr9:9329776-9330325</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">284</td>
+      <td style="text-align:left;">294</td>
+      <td style="text-align:left;">0.000451</td>
+      <td style="text-align:left;">0.551</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAAGAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:100924866-100925363</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">286</td>
+      <td style="text-align:left;">296</td>
+      <td style="text-align:left;">0.000458</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGATAATGGTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:60436239-60436522</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">187</td>
+      <td style="text-align:left;">197</td>
+      <td style="text-align:left;">0.000462</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATACAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:32321001-32321422</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">78</td>
+      <td style="text-align:left;">88</td>
+      <td style="text-align:left;">0.000475</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAAAGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:97877355-97877542</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">27</td>
+      <td style="text-align:left;">37</td>
+      <td style="text-align:left;">0.000477</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATAATC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr10:11636654-11637350</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">322</td>
+      <td style="text-align:left;">332</td>
+      <td style="text-align:left;">0.00048</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATAAAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:60530523-60530958</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">258</td>
+      <td style="text-align:left;">268</td>
+      <td style="text-align:left;">0.000489</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:1919364-1919651</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">255</td>
+      <td style="text-align:left;">265</td>
+      <td style="text-align:left;">0.000496</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACTATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:1917435-1917745</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">271</td>
+      <td style="text-align:left;">281</td>
+      <td style="text-align:left;">0.000498</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATAATT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:145898962-145899600</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">194</td>
+      <td style="text-align:left;">204</td>
+      <td style="text-align:left;">0.000501</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAAGAATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:65881533-65881964</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">168</td>
+      <td style="text-align:left;">178</td>
+      <td style="text-align:left;">0.000504</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACTATGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:90390491-90390878</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">160</td>
+      <td style="text-align:left;">170</td>
+      <td style="text-align:left;">0.000506</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:26403635-26404252</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">549</td>
+      <td style="text-align:left;">559</td>
+      <td style="text-align:left;">0.000516</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATACAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr6:27838242-27838626</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">157</td>
+      <td style="text-align:left;">167</td>
+      <td style="text-align:left;">0.000518</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAAGAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:28558994-28559463</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">272</td>
+      <td style="text-align:left;">282</td>
+      <td style="text-align:left;">0.000526</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAAAGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr13:16688874-16689248</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">26</td>
+      <td style="text-align:left;">36</td>
+      <td style="text-align:left;">0.000535</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATAACC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:19757675-19757849</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">42</td>
+      <td style="text-align:left;">52</td>
+      <td style="text-align:left;">0.000535</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATAATA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:193311642-193311882</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">103</td>
+      <td style="text-align:left;">113</td>
+      <td style="text-align:left;">0.000535</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATATAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:92439228-92439376</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">135</td>
+      <td style="text-align:left;">145</td>
+      <td style="text-align:left;">0.000535</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATATAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:43436295-43436901</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">318</td>
+      <td style="text-align:left;">328</td>
+      <td style="text-align:left;">0.000535</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATACTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr10:20977432-20977722</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">84</td>
+      <td style="text-align:left;">94</td>
+      <td style="text-align:left;">0.00055</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCATAATGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:12552979-12553674</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">550</td>
+      <td style="text-align:left;">560</td>
+      <td style="text-align:left;">0.00055</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATAAAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:122879601-122880186</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">192</td>
+      <td style="text-align:left;">202</td>
+      <td style="text-align:left;">0.000553</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATAACC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:143231255-143231605</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">217</td>
+      <td style="text-align:left;">227</td>
+      <td style="text-align:left;">0.000553</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTATAATGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:122571193-122571706</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">427</td>
+      <td style="text-align:left;">437</td>
+      <td style="text-align:left;">0.000553</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTATAATGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:28558994-28559463</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">300</td>
+      <td style="text-align:left;">310</td>
+      <td style="text-align:left;">0.000554</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATACAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:6445394-6445600</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">28</td>
+      <td style="text-align:left;">38</td>
+      <td style="text-align:left;">0.000558</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACAATAACA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:124514043-124514387</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">110</td>
+      <td style="text-align:left;">120</td>
+      <td style="text-align:left;">0.000562</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:36988709-36989021</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">272</td>
+      <td style="text-align:left;">282</td>
+      <td style="text-align:left;">0.000562</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAGTGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:55789271-55789415</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">123</td>
+      <td style="text-align:left;">133</td>
+      <td style="text-align:left;">0.000573</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATAAGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:24296923-24297244</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">134</td>
+      <td style="text-align:left;">144</td>
+      <td style="text-align:left;">0.000581</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATACTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:34643471-34644054</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">229</td>
+      <td style="text-align:left;">239</td>
+      <td style="text-align:left;">0.000584</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATATAATGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:19138852-19139458</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">454</td>
+      <td style="text-align:left;">464</td>
+      <td style="text-align:left;">0.000584</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGAGAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:8192507-8192953</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">172</td>
+      <td style="text-align:left;">182</td>
+      <td style="text-align:left;">0.000586</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAAGAATGGGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:11276322-11276834</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">204</td>
+      <td style="text-align:left;">214</td>
+      <td style="text-align:left;">0.000586</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAGAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:100819084-100819708</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">596</td>
+      <td style="text-align:left;">606</td>
+      <td style="text-align:left;">0.00059</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATAACT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:104818570-104818818</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">137</td>
+      <td style="text-align:left;">147</td>
+      <td style="text-align:left;">0.000594</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACTATGGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:12552979-12553674</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">587</td>
+      <td style="text-align:left;">597</td>
+      <td style="text-align:left;">0.000599</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTACAATAAAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:122480785-122481197</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">143</td>
+      <td style="text-align:left;">153</td>
+      <td style="text-align:left;">0.000604</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATATGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:123773601-123774219</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">352</td>
+      <td style="text-align:left;">362</td>
+      <td style="text-align:left;">0.000604</td>
+      <td style="text-align:left;">0.552</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAGTGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">406</td>
+      <td style="text-align:left;">416</td>
+      <td style="text-align:left;">0.000621</td>
+      <td style="text-align:left;">0.563</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAAGAATGGGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:32321001-32321422</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">314</td>
+      <td style="text-align:left;">324</td>
+      <td style="text-align:left;">0.00063</td>
+      <td style="text-align:left;">0.565</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAAAGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:28622797-28623468</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">113</td>
+      <td style="text-align:left;">123</td>
+      <td style="text-align:left;">0.000636</td>
+      <td style="text-align:left;">0.565</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGAGAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:104818570-104818818</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">167</td>
+      <td style="text-align:left;">177</td>
+      <td style="text-align:left;">0.000638</td>
+      <td style="text-align:left;">0.565</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACTATGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:90390491-90390878</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">275</td>
+      <td style="text-align:left;">285</td>
+      <td style="text-align:left;">0.000642</td>
+      <td style="text-align:left;">0.565</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AATCAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:143239314-143239944</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">497</td>
+      <td style="text-align:left;">507</td>
+      <td style="text-align:left;">0.000642</td>
+      <td style="text-align:left;">0.565</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AATCAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:31691005-31691243</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">100</td>
+      <td style="text-align:left;">110</td>
+      <td style="text-align:left;">0.000657</td>
+      <td style="text-align:left;">0.574</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACCATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:27447939-27448362</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">91</td>
+      <td style="text-align:left;">101</td>
+      <td style="text-align:left;">0.000666</td>
+      <td style="text-align:left;">0.578</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATAATA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr10:2106619-2107020</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">76</td>
+      <td style="text-align:left;">86</td>
+      <td style="text-align:left;">0.00067</td>
+      <td style="text-align:left;">0.578</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGAGAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:33410085-33410737</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">515</td>
+      <td style="text-align:left;">525</td>
+      <td style="text-align:left;">0.000687</td>
+      <td style="text-align:left;">0.588</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TATCAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:81462363-81462817</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">435</td>
+      <td style="text-align:left;">445</td>
+      <td style="text-align:left;">0.000694</td>
+      <td style="text-align:left;">0.588</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACAGAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:100924866-100925363</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">269</td>
+      <td style="text-align:left;">279</td>
+      <td style="text-align:left;">0.000696</td>
+      <td style="text-align:left;">0.588</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAATATTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:11114410-11114610</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">27</td>
+      <td style="text-align:left;">37</td>
+      <td style="text-align:left;">0.000702</td>
+      <td style="text-align:left;">0.588</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGACAATTGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:57602642-57603060</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">375</td>
+      <td style="text-align:left;">385</td>
+      <td style="text-align:left;">0.000702</td>
+      <td style="text-align:left;">0.588</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAATAATGAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr10:2106619-2107020</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">348</td>
+      <td style="text-align:left;">358</td>
+      <td style="text-align:left;">0.000716</td>
+      <td style="text-align:left;">0.594</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATTGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr13:16688874-16689248</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">83</td>
+      <td style="text-align:left;">93</td>
+      <td style="text-align:left;">0.000722</td>
+      <td style="text-align:left;">0.594</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:8649011-8649466</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">157</td>
+      <td style="text-align:left;">167</td>
+      <td style="text-align:left;">0.000722</td>
+      <td style="text-align:left;">0.594</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAGTGGTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:81600667-81601249</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">243</td>
+      <td style="text-align:left;">253</td>
+      <td style="text-align:left;">0.00074</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATGAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:23066012-23066341</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">237</td>
+      <td style="text-align:left;">247</td>
+      <td style="text-align:left;">0.000753</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAATATCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:43436295-43436901</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">572</td>
+      <td style="text-align:left;">582</td>
+      <td style="text-align:left;">0.000756</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCAGAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:32212624-32212786</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">22</td>
+      <td style="text-align:left;">32</td>
+      <td style="text-align:left;">0.000762</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACTATGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:70426044-70426540</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">437</td>
+      <td style="text-align:left;">447</td>
+      <td style="text-align:left;">0.000768</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATGAAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:12552979-12553674</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">490</td>
+      <td style="text-align:left;">500</td>
+      <td style="text-align:left;">0.000768</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAATATAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:38424553-38424939</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">220</td>
+      <td style="text-align:left;">230</td>
+      <td style="text-align:left;">0.000779</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATACTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:30666867-30667259</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">363</td>
+      <td style="text-align:left;">373</td>
+      <td style="text-align:left;">0.000779</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCACAGTGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:33151689-33152038</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">187</td>
+      <td style="text-align:left;">197</td>
+      <td style="text-align:left;">0.000786</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATATGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:114063347-114063891</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">188</td>
+      <td style="text-align:left;">198</td>
+      <td style="text-align:left;">0.000789</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATATGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr6:22699093-22699660</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">526</td>
+      <td style="text-align:left;">536</td>
+      <td style="text-align:left;">0.000799</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAATAATGAAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr13:16455595-16455777</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">59</td>
+      <td style="text-align:left;">69</td>
+      <td style="text-align:left;">0.000801</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAACAAAGGTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:192584751-192585266</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">467</td>
+      <td style="text-align:left;">477</td>
+      <td style="text-align:left;">0.000805</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATATTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:43436295-43436901</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">86</td>
+      <td style="text-align:left;">96</td>
+      <td style="text-align:left;">0.000812</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACACTGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:96900418-96901022</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">107</td>
+      <td style="text-align:left;">117</td>
+      <td style="text-align:left;">0.000812</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACACTGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:37640904-37641129</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">2</td>
+      <td style="text-align:left;">12</td>
+      <td style="text-align:left;">0.00082</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATAGAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:30492529-30493202</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">92</td>
+      <td style="text-align:left;">102</td>
+      <td style="text-align:left;">0.00082</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGAGAATGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr18:5414534-5415423</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">438</td>
+      <td style="text-align:left;">448</td>
+      <td style="text-align:left;">0.00082</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAAAAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr5:32251861-32252191</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">186</td>
+      <td style="text-align:left;">196</td>
+      <td style="text-align:left;">0.000824</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:30666867-30667259</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">242</td>
+      <td style="text-align:left;">252</td>
+      <td style="text-align:left;">0.000824</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:46850738-46851091</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">282</td>
+      <td style="text-align:left;">292</td>
+      <td style="text-align:left;">0.000824</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:52835021-52835520</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">291</td>
+      <td style="text-align:left;">301</td>
+      <td style="text-align:left;">0.000824</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATATTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:166888721-166889242</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">51</td>
+      <td style="text-align:left;">61</td>
+      <td style="text-align:left;">0.000833</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AATCAATGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:8010709-8010939</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">181</td>
+      <td style="text-align:left;">191</td>
+      <td style="text-align:left;">0.000837</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCACAAAGGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:76449195-76449304</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">66</td>
+      <td style="text-align:left;">76</td>
+      <td style="text-align:left;">0.000841</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGTCAATGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:52835021-52835520</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">470</td>
+      <td style="text-align:left;">480</td>
+      <td style="text-align:left;">0.000849</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATACAGTGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr13:17255358-17255480</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">98</td>
+      <td style="text-align:left;">108</td>
+      <td style="text-align:left;">0.000851</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAGGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:1919364-1919651</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">234</td>
+      <td style="text-align:left;">244</td>
+      <td style="text-align:left;">0.000855</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCATAATGGGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:17946485-17946674</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">153</td>
+      <td style="text-align:left;">163</td>
+      <td style="text-align:left;">0.00086</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATGAAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:23050387-23050695</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">20</td>
+      <td style="text-align:left;">30</td>
+      <td style="text-align:left;">0.000867</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAGAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:490057-490211</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">123</td>
+      <td style="text-align:left;">133</td>
+      <td style="text-align:left;">0.000867</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAGAAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr6:24985387-24985657</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">87</td>
+      <td style="text-align:left;">97</td>
+      <td style="text-align:left;">0.000873</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:140846618-140847035</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">399</td>
+      <td style="text-align:left;">409</td>
+      <td style="text-align:left;">0.000873</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACAATTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:71435611-71435964</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">61</td>
+      <td style="text-align:left;">71</td>
+      <td style="text-align:left;">0.000876</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAATTGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr12:4136230-4136749</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">14</td>
+      <td style="text-align:left;">24</td>
+      <td style="text-align:left;">0.000879</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTACAATAATT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:30666867-30667259</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">41</td>
+      <td style="text-align:left;">51</td>
+      <td style="text-align:left;">0.000879</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAGTGGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:61612221-61612562</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">157</td>
+      <td style="text-align:left;">167</td>
+      <td style="text-align:left;">0.000879</td>
+      <td style="text-align:left;">0.595</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCAGAATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:38424553-38424939</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">3</td>
+      <td style="text-align:left;">13</td>
+      <td style="text-align:left;">0.000886</td>
+      <td style="text-align:left;">0.598</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACACTGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:92439228-92439376</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">9</td>
+      <td style="text-align:left;">19</td>
+      <td style="text-align:left;">0.000891</td>
+      <td style="text-align:left;">0.598</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACCATGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:52835021-52835520</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">396</td>
+      <td style="text-align:left;">406</td>
+      <td style="text-align:left;">0.000901</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACAATATTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:69532660-69533020</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">253</td>
+      <td style="text-align:left;">263</td>
+      <td style="text-align:left;">0.000905</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTACAATACTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:61612221-61612562</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">111</td>
+      <td style="text-align:left;">121</td>
+      <td style="text-align:left;">0.000931</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAATAATGAAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:332773-333071</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">38</td>
+      <td style="text-align:left;">48</td>
+      <td style="text-align:left;">0.000937</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTAGAATGGGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:81889349-81889933</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">355</td>
+      <td style="text-align:left;">365</td>
+      <td style="text-align:left;">0.000937</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TTTCAATGGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:54486137-54486919</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">446</td>
+      <td style="text-align:left;">456</td>
+      <td style="text-align:left;">0.000937</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCACAAAGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:8192507-8192953</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">288</td>
+      <td style="text-align:left;">298</td>
+      <td style="text-align:left;">0.00094</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAAAAATGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr2:92511052-92511236</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">7</td>
+      <td style="text-align:left;">17</td>
+      <td style="text-align:left;">0.000944</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAATAATAGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:28558994-28559463</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">121</td>
+      <td style="text-align:left;">131</td>
+      <td style="text-align:left;">0.000944</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACATTGGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr4:80431468-80431948</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">429</td>
+      <td style="text-align:left;">439</td>
+      <td style="text-align:left;">0.000948</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAGTGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:124098537-124099145</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">459</td>
+      <td style="text-align:left;">469</td>
+      <td style="text-align:left;">0.000948</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACACAGTGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:176983800-176984144</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">146</td>
+      <td style="text-align:left;">156</td>
+      <td style="text-align:left;">0.000952</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAAGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr7:34643471-34644054</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">317</td>
+      <td style="text-align:left;">327</td>
+      <td style="text-align:left;">0.000952</td>
+      <td style="text-align:left;">0.602</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGATAATAGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr8:8316211-8316580</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">263</td>
+      <td style="text-align:left;">273</td>
+      <td style="text-align:left;">0.000968</td>
+      <td style="text-align:left;">0.609</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGACAATATTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr1:33410085-33410737</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">224</td>
+      <td style="text-align:left;">234</td>
+      <td style="text-align:left;">0.000976</td>
+      <td style="text-align:left;">0.612</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACAAAGACA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">UN0383.1</td>
+      <td style="text-align:left;">Nanog</td>
+      <td style="text-align:left;">chr3:9422718-9422924</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">94</td>
+      <td style="text-align:left;">104</td>
+      <td style="text-align:left;">0.000985</td>
+      <td style="text-align:left;">0.615</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGACAATTGGT</td>
+   </tr>
+</tbody>
+</table>
+
+<hr>
+<center><big><b><a name="debugging_information">DEBUGGING INFORMATION</a></b></big></center>
+<hr>
+<p>
+Command line:
+</p>
+<pre>
+fimo --thresh 1e-3 -o NANOG_NC_Specific ../Imports/UN0383.1.meme NC_Specific_motifs.fa
+</pre>
+<p>
+Settings:
+</p>
+<pre>
+<table>
+  <tr>
+    <td style="padding-right: 2em">output_directory = NANOG_NC_Specific</td>
+    <td style="padding-left: 5em; padding-right: 2em">MEME file name = ../Imports/UN0383.1.meme</td>
+    <td style="padding-left: 5em; padding-right: 2em">sequence file name = NC_Specific_motifs.fa</td>
+  </tr>  <tr>
+    <td style="padding-right: 2em">background file name = --nrdb--</td>
+    <td style="padding-left: 5em; padding-right: 2em">alphabet = DNA</td>
+    <td style="padding-left: 5em; padding-right: 2em">max stored scores = 100000</td>
+  </tr>  <tr>
+    <td style="padding-right: 2em">allow clobber = false</td>
+    <td style="padding-left: 5em; padding-right: 2em">compute q-values = true</td>
+    <td style="padding-left: 5em; padding-right: 2em">parse genomic coord. = false</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 2em">text only = false</td>
+    <td style="padding-left: 5em; padding-right: 2em">scan both strands = true</td>
+    <td style="padding-left: 5em; padding-right: 2em">max strand = false</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 2em">threshold type = p-value</td>
+    <td style="padding-left: 5em; padding-right: 2em">output theshold = 0.001</td>
+    <td style="padding-left: 5em; padding-right: 2em">pseudocount = 0.1</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 2em">alpha = 1</td>
+    <td style="padding-left: 5em; padding-right: 2em">verbosity = 2</td>
+    <td style="padding-left: 5em; padding-right: 2em"></td>
+  </tr>
+
+</table>
+</pre>
+<p>
+This information can be useful in the event you wish to report a
+problem with the FIMO software.
+</p>
+<hr>
+<span style="background-color: #DDDDFF"><a href="#top_buttons"><b>Go to top</b></a></span>
+</body>
+</html>

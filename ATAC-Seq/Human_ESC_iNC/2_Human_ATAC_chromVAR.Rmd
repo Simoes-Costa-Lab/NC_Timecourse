@@ -44,9 +44,11 @@ motif_ix <- matchMotifs(motifs, summarized_experiment2, genome = BSgenome.Hsapie
 dev <- computeDeviations(summarized_experiment2, motif_ix)
 dev@NAMES <- paste0(dev@NAMES,"_",TFBSTools::name(motifs))
 variability <- computeVariability(dev)
-plotVariability(variability, n = 5)
+plotVariability(variability, n = 5, use_plotly = F)
+ggsave("Exports/ESC_to_iNC_chromVAR_Variability.eps", width = 8, height = 6)
+
 tsne_dev <- deviationsTsne(dev, shiny = T) #1.5 var cutoff
-g <- plotDeviationsTsne(dev, tsne = tsne_dev, sample_column = "Tissue", shiny = F)
+g <- plotDeviationsTsne(dev, tsne = tsne_dev, sample_column = "Condition", shiny = F)
 
 diff_acc <- differentialDeviations(dev, "Condition")
 saveRDS(dev, file = "Exports/Human_ATAC_chromVAR_dev.RDS")
@@ -69,12 +71,40 @@ MYC <- plotDeviationsTsne(dev, tsne = tsne_dev, annotation_name = "MYC", shiny=F
 Rbpjl <- plotDeviationsTsne(dev, tsne = tsne_dev, annotation_name = "Rbpjl", shiny=F, var_df = variability)
 TCF7L2 <- plotDeviationsTsne(dev, tsne = tsne_dev, annotation_name = "TCF7L2", shiny=F, var_df = variability)
 TCF3 <- plotDeviationsTsne(dev, tsne = tsne_dev, annotation_name = "TCF3", shiny=F, var_df = variability)
+TFAP2a <- plotDeviationsTsne(dev, tsne = tsne_dev, annotation_name = "TFAP2A", shiny=F, var_df = variability)
 
 cowplot::plot_grid(sox2$SOX2, oct4_sox2$`Pou5f1::Sox2`, POU5F1$POU5F1, NR2F2$NR2F2, MITF$MITF, TWIST1$TWIST1)
 
 SMAD5 <- plotDeviationsTsne(dev, tsne = tsne_dev, annotation_name = "SMAD5", shiny=F, var_df = variability)
 
-cowplot::plot_grid(g$Tissue + theme(legend.position = "top"), oct4_sox2$`Pou5f1::Sox2`+ theme(legend.position = "none")+ ggtitle("Oct4:Sox2"), TCF3$TCF3 + theme(legend.position = "none")+ggtitle("TCF3"), NR2F2$NR2F2 + theme(legend.position = "none")+ggtitle("NR2F2"))
-ggsave("Exports/chromVAR_ES_to_Myo_2.eps", width = 7, height = 5)
+cowplot::plot_grid(g$Condition + theme(legend.position = "none") + ggtitle("Condition"), oct4_sox2$`Pou5f1::Sox2`+ theme(legend.position = "none")+ ggtitle("Oct4:Sox2"), TFAP2a$TFAP2A + theme(legend.position = "none")+ggtitle("TFAP2a"), sox2$SOX2 + theme(legend.position = "none")+ggtitle("Sox2"))
+ggsave("Exports/chromVAR_ES_to_Myo_3.eps", width = 7, height = 5)
+```
+
+Now, let's do the ESC vs NC chromVAR.
+
+```{r}
+All_dba <- dba(sampleSheet="ESC_SampleSheet_CombinedPeaks_NC_Myo.csv")
+All_dba <- dba.count(All_dba)
+summarized_experiment2 <- dba(All_dba, bSummarizedExperiment = T)
+summarized_experiment2@assays@data$scores <- summarized_experiment2@assays@data$Reads
+
+names(summarized_experiment2@assays) <- c("scores", "RPKM", "counts","cRPKM","cReads")
+summarized_experiment2 <- addGCBias(summarized_experiment2, genome = BSgenome.Hsapiens.UCSC.hg38)
+head(rowData(summarized_experiment2))
+opts <- list()
+opts["tax_group"] <- "vertebrates"
+opts["collection"] <- "CORE"
+motifs <- getMatrixSet(JASPAR2020, opts = opts)
+
+motif_ix <- matchMotifs(motifs, summarized_experiment2, genome = BSgenome.Hsapiens.UCSC.hg38)
+dev <- computeDeviations(summarized_experiment2, motif_ix)
+dev@NAMES <- paste0(dev@NAMES,"_",TFBSTools::name(motifs))
+variability <- computeVariability(dev)
+plotVariability(variability, n = 5)
+tsne_dev <- deviationsTsne(dev, shiny = T) #1.5 var cutoff
+g <- plotDeviationsTsne(dev, tsne = tsne_dev, sample_column = "Condition", shiny = F)
+
+diff_acc <- differentialDeviations(dev, "Condition")
 ```
 

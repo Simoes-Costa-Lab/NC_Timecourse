@@ -1,0 +1,1469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:cis="http://zlab.bu.edu/schema/cisml" xmlns:fimo="http://noble.gs.washington.edu/schema/cisml" xmlns:mem="http://noble.gs.washington.edu/meme">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>FIMO Results</title>
+<style type="text/css">
+td.left {text-align: left;}
+td.right {text-align: right; padding-right: 1cm;}
+</style>
+</head>
+<body color="#000000">
+<a name="top_buttons"></a>
+<hr>
+<table summary="buttons" align="left" cellspacing="0">
+<tr>
+<td bgcolor="#00FFFF"><a href="#database_and_motifs"><b>Database and Motifs</b></a></td>
+<td bgcolor="#DDFFDD"><a href="#sec_i"><b>High-scoring Motif Occurences</b></a></td>
+<td bgcolor="#DDDDFF"><a href="#debugging_information"><b>Debugging Information</b></a></td>
+<td bgcolor="#FFDD00"><a href="fimo.tsv""><b>Results in TSV Format</b></a></td>
+<td bgcolor="#FFDDFF"><a href="fimo.gff""><b>Results in GFF3 Format</b></a></td>
+</tr>
+</table>
+<br/>
+<br/>
+<hr/>
+<center><big><b>FIMO - Motif search tool</b></big></center>
+<hr>
+<p>
+FIMO version 5.0.5, (Release date: Mon Mar 18 20:12:19 2019 -0700)
+</p>
+<p>
+For further information on how to interpret these results please access <a href="http://meme-suite.org/doc/fimo-output-format.html">http://meme-suite.org/doc/fimo-output-format.html</a>.<br>
+To get a copy of the FIMO software please access <a href="http://meme-suite.org">http://meme-suite.org</a>
+
+</p>
+<p>If you use FIMO in your research, please cite the following paper:<br>
+Charles E. Grant, Timothy L. Bailey, and William Stafford Noble,
+"FIMO: Scanning for occurrences of a given motif",
+<i>Bioinformatics</i>, <b>27</b>(7):1017-1018, 2011.
+<a href="http://bioinformatics.oxfordjournals.org/content/27/7/1017">[full text]</a></p>
+<hr>
+<center><big><b><a name="database_and_motifs">DATABASE AND MOTIFS</a></b></big></center>
+<hr>
+<div style="padding-left: 0.75in; line-height: 1em; font-family: monospace;">
+<p>
+  DATABASE NC_Specific_motifs.fa
+  <br />
+  Database contains 229 sequences, 80254 residues
+</p>
+<p>
+  MOTIFS ../Imports/MA0696.1.meme (DNA)
+  <table>
+    <thead>
+      <tr>
+        <th style="border-bottom: 1px dashed;">MOTIF</th>
+        <th style="border-bottom: 1px dashed; padding-left: 1em;">WIDTH</th>
+        <th style="border-bottom: 1px dashed; padding-left: 1em;text-align:left;" >
+         BEST POSSIBLE MATCH
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:right;">MA0696.1</td>
+        <td style="text-align:right;padding-left: 1em;">14</td>
+        <td style="text-align:left;padding-left: 1em;">GACCCCCCGCTGTG</td>
+       </tr>
+    </tbody>
+  </table>
+</p>
+<p>
+Random model letter frequencies (--nrdb--):
+<br/>
+
+A 0.275 C 0.225 G 0.225 T 0.275 </p>
+</div>
+<hr>
+<center><big><b><a name="sec_i">SECTION I: HIGH-SCORING MOTIF OCCURENCES</a></b></big></center>
+<hr>
+<ul>
+<li>
+There were 117 motif occurences with a p-value less than 0.001.
+
+The full set of motif occurences can be seen in the
+TSV (tab-delimited values) output file
+<a href="fimo.tsv">fimo.tsv</a>, 
+the GFF3 file 
+<a href="fimo.gff">fimo.gff</a> 
+which may be suitable for uploading to the 
+<a href="http://genome.ucsc.edu/cgi-bin/hgTables">UCSC Genome Table Browser</a>
+(assuming the FASTA input sequences included genomic coordinates in UCSC or Galaxy format),
+or the XML file 
+<a href="fimo.xml">fimo.xml</a>.
+</li>
+<li>
+The <i>p</i>-value of a motif occurrence is defined as the
+probability of a random sequence of the same length as the motif
+matching that position of the sequence with as good or better a score.
+</li>
+<li>
+The score for the match of a position in a sequence to a motif
+is computed by summing the appropriate entries from each column of
+the position-dependent scoring matrix that represents the motif.
+</li>
+<li>
+The q-value of a motif occurrence is defined as the
+false discovery rate if the occurrence is accepted as significant.
+</li>
+<li>The table is sorted by increasing <i>p</i>-value.</li>
+</ul>
+<table border="1">
+<thead>
+<tr>
+<th>Motif ID</th>
+<th>Alt ID</th>
+<th>Sequence Name</th>
+<th>Strand</th>
+<th>Start</th>
+<th>End</th>
+<th>p-value</th>
+<th>q-value</th>
+<th>Matched Sequence</th>
+</tr>
+</thead>
+<tbody>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:33372850-33373402</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">288</td>
+      <td style="text-align:left;">301</td>
+      <td style="text-align:left;">4.1e-06</td>
+      <td style="text-align:left;">0.634</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACCCCCTGGAGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:27838242-27838626</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">65</td>
+      <td style="text-align:left;">78</td>
+      <td style="text-align:left;">1.06e-05</td>
+      <td style="text-align:left;">0.718</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACAGCCCGCTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr20:2967897-2968237</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">308</td>
+      <td style="text-align:left;">321</td>
+      <td style="text-align:left;">1.39e-05</td>
+      <td style="text-align:left;">0.718</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCCACCCCACTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">194</td>
+      <td style="text-align:left;">207</td>
+      <td style="text-align:left;">3.11e-05</td>
+      <td style="text-align:left;">0.891</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAGCCCTGCTGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr17:9330611-9331040</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">112</td>
+      <td style="text-align:left;">125</td>
+      <td style="text-align:left;">3.37e-05</td>
+      <td style="text-align:left;">0.891</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCCCCCCTCCTGCG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr8:8316211-8316580</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">351</td>
+      <td style="text-align:left;">364</td>
+      <td style="text-align:left;">3.82e-05</td>
+      <td style="text-align:left;">0.891</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AACCTCCTGTTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">256</td>
+      <td style="text-align:left;">269</td>
+      <td style="text-align:left;">4.04e-05</td>
+      <td style="text-align:left;">0.891</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CGCTCCCTGCAGCG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:81600667-81601249</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">34</td>
+      <td style="text-align:left;">47</td>
+      <td style="text-align:left;">4.8e-05</td>
+      <td style="text-align:left;">0.926</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACCCCCCTGCTATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:114063347-114063891</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">184</td>
+      <td style="text-align:left;">197</td>
+      <td style="text-align:left;">7.21e-05</td>
+      <td style="text-align:left;">0.976</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACCCCATATTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr13:17255358-17255480</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">11</td>
+      <td style="text-align:left;">24</td>
+      <td style="text-align:left;">7.31e-05</td>
+      <td style="text-align:left;">0.976</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACCTCCCGCCCTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:22699093-22699660</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">224</td>
+      <td style="text-align:left;">237</td>
+      <td style="text-align:left;">7.51e-05</td>
+      <td style="text-align:left;">0.976</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TACCACCCGCTACT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:24874944-24875144</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">12</td>
+      <td style="text-align:left;">25</td>
+      <td style="text-align:left;">8.21e-05</td>
+      <td style="text-align:left;">0.976</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCATCCTGCTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:4918806-4919314</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">453</td>
+      <td style="text-align:left;">466</td>
+      <td style="text-align:left;">8.21e-05</td>
+      <td style="text-align:left;">0.976</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCCCCCCATTACG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:33372850-33373402</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">442</td>
+      <td style="text-align:left;">455</td>
+      <td style="text-align:left;">8.89e-05</td>
+      <td style="text-align:left;">0.982</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCCCCCAGTGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr20:6561820-6562450</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">220</td>
+      <td style="text-align:left;">233</td>
+      <td style="text-align:left;">0.000105</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TATACCCTGCAGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:81696879-81697427</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">403</td>
+      <td style="text-align:left;">416</td>
+      <td style="text-align:left;">0.00012</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCCACACATTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:122571193-122571706</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">484</td>
+      <td style="text-align:left;">497</td>
+      <td style="text-align:left;">0.000124</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCCTCCTGCTAAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr18:5414534-5415423</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">663</td>
+      <td style="text-align:left;">676</td>
+      <td style="text-align:left;">0.000127</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACCTCCCACTGGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:12404014-12404480</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">291</td>
+      <td style="text-align:left;">304</td>
+      <td style="text-align:left;">0.000133</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCCCCCCGCCCAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:30492529-30493202</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">296</td>
+      <td style="text-align:left;">309</td>
+      <td style="text-align:left;">0.000133</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCTGCCCGCTGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:30492529-30493202</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">193</td>
+      <td style="text-align:left;">206</td>
+      <td style="text-align:left;">0.000154</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CAGCACCCGCTGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr18:6581308-6581585</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">177</td>
+      <td style="text-align:left;">190</td>
+      <td style="text-align:left;">0.000157</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAATCCTGTTGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:1919364-1919651</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">60</td>
+      <td style="text-align:left;">73</td>
+      <td style="text-align:left;">0.00017</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCATCCTGCTGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:33372850-33373402</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">329</td>
+      <td style="text-align:left;">342</td>
+      <td style="text-align:left;">0.000174</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AACCTCCTACAGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:166888721-166889242</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">20</td>
+      <td style="text-align:left;">33</td>
+      <td style="text-align:left;">0.000176</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACCTCCCGGGGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:76339279-76339632</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">326</td>
+      <td style="text-align:left;">339</td>
+      <td style="text-align:left;">0.000186</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCTCGCTGCTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:30492529-30493202</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">409</td>
+      <td style="text-align:left;">422</td>
+      <td style="text-align:left;">0.000192</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCCCCACTCGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr9:16152740-16153233</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">136</td>
+      <td style="text-align:left;">149</td>
+      <td style="text-align:left;">0.000198</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCCCCCCCCCGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:100819084-100819708</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">555</td>
+      <td style="text-align:left;">568</td>
+      <td style="text-align:left;">0.000206</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACTCCCTACCGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:122571193-122571706</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">246</td>
+      <td style="text-align:left;">259</td>
+      <td style="text-align:left;">0.000213</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCCCACATGCCGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr12:13960515-13961169</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">566</td>
+      <td style="text-align:left;">579</td>
+      <td style="text-align:left;">0.000216</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACTACCTACTGGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr9:16152740-16153233</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">133</td>
+      <td style="text-align:left;">146</td>
+      <td style="text-align:left;">0.00022</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCCCCCCCGCTCCC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:26403635-26404252</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">45</td>
+      <td style="text-align:left;">58</td>
+      <td style="text-align:left;">0.000236</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AACCTCCCATGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:4918806-4919314</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">407</td>
+      <td style="text-align:left;">420</td>
+      <td style="text-align:left;">0.000238</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCTCACCTGCTGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:84938468-84938931</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">366</td>
+      <td style="text-align:left;">379</td>
+      <td style="text-align:left;">0.00026</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACCACTTGTTGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">518</td>
+      <td style="text-align:left;">531</td>
+      <td style="text-align:left;">0.000265</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCCCTCTCGTGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:65881533-65881964</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">169</td>
+      <td style="text-align:left;">182</td>
+      <td style="text-align:left;">0.000278</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TACTCCCCATAGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:61713913-61714158</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">198</td>
+      <td style="text-align:left;">211</td>
+      <td style="text-align:left;">0.000286</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TACTACCCTCTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:19235197-19235337</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">76</td>
+      <td style="text-align:left;">89</td>
+      <td style="text-align:left;">0.0003</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTCCCCCTGCTCAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:13101846-13102001</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">110</td>
+      <td style="text-align:left;">123</td>
+      <td style="text-align:left;">0.000333</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAAGCCCCGCTGGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:7156132-7156300</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">60</td>
+      <td style="text-align:left;">73</td>
+      <td style="text-align:left;">0.000369</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TACCGCCTGTTGGA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:69532660-69533020</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">341</td>
+      <td style="text-align:left;">354</td>
+      <td style="text-align:left;">0.000369</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGTTCCCTGTTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:11276322-11276834</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">467</td>
+      <td style="text-align:left;">480</td>
+      <td style="text-align:left;">0.000373</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACACCTACTCTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr9:16152740-16153233</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">112</td>
+      <td style="text-align:left;">125</td>
+      <td style="text-align:left;">0.00038</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCCAGCCCGGGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">32</td>
+      <td style="text-align:left;">45</td>
+      <td style="text-align:left;">0.000388</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ATCCCCCCAGTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:82175-82501</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">45</td>
+      <td style="text-align:left;">58</td>
+      <td style="text-align:left;">0.000395</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCCACCAGTGGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:123773601-123774219</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">254</td>
+      <td style="text-align:left;">267</td>
+      <td style="text-align:left;">0.000395</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCAGCCTTCTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:1919364-1919651</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">204</td>
+      <td style="text-align:left;">217</td>
+      <td style="text-align:left;">0.0004</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACACCAGCTGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:33372850-33373402</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">506</td>
+      <td style="text-align:left;">519</td>
+      <td style="text-align:left;">0.00042</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGTCACCTACAGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr18:5123065-5123707</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">133</td>
+      <td style="text-align:left;">146</td>
+      <td style="text-align:left;">0.000435</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAAACCTATTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:96900418-96901022</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">172</td>
+      <td style="text-align:left;">185</td>
+      <td style="text-align:left;">0.000435</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGAAACCTGTGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:79141239-79141530</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">96</td>
+      <td style="text-align:left;">109</td>
+      <td style="text-align:left;">0.000442</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACACCAAGCTGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:13514854-13515316</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">210</td>
+      <td style="text-align:left;">223</td>
+      <td style="text-align:left;">0.00045</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">ACCCCCACACTGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:145957969-145958169</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">49</td>
+      <td style="text-align:left;">62</td>
+      <td style="text-align:left;">0.00046</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GATTCCCCATTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:28558994-28559463</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">67</td>
+      <td style="text-align:left;">80</td>
+      <td style="text-align:left;">0.000462</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACCTCCAGCAGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:13860131-13860755</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">184</td>
+      <td style="text-align:left;">197</td>
+      <td style="text-align:left;">0.000465</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACCCTCTGCTAGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr10:20977432-20977722</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">39</td>
+      <td style="text-align:left;">52</td>
+      <td style="text-align:left;">0.000489</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AATCCCCCATTGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:35038058-35038441</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">359</td>
+      <td style="text-align:left;">372</td>
+      <td style="text-align:left;">0.000502</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACGTCCTGTTGTA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:145898962-145899600</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">291</td>
+      <td style="text-align:left;">304</td>
+      <td style="text-align:left;">0.000505</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CATAGCCCGCTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">6</td>
+      <td style="text-align:left;">19</td>
+      <td style="text-align:left;">0.000513</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACACCCACCATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:11276322-11276834</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">28</td>
+      <td style="text-align:left;">41</td>
+      <td style="text-align:left;">0.000516</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACTTCACGCTGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:166888721-166889242</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">413</td>
+      <td style="text-align:left;">426</td>
+      <td style="text-align:left;">0.000522</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TATCTCCCACAGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">459</td>
+      <td style="text-align:left;">472</td>
+      <td style="text-align:left;">0.000522</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AACCACCCATGATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr9:16152740-16153233</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">15</td>
+      <td style="text-align:left;">28</td>
+      <td style="text-align:left;">0.000525</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAAACCCCGCGGGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:80431468-80431948</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">252</td>
+      <td style="text-align:left;">265</td>
+      <td style="text-align:left;">0.000531</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TACTGCATGTTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:44521800-44522197</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">170</td>
+      <td style="text-align:left;">183</td>
+      <td style="text-align:left;">0.000537</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACTCCCTGCTTTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr13:17607250-17607380</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">5</td>
+      <td style="text-align:left;">18</td>
+      <td style="text-align:left;">0.000542</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CGCAGCCTGGTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:1919364-1919651</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">230</td>
+      <td style="text-align:left;">243</td>
+      <td style="text-align:left;">0.000548</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCCCTCCCATTATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">60</td>
+      <td style="text-align:left;">73</td>
+      <td style="text-align:left;">0.000551</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CGCCTCGTGCAGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr20:2967897-2968237</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">244</td>
+      <td style="text-align:left;">257</td>
+      <td style="text-align:left;">0.000576</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCAACCCATTGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:80431468-80431948</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">423</td>
+      <td style="text-align:left;">436</td>
+      <td style="text-align:left;">0.000582</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAACCACACAGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:4918806-4919314</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">410</td>
+      <td style="text-align:left;">423</td>
+      <td style="text-align:left;">0.000585</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACCTGCTGCTGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:52835021-52835520</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">446</td>
+      <td style="text-align:left;">459</td>
+      <td style="text-align:left;">0.000595</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCTCCCATGCAGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:81381943-81382113</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">69</td>
+      <td style="text-align:left;">82</td>
+      <td style="text-align:left;">0.000605</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TAACCCGTGCGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:56110980-56111395</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">369</td>
+      <td style="text-align:left;">382</td>
+      <td style="text-align:left;">0.000608</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GATCTCCTGGTGAT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:96900418-96901022</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">376</td>
+      <td style="text-align:left;">389</td>
+      <td style="text-align:left;">0.000611</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACCACCCACTCAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:30666867-30667259</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">364</td>
+      <td style="text-align:left;">377</td>
+      <td style="text-align:left;">0.000621</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAACCTCCACTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:8951225-8951693</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">378</td>
+      <td style="text-align:left;">391</td>
+      <td style="text-align:left;">0.000625</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCTGCCTGCTGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:28622797-28623468</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">97</td>
+      <td style="text-align:left;">110</td>
+      <td style="text-align:left;">0.000635</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCTCCCTGGAGGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:65881533-65881964</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">271</td>
+      <td style="text-align:left;">284</td>
+      <td style="text-align:left;">0.000662</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCCCCCCTGGAGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr8:18569609-18569790</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">94</td>
+      <td style="text-align:left;">107</td>
+      <td style="text-align:left;">0.000666</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACCTCCATTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:18676245-18676679</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">275</td>
+      <td style="text-align:left;">288</td>
+      <td style="text-align:left;">0.000666</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAAACATGCAGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:12404014-12404480</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">227</td>
+      <td style="text-align:left;">240</td>
+      <td style="text-align:left;">0.000684</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCACCTTGTGGAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:31935153-31935559</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">72</td>
+      <td style="text-align:left;">85</td>
+      <td style="text-align:left;">0.000687</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCTCACCTGTTATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:36647192-36647392</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">115</td>
+      <td style="text-align:left;">128</td>
+      <td style="text-align:left;">0.000687</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TATACCACGCTGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:145898962-145899600</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">294</td>
+      <td style="text-align:left;">307</td>
+      <td style="text-align:left;">0.000695</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGCCCGCTGTTGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr13:16688874-16689248</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">84</td>
+      <td style="text-align:left;">97</td>
+      <td style="text-align:left;">0.000721</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GATCCCATATTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:39153703-39154097</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">139</td>
+      <td style="text-align:left;">152</td>
+      <td style="text-align:left;">0.000792</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GACACCCTGGCAGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:122480785-122481197</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">213</td>
+      <td style="text-align:left;">226</td>
+      <td style="text-align:left;">0.000792</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCCCCCCACTCAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr4:6511496-6512050</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">196</td>
+      <td style="text-align:left;">209</td>
+      <td style="text-align:left;">0.000801</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TACTGCCTGCTAAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:56123732-56124289</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">27</td>
+      <td style="text-align:left;">40</td>
+      <td style="text-align:left;">0.000809</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCATCACACTGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:137775906-137776352</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">41</td>
+      <td style="text-align:left;">54</td>
+      <td style="text-align:left;">0.000826</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTCTTCCTGCTGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr20:6561820-6562450</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">213</td>
+      <td style="text-align:left;">226</td>
+      <td style="text-align:left;">0.000826</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCCATCCCACTGCA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:17946485-17946674</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">73</td>
+      <td style="text-align:left;">86</td>
+      <td style="text-align:left;">0.000835</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAAACCCCGCTTAG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr8:24296923-24297244</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">227</td>
+      <td style="text-align:left;">240</td>
+      <td style="text-align:left;">0.000839</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCTACCAGCTGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">305</td>
+      <td style="text-align:left;">318</td>
+      <td style="text-align:left;">0.000839</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAAACCCCGCAGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:6271104-6271469</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">347</td>
+      <td style="text-align:left;">360</td>
+      <td style="text-align:left;">0.000848</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGAAGCCTGCTGGC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr10:11636654-11637350</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">579</td>
+      <td style="text-align:left;">592</td>
+      <td style="text-align:left;">0.000852</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CCTCTCCTACTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:123773601-123774219</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">27</td>
+      <td style="text-align:left;">40</td>
+      <td style="text-align:left;">0.000857</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCATACCTACTGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:97877355-97877542</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">158</td>
+      <td style="text-align:left;">171</td>
+      <td style="text-align:left;">0.000874</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AACATCCCATTGGT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr11:19552646-19553335</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">448</td>
+      <td style="text-align:left;">461</td>
+      <td style="text-align:left;">0.000879</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AATACCCTGCAGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr5:36606222-36606673</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">196</td>
+      <td style="text-align:left;">209</td>
+      <td style="text-align:left;">0.000888</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AAAAACCTGCTGAC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr9:16152740-16153233</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">19</td>
+      <td style="text-align:left;">32</td>
+      <td style="text-align:left;">0.000893</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GTCTGCCCGCGGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:9559151-9559553</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">16</td>
+      <td style="text-align:left;">29</td>
+      <td style="text-align:left;">0.000897</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CATTTCCTACTGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:57602642-57603060</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">215</td>
+      <td style="text-align:left;">228</td>
+      <td style="text-align:left;">0.000897</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GCACATCTGCTGGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:15486000-15486280</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">145</td>
+      <td style="text-align:left;">158</td>
+      <td style="text-align:left;">0.000902</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCCACCTGTAAGG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr6:35169540-35169764</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">19</td>
+      <td style="text-align:left;">32</td>
+      <td style="text-align:left;">0.000907</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">CACCACATATGGCT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:123950096-123950377</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">197</td>
+      <td style="text-align:left;">210</td>
+      <td style="text-align:left;">0.000916</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AGCAACCTGCTGAA</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:70652453-70652730</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">195</td>
+      <td style="text-align:left;">208</td>
+      <td style="text-align:left;">0.00092</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAGCCCACATAGCG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr2:23066012-23066341</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">274</td>
+      <td style="text-align:left;">287</td>
+      <td style="text-align:left;">0.00092</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCTGCACGTGGTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr7:490057-490211</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">37</td>
+      <td style="text-align:left;">50</td>
+      <td style="text-align:left;">0.000935</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GATAACCTGTAGTT</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:146672245-146672509</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">116</td>
+      <td style="text-align:left;">129</td>
+      <td style="text-align:left;">0.000944</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TCCCTCCTGTTTTG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr3:14435492-14435727</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">185</td>
+      <td style="text-align:left;">198</td>
+      <td style="text-align:left;">0.000969</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GGCTGCCTGTAGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr18:6581308-6581585</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">204</td>
+      <td style="text-align:left;">217</td>
+      <td style="text-align:left;">0.000974</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACTGCCGCAGCG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:8951225-8951693</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">194</td>
+      <td style="text-align:left;">207</td>
+      <td style="text-align:left;">0.000984</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">TGCCCTCTGGTGTC</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr10:20977432-20977722</td>
+      <td style="text-align:center;">+</td>
+      <td style="text-align:left;">80</td>
+      <td style="text-align:left;">93</td>
+      <td style="text-align:left;">0.000989</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">AATCCCCCATTATG</td>
+   </tr>
+    <tr>
+      <td style="text-align:left;">MA0696.1</td>
+      <td style="text-align:left;">ZIC1</td>
+      <td style="text-align:left;">chr1:193311642-193311882</td>
+      <td style="text-align:center;">-</td>
+      <td style="text-align:left;">40</td>
+      <td style="text-align:left;">53</td>
+      <td style="text-align:left;">0.000994</td>
+      <td style="text-align:left;">1</td>
+      <td style="text-align:left;font-size:x-large;font-family:monospace;">GAACACCCACAGCA</td>
+   </tr>
+</tbody>
+</table>
+
+<hr>
+<center><big><b><a name="debugging_information">DEBUGGING INFORMATION</a></b></big></center>
+<hr>
+<p>
+Command line:
+</p>
+<pre>
+fimo --thresh 1e-3 -o ZIC1_NC_Specific ../Imports/MA0696.1.meme NC_Specific_motifs.fa
+</pre>
+<p>
+Settings:
+</p>
+<pre>
+<table>
+  <tr>
+    <td style="padding-right: 2em">output_directory = ZIC1_NC_Specific</td>
+    <td style="padding-left: 5em; padding-right: 2em">MEME file name = ../Imports/MA0696.1.meme</td>
+    <td style="padding-left: 5em; padding-right: 2em">sequence file name = NC_Specific_motifs.fa</td>
+  </tr>  <tr>
+    <td style="padding-right: 2em">background file name = --nrdb--</td>
+    <td style="padding-left: 5em; padding-right: 2em">alphabet = DNA</td>
+    <td style="padding-left: 5em; padding-right: 2em">max stored scores = 100000</td>
+  </tr>  <tr>
+    <td style="padding-right: 2em">allow clobber = false</td>
+    <td style="padding-left: 5em; padding-right: 2em">compute q-values = true</td>
+    <td style="padding-left: 5em; padding-right: 2em">parse genomic coord. = false</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 2em">text only = false</td>
+    <td style="padding-left: 5em; padding-right: 2em">scan both strands = true</td>
+    <td style="padding-left: 5em; padding-right: 2em">max strand = false</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 2em">threshold type = p-value</td>
+    <td style="padding-left: 5em; padding-right: 2em">output theshold = 0.001</td>
+    <td style="padding-left: 5em; padding-right: 2em">pseudocount = 0.1</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 2em">alpha = 1</td>
+    <td style="padding-left: 5em; padding-right: 2em">verbosity = 2</td>
+    <td style="padding-left: 5em; padding-right: 2em"></td>
+  </tr>
+
+</table>
+</pre>
+<p>
+This information can be useful in the event you wish to report a
+problem with the FIMO software.
+</p>
+<hr>
+<span style="background-color: #DDDDFF"><a href="#top_buttons"><b>Go to top</b></a></span>
+</body>
+</html>
