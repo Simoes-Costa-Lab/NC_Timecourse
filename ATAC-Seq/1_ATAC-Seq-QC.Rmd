@@ -4,7 +4,7 @@ output: html_notebook
 ---
 ## ATAC-Seq Step 1: QC
 Our first step in evaluating ATAC-Seq data is by running a variety of QC measures. We will operate on the dba object from diffbind to store the reads (bams) from our samples. For simplicity of github, we will just be working with the final object, but the bams can be found at `/data/Debbie/Sox2_Oct4_project/exports/Fig1/BAM`
-```{r Libraries-1, echo=FALSE, warning=FALSE}
+```{r Libraries-1, echo=FALSE, message=FALSE, warning=FALSE}
 library(GenomicRanges)
 library(DiffBind)
 library(BiocParallel)
@@ -75,7 +75,7 @@ dba.plotPCA(samples_ATAC, attributes = DBA_CONDITION)
 
 saveRDS(samples_ATAC, file = "/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Exports/samples_ATAC_400bp_2.RDS")
 
-#samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
+samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
 ```
 
 Let's generate some QC metrics for these BAMs.

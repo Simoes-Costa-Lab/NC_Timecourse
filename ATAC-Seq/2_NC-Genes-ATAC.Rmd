@@ -497,7 +497,7 @@ library(cowplot)
 library(stringr)
 source(file = "Peak-Gene-Fitting.R")
 
-register(BPPARAM = MulticoreParam(progressbar = T, workers = 60, stop.on.error = F))
+register(BPPARAM = MulticoreParam(progressbar = T, workers = 12, stop.on.error = F))
 impulse_obj <- readRDS("../RNA-Seq/Exports/impulse_obj.RDS")
 impulse_obj2 <- readRDS("Exports/ATAC-Seq-Impulse.RDS")
 ATAC_all_peaks_anno.df <- readRDS("Exports/ATAC_all_peaks_anno.RDS")
@@ -537,6 +537,9 @@ summary(All_Genes_Tests$PeakID %in% closest_5_genes$PeakID)
 saveRDS(All_Genes_Tests, file = "Exports/All_Genes_Tests.RDS")
 All_Genes_Tests <- readRDS(file = "Exports/All_Genes_Tests.RDS")
 
+TC_NC_Enriched_Enhancers <- subset(All_Genes_Tests, All_Genes_Tests$gene %in% TC_NC_Enriched$Chick_ENSEMBL)
+write_csv(All_Genes_Tests, path = "Exports/All_Genes_Tests.csv", col_names = T)
+write_csv(TC_NC_Enriched_Enhancers, path = "Exports/TC_NC_Enriched_Enhancers.csv", col_names = T)
 
 ```
 
@@ -631,7 +634,9 @@ peak_fit <-
 
 cor(gene_fit$value[1:100], peak_fit$value, method = "spearman")
 ```
+
 Let's visualize the enriched TF's called by the RNA-Seq analysis and their associated potential enhancers.
+
 ```{r}
 TC_NC_Enriched_TF_enhancers <- subset(All_Genes_Tests, All_Genes_Tests$gene %in% TC_NC_Enriched$Chick_ENSEMBL)
 TC_NC_Enriched_TF_enhancers <- TC_NC_Enriched_TF_enhancers[!duplicated(TC_NC_Enriched_TF_enhancers$PeakID),]
@@ -677,7 +682,8 @@ library(DESeq2)
 library(ggplot2)
 library(ggpubr)
 # Only doing with peaks > 0.8 and < -0.8
-strong_correlates <- TC_NC_Enriched_TF_enhancers[TC_NC_Enriched_TF_enhancers$spearman > 0.8 | TC_NC_Enriched_TF_enhancers$spearman < -0.8,]
+strong_correlates <- TC_NC_Enriched_TF_enhancers[TC_NC_Enriched_TF_enhancers$spearman > 0.8 | TC_NC_Enriched_TF_enhancers$spearman < -0.8 |  (TC_NC_Enriched_TF_enhancers$spearman < 0.2 & TC_NC_Enriched_TF_enhancers$spearman > -0.2) ,]
+
 strong_correlates.gr <- Signac::StringToGRanges(strong_correlates$PeakID)
 
 H3K27Ac_corr <- dba.peakset(NULL,peaks=strong_correlates.gr,
@@ -707,14 +713,17 @@ search <- search[!duplicated(search$PeakID),]
 Corr_group <- data.frame(
   PeakID = rownames(rld_df),
   spearman = qdapTools::lookup(terms = rownames(rld_df), key.match = search))
-Corr_group$group <- ifelse(Corr_group$spearman > 0.8, "Positive","Negative")
+Corr_group$group <- as.factor(ifelse(Corr_group$spearman > 0.8, "Positive", ifelse(Corr_group$spearman < -0.8, "Negative", "None")))
+
+Corr_group$group <- factor(Corr_group$group, levels = levels(Corr_group$group)[c(3,2,1)])
 
 rld_df$Corr_group <- qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")])
 rld_df$PeakID <- rownames(rld_df)
 rld_df_melt <- reshape2::melt(rld_df)
-
+levels(rld_df_melt$Corr_group)
 ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group)) + geom_boxplot() + stat_compare_means()
-ggsave(filename = "Exports/Positive_vs_Negative_strong_correlation_H3K27Ac_Levels.eps", width = 5, height = 7)
+
+ggsave(filename = "Exports/Positive_vs_Negative_vs_None_strong_correlation_H3K27Ac_Levels.eps", width = 5, height = 7)
 ```
 
 No longer using annotation.
@@ -785,5 +794,54 @@ ggplot(Type_summary2, aes(x="", y=prop, fill=Type)) +
   scale_fill_brewer(palette="Set1")
 
 ggsave(filename = "Exports/Moderate_and_strong_neg_correlation_anno.pdf", height = 4, width = 5)
+```
+
+
+Analysis of neural-crest related enhancers. Does the ATAC signal decrease over time for peaks associated with NC GRN genes compared to the same amount of random associated peaks?
+
+```{r}
+library(pheatmap)
+library(stringr)
+library(ggplot2)
+library(heatmaply)
+library(RColorBrewer)
+library(reshape2)
+
+Annotated_Rlog_Positive_Averages <- read_csv("../RNA-Seq/Exports/Annotated_Rlog_Positive_Averages.csv")
+Rlog_counts_avergae_All_ATAC_Peaks <- read.delim("~/local_git/NC_Timecourse/ATAC-Seq/Exports/Rlog_counts_avergae_All_ATAC_Peaks")
+
+
+TC_NC_Enriched_enhancers <- subset(All_Genes_Tests, All_Genes_Tests$gene %in% TC_NC_Enriched$Chick_ENSEMBL)
+
+strong_NC_correlates <- TC_NC_Enriched_enhancers[TC_NC_Enriched_enhancers$spearman > 0.8,]
+strong_NC_correlates <- strong_NC_correlates[isUnique(strong_NC_correlates$PeakID),]
+#131 genes 700 peaks
+summary(unique(strong_NC_correlates$gene))
+
+strong_rand_correlates <- All_Genes_Tests[All_Genes_Tests$spearman > 0.8,]
+
+# Make sure the gene is in expressed genes, but not necessarily NC expressed
+strong_rand_correlates <- strong_rand_correlates[strong_rand_correlates$gene %in% sample(unique(impulse_obj@vecAllIDs), size = 200),]
+strong_rand_correlates <- strong_rand_correlates[isUnique(strong_rand_correlates$PeakID),]
+
+rownames(Rlog_counts_avergae_All_ATAC_Peaks) <- gsub(rownames(Rlog_counts_avergae_All_ATAC_Peaks), pattern = "_", replacement = "-")
+
+pheatmap(Rlog_counts_avergae_All_ATAC_Peaks[rownames(Rlog_counts_avergae_All_ATAC_Peaks) %in% strong_NC_correlates$PeakID,],
+         scale = "row", cluster_cols = F, show_rownames = F)
+
+pheatmap(Rlog_counts_avergae_All_ATAC_Peaks[rownames(Rlog_counts_avergae_All_ATAC_Peaks) %in% strong_rand_correlates$PeakID,],
+         scale = "row", cluster_cols = F, show_rownames = F)
+
+nc_corr_melt <- melt(Rlog_counts_avergae_All_ATAC_Peaks[rownames(Rlog_counts_avergae_All_ATAC_Peaks) %in% strong_NC_correlates$PeakID,] %>% rownames_to_column())
+
+rand_corr_melt <- melt(Rlog_counts_avergae_All_ATAC_Peaks[rownames(Rlog_counts_avergae_All_ATAC_Peaks) %in% strong_rand_correlates$PeakID,] %>% rownames_to_column())
+
+nc_corr_melt$source <- "NC_GRN"
+rand_corr_melt$source <- "Random_Genes"
+
+combined_melt <- rbind(nc_corr_melt, rand_corr_melt)
+ggplot(combined_melt, aes(x = variable, y = value, color = source)) + geom_boxplot()
+ggplot(rand_corr_melt, aes(x = variable, y = value)) + geom_boxplot()
+
 ```
 

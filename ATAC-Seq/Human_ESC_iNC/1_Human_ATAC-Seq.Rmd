@@ -4,7 +4,7 @@ output: html_notebook
 ---
 ## ATAC-Seq Step 1: QC
 Our first step in evaluating ATAC-Seq data is by running a variety of QC measures. We will operate on the dba object from diffbind to store the reads (bams) from our samples. For simplicity of github, we will just be working with the final object, but the bams for our Human data can be found at CREST2 `/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM`
-```{r Libraries-1, echo=FALSE, warning=FALSE}
+```{r Libraries-1, echo=FALSE, message=FALSE, warning=FALSE}
 library(GenomicRanges)
 library(DiffBind)
 library(BiocParallel)
@@ -104,18 +104,39 @@ NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$Mel)
 # Mel vs D5
 NC_dba <- dba.contrast(NC_dba, NC_dba$masks$Mel, NC_dba$masks$D5)
 
-NC_dba <- dba.analyze(NC_dba, bParallel = T)
+NC_dba <- dba.analyze(NC_dba, bParallel = F)
 
-ESC_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 1))
-ESC_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 2))
-D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 3))
-D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 4))
-D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 5))
-D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 6))
+ESC_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 1, th = 0.00001))
+ESC_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 2, th = 0.00001))
+D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 3, th = 0.00001))
+ESC_vs_Mel <- as.data.frame(dba.report(NC_dba, contrast = 4, th = 0.00001))
+Mel_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 5, th = 0.00001))
+Mel_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 6, th = 0.00001))
 
+ESC_vs_D3$PeakID <- paste0(ESC_vs_D3$seqnames, "_", ESC_vs_D3$start, "_", ESC_vs_D3$end)
+ESC_vs_D5$PeakID <- paste0(ESC_vs_D5$seqnames, "_", ESC_vs_D5$start, "_", ESC_vs_D5$end)
+D3_vs_D5$PeakID <- paste0(D3_vs_D5$seqnames, "_", D3_vs_D5$start, "_", D3_vs_D5$end)
+ESC_vs_Mel$PeakID <- paste0(ESC_vs_Mel$seqnames, "_", ESC_vs_Mel$start, "_", ESC_vs_Mel$end)
+Mel_vs_D3$PeakID <- paste0(Mel_vs_D3$seqnames, "_", Mel_vs_D3$start, "_", Mel_vs_D3$end)
+Mel_vs_D5$PeakID <- paste0(Mel_vs_D5$seqnames, "_", Mel_vs_D5$start, "_", Mel_vs_D5$end)
 
+write.csv(ESC_vs_D3, file = "Exports/ESC_vs_D3.csv", row.names = F)
+write.csv(ESC_vs_D5, file = "Exports/ESC_vs_D5.csv", row.names = F)
+write.csv(D3_vs_D5, file = "Exports/D3_vs_D5.csv", row.names = F)
+write.csv(ESC_vs_Mel, file = "Exports/ESC_vs_Mel.csv", row.names = F)
+write.csv(Mel_vs_D3, file = "Exports/Mel_vs_D3.csv", row.names = F)
+write.csv(Mel_vs_D5, file = "Exports/Mel_vs_D5.csv", row.names = F)
 
+All_Unique_PeakIDs <- unique(c(ESC_vs_D3$PeakID, ESC_vs_D5$PeakID,
+                        D3_vs_D5$PeakID, ESC_vs_Mel$PeakID,
+                        Mel_vs_D3$PeakID, Mel_vs_D5$PeakID))
 
+All_Unique_PeakIDs.df <- data.frame(chr = stringr::str_split(All_Unique_PeakIDs, pattern = "_", simplify = T)[,1], start = stringr::str_split(All_Unique_PeakIDs, pattern = "_", simplify = T)[,2], end = stringr::str_split(All_Unique_PeakIDs, pattern = "_", simplify = T)[,3])
+
+All_Unique_PeakIDs.df <- All_Unique_PeakIDs.df[!rownames(All_Unique_PeakIDs.df) %in% c(2236, 28474, 36692),]
+
+write.table(All_Unique_PeakIDs.df, file = "Exports/Human_ESC_to_Mel_Differential_Peaks.bed",
+            sep = "\t",row.names = F, col.names = F, quote = F)
 
 # Make other PCA plot
 dba.plotPCA(NC_dba)
@@ -145,7 +166,7 @@ g <- ggplot(pca_mat, aes(x=PC1, y=PC2, color=timepoint)) +
 
 g
 
-ggsave('./Exports/Human_ESC-to-iNC-PCA.eps', units = 'in', height = 4, width = 6, device = "eps")
+#ggsave('./Exports/Human_ESC-to-iNC-PCA.eps', units = 'in', height = 4, width = 6, device = "eps")
 ```
 
 ## Exporting enriched peaksets.
