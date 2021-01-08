@@ -690,9 +690,9 @@ H3K27Ac_corr <- dba.peakset(NULL,peaks=strong_correlates.gr,
                             sampID="Epi_1",tissue="Epi",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Epiblast_vs_NF_CR/BAM/H3K27ac_Epi_R1_toGalGal6_nodups.bam")
 
 H3K27Ac_corr <- dba.peakset(H3K27Ac_corr,peaks=strong_correlates.gr,
-                            sampID="NF_1",tissue="NF",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104544_HVGL5BGXB_HH9WE_H3K27Ac_1_GTGAAACG_R1_toGalGal6.bam")
+                            sampID="WE_1",tissue="WE",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104544_HVGL5BGXB_HH9WE_H3K27Ac_1_GTGAAACG_R1_toGalGal6.bam")
 H3K27Ac_corr <- dba.peakset(H3K27Ac_corr,peaks=strong_correlates.gr,
-                            sampID="NF_2",tissue="NF",factor="CR",condition="H3K27AC",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104545_HVGL5BGXB_HH9WE_H3K27Ac_2_GTGGCCTT_R1_toGalGal6.bam")
+                            sampID="WE_2",tissue="WE",factor="CR",condition="H3K27AC",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104545_HVGL5BGXB_HH9WE_H3K27Ac_2_GTGGCCTT_R1_toGalGal6.bam")
 
 H3K27Ac_corr <- dba.count(H3K27Ac_corr, bParallel = T)
 pca <- dba.plotPCA(H3K27Ac_corr, attributes = DBA_TISSUE)
@@ -721,6 +721,7 @@ rld_df$Corr_group <- qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID",
 rld_df$PeakID <- rownames(rld_df)
 rld_df_melt <- reshape2::melt(rld_df)
 levels(rld_df_melt$Corr_group)
+
 ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group)) + geom_boxplot() + stat_compare_means()
 
 ggsave(filename = "Exports/Positive_vs_Negative_vs_None_strong_correlation_H3K27Ac_Levels.eps", width = 5, height = 7)
