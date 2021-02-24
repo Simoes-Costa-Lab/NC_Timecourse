@@ -247,9 +247,11 @@ rld_df_avg <- data.frame(HH6 = rowMeans(rld_df[c('HH6_1', 'HH6_2')], na.rm=TRUE)
 
 write.table(rld_df_avg, file = "./Exports/Rlog_counts_avergae_All_ATAC_Peaks", quote = F, sep = "\t", row.names = T)
 
+colors <- colorRampPalette(c("#0584bc","#ffffff","#e45649"))(250)
+
 ATAC_clusters = pheatmap(subset(rld_df_avg, rownames(rld_df_avg) %in% top_18k_differential$peakID),
                          cluster_cols = F, scale = "row", show_rownames = F, show_colnames = T,
-                         color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250),
+                         color = colors,
                          filename = "./Exports/top_18k_peaks_heatmap.pdf", width = 6, height = 5)
 
 #So it renders properly in html doc
@@ -282,9 +284,9 @@ plotHeatmap -m mid_peaks_alt_timepoints.mat.gz -out mid_peaks_alt_timepoints_2.p
 ```
 
 ```{bash replotting with color changes, eval=FALSE}
-plotHeatmap -m ./Exports/early_peaks_alt_timepoints.mat.gz -out ./Exports/early_peaks_alt_timepoints_2.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5
-plotHeatmap -m ./Exports/late_peaks_alt_timepoints.mat.gz -out ./Exports/late_peaks_alt_timepoints.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5
-plotHeatmap -m ./Exports/mid_peaks_alt_timepoints.mat.gz -out ./Exports/mid_peaks_alt_timepoints_2.eps --colorList "#0797B3,#FFFFFF,#4FA14E" --dpi 600 --heatmapHeight 5 --yMax 450
+plotHeatmap -m ./Exports/early_peaks_alt_timepoints.mat.gz -out ./Exports/early_peaks_alt_timepoints_2.eps --colorList "#0584bc","#ffffff","#e45649" --dpi 600 --heatmapHeight 5
+plotHeatmap -m ./Exports/late_peaks_alt_timepoints.mat.gz -out ./Exports/late_peaks_alt_timepoints.eps --colorList "#0584bc","#ffffff","#e45649" --dpi 600 --heatmapHeight 5
+plotHeatmap -m ./Exports/mid_peaks_alt_timepoints.mat.gz -out ./Exports/mid_peaks_alt_timepoints_2.eps --colorList "#0584bc","#ffffff","#e45649" --dpi 600 --heatmapHeight 5 --yMax 450
 
 gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ./Exports/early_peaks_alt_timepoints_2.png ./Exports/early_peaks_alt_timepoints_2.eps
 gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o ./Exports/late_peaks_alt_timepoints.png ./Exports/late_peaks_alt_timepoints.eps

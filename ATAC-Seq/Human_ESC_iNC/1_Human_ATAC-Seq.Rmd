@@ -136,6 +136,10 @@ All_Unique_PeakIDs.df <- data.frame(chr = stringr::str_split(All_Unique_PeakIDs,
 write.table(All_Unique_PeakIDs.df, file = "Exports/Human_ESC_to_Myo_Differential_Peaks.bed",
             sep = "\t",row.names = F, col.names = F, quote = F)
 
+All_Unique_PeakIDs.df <- read.delim("Exports/Human_ESC_to_Myo_Differential_Peaks.bed", header = F)
+All_Unique_PeakIDs <- paste0(All_Unique_PeakIDs.df$V1, "_", 
+                             All_Unique_PeakIDs.df$V2, "_",
+                             All_Unique_PeakIDs.df$V3)
 ```
 
 ## Normalized counts via DESeq2
@@ -158,6 +162,8 @@ rownames(rlog_human_ATAC.df) <- paste0(NC_dba$peaks[[1]]$Chr,"_",NC_dba$peaks[[1
 
 write.table(rlog_human_ATAC.df, file = "./Exports/Rlog_counts_All_Human_ESC-NC_Myo_ATAC_Peaks.txt", quote = F, sep = "\t", row.names = T)
 
+rlog_human_ATAC.df <- read.delim("./Exports/Rlog_counts_All_Human_ESC-NC_Myo_ATAC_Peaks.txt")
+
 human_ATAC_avg <- data.frame(ES_D0 = rowMeans(rlog_human_ATAC.df[c('ATAC_ES_D0_1', 'ATAC_ES_D0_2')], na.rm=TRUE),
                          NC_D3 = rowMeans(rlog_human_ATAC.df[c('ATAC_NC_D3_1', 'ATAC_NC_D3_2')], na.rm=TRUE),
                          NC_D5 = rowMeans(rlog_human_ATAC.df[c('ATAC_NC_D5_1', 'ATAC_NC_D5_2')], na.rm=TRUE),
@@ -166,18 +172,20 @@ human_ATAC_avg <- data.frame(ES_D0 = rowMeans(rlog_human_ATAC.df[c('ATAC_ES_D0_1
 write.table(human_ATAC_avg, file = "./Exports/Rlog_counts_Avg_All_Human_ESC-NC_Myo_ATAC_Peaks.txt", quote = F, sep = "\t", row.names = T)
 
 
-human_ATAC_avg_subset <- human_ATAC_avg[rownames(human_ATAC_avg) %in% All_Unique_PeakIDs,]
+human_ATAC_subset <- rlog_human_ATAC.df[rownames(rlog_human_ATAC.df) %in% All_Unique_PeakIDs,]
 
-ATAC_clusters = pheatmap(human_ATAC_avg_subset,
+human_ATAC_subset <- human_ATAC_subset[,c("ATAC_ES_D0_1","ATAC_ES_D0_2","ATAC_NC_D3_1","ATAC_NC_D3_2","ATAC_NC_D5_1","ATAC_NC_D5_2","ATAC_Myo_D14_1","ATAC_Myo_D14_2")]
+
+ATAC_clusters = pheatmap(human_ATAC_subset,
                          cluster_cols = F,
                          scale = "row",
                          show_rownames = F,
                          show_colnames = T,
                          cluster_rows = T,
-                         cutree_rows = 6, color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250))
+                         cutree_rows = 6, color=colorRampPalette(colors=c("#0584BC","#FFFFFF","#E45649"))(250))
 
 #Re-order original data (genes) to match ordering in heatmap (top-to-bottom)
-rownames(human_ATAC_avg_subset[ATAC_clusters$tree_row[["order"]],])
+rownames(human_ATAC_subset[ATAC_clusters$tree_row[["order"]],])
 #6 groups
 clusters_6 <- data.frame(
   peak = names(sort(cutree(ATAC_clusters$tree_row, k=6))),
@@ -186,10 +194,81 @@ clusters_6 <- data.frame(
 
 row_annotation <- data.frame(cluster = clusters_6$cluster, row.names = clusters_6$peak)
 
-pheatmap(human_ATAC_avg_subset, annotation_row = row_annotation, 
+pheatmap(human_ATAC_subset, annotation_row = row_annotation, 
                          cluster_cols = F, scale = "row",
                          show_rownames = F,show_colnames = T, cluster_rows = T, cutree_rows = 6,
-                         color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250),
+                         color=colorRampPalette(colors=c("#0584BC","#FFFFFF","#E45649"))(250),
          filename = "./Exports/Rlog_Counts_Human_DeSeq2_ATAC_peaks.pdf", width = 8, height = 6)
 
 ```
+
+# Properties of ATAC clusters?
+I want to demonstrate enrichment of the pluripotency program in Cluster 2/3, neural crest identity in Cluster 5/6/4, and myo identity in Cluster 1.
+
+```{r}
+row_annotation2 <- row_annotation %>% rownames_to_column() %>% mutate(chr = stringr::str_split(rowname, pattern = "_", simplify = T)[,1],
+                                                    start = stringr::str_split(rowname, pattern = "_", simplify = T)[,2],
+                                                    end = stringr::str_split(rowname, pattern = "_", simplify = T)[,3]) 
+
+
+
+(row_annotation2 %>% dplyr::filter(cluster == 1) %>% dplyr::select(-rowname, -cluster))
+
+write.table((row_annotation2 %>% dplyr::filter(cluster == 1) %>% dplyr::select(-rowname, -cluster)),
+            file = "Exports/Cluster1_Myo.bed", row.names = F, col.names = F, sep = "\t", quote = F)
+write.table((row_annotation2 %>% dplyr::filter(cluster %in% c(2,3)) %>% dplyr::select(-rowname, -cluster)),
+            file = "Exports/Clusters-2-3_ESC.bed", row.names = F, col.names = F, sep = "\t", quote = F)
+write.table((row_annotation2 %>% dplyr::filter(cluster %in% c(4,5,6)) %>% dplyr::select(-rowname, -cluster)),
+            file = "Exports/Clusters-4-5-6_NC.bed", row.names = F, col.names = F, sep = "\t", quote = F)
+
+```
+
+
+```{bash, EVAL=FALSE}
+findMotifsGenome.pl Cluster1_Myo.bed /data/Austin/workdir/genome/hg38.fa Cluster1_Myo_MYO_HOMER -nomotif -p 15
+findMotifsGenome.pl Clusters-2-3_ESC.bed /data/Austin/workdir/genome/hg38.fa Clusters-2-3_Myo_ESC_HOMER -nomotif -p 15
+findMotifsGenome.pl Clusters-4-5-6_NC.bed /data/Austin/workdir/genome/hg38.fa Clusters-4-5-6_Myo_NC_HOMER -nomotif -p 15
+
+```
+
+Running NucleoATAC to determine occupancy around Sox2/Oct4 shared regions and things.
+It recommends broad peaks (maybe a 1-2kb?) to call occupancy around.
+
+First combine all of the stage-specific nodupes BAMs All Sox2 peaks extend.
+```{bash}
+conda activate py37
+samtools merge -@ 16 ATAC_ES_D0_merged.bam ATAC_ES_D0_1_toGRCh38_sorted_nodups.bam ATAC_ES_D0_2_toGRCh38_sorted_nodups.bam
+samtools merge -@ 16 ATAC_NC_D3_merged.bam ATAC_NC_D3_1_toGRCh38_sorted_nodups.bam  ATAC_NC_D3_2_toGRCh38_sorted_nodups.bam
+samtools merge -@ 16 ATAC_NC_D5_merged.bam ATAC_NC_D5_1_toGRCh38_sorted_nodups.bam  ATAC_NC_D5_2_toGRCh38_sorted_nodups.bam
+samtools merge -@ 16 ATAC_Myo_D14_merged.bam ATAC_Myo_D14_1_toGRCh38_sorted_nodups.bam  ATAC_Myo_D14_2_toGRCh38_sorted_nodups.bam
+
+samtools index -@ 16 ATAC_ES_D0_merged.bam
+samtools index -@ 16 ATAC_NC_D3_merged.bam
+samtools index -@ 16 ATAC_NC_D5_merged.bam
+samtools index -@ 16 ATAC_Myo_D14_merged.bam
+```
+
+Then get peaks of interest
+1. All Human ESC to iNC Sox2 Peaks
+2. ESC enriched Sox2 Peaks
+3. NC enriched Sox2 Peaks
+
+Then widen them to 2kb
+```{bash}
+awk -F '\t' '{X=1000; mid=(int($2)+int($3))/2;printf("%s\t%d\t%d\n",$1,(mid-X<0?0:mid-X),mid+X);}' All_Sox2_Peaks.bed > All_Sox2_Peaks_2kwide.bed
+```
+
+Then call nucleo atac
+
+```{bash}
+conda activate nucleo
+cd /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/NucleoATAC
+
+nucleoatac run --cores 16 \
+--bed /home/ash274/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/All_Sox2_Peaks_2kwide.bed \
+--bam /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_ES_D0_merged.bam \
+--fasta /data/Austin/workdir/genome/hg38.fa \
+--out ATAC_ES_D0_All_Sox2_Peaks_NucleoATAC
+```
+
+
