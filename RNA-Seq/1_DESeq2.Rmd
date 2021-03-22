@@ -95,8 +95,12 @@ dds <- dds[,!(colnames(dds) %in% bad_samples)]
     
 # Export filtered FeatureCounts
 filt_counts <- as.data.frame(dds@assays@data$counts)
+colnames(filt_counts) <- dds$Group
+
+
 filt_counts <- filt_counts %>% tibble::rownames_to_column()
 colnames(filt_counts)[1] <- "ENSEMBL"
+
 write.table(filt_counts, file = "Imports/featureCountsFiltered.txt", quote = F,
             sep = "\t", row.names = F, col.names = T)
 

@@ -115,7 +115,8 @@ ATAC_QC_List_1[[3]]
 ATAC_QC_List_1[[4]]
 ATAC_QC_List_1[[5]]
 
-
+# Export Raw Counts for ATAC Samples
+assays(samples_ATAC)
 ```
 
 
@@ -228,6 +229,10 @@ summarized_experiment2@assays@data$scores <- summarized_experiment2@assays@data$
 dds_experiment2 <- DESeqDataSet(summarized_experiment2, design = ~ Condition)
 dds_experiment2 <- DESeq(dds_experiment2)
 dds_results <- results(dds_experiment2)
+raw_counts <- as.data.frame(assay(dds_experiment2))
+rownames(raw_counts) <- paste0(samples_ATAC$peaks[[1]]$Chr,"_",samples_ATAC$peaks[[1]]$Start,"_",samples_ATAC$peaks[[1]]$End)
+raw_counts <- raw_counts %>% rownames_to_column()
+write.table(raw_counts, file = "Exports/Raw_ATAC_Counts.txt", quote = F, sep = "\t",col.names = T, row.names = F)
 rld <- rlog(dds_experiment2, blind = FALSE)
 rownames(assay(rld)) <- paste0(samples_ATAC$peaks[[1]]$Chr,"_",samples_ATAC$peaks[[1]]$Start,"_",samples_ATAC$peaks[[1]]$End)
 rld_df <- data.frame(row.names = paste0(samples_ATAC$peaks[[1]]$Chr,"_",samples_ATAC$peaks[[1]]$Start,"_",samples_ATAC$peaks[[1]]$End),

@@ -717,12 +717,16 @@ Corr_group$group <- as.factor(ifelse(Corr_group$spearman > 0.8, "Positive", ifel
 
 Corr_group$group <- factor(Corr_group$group, levels = levels(Corr_group$group)[c(3,2,1)])
 
-rld_df$Corr_group <- qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")])
+rld_df$Corr_group <- factor(qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")]),
+                            levels = levels(as.factor(qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")])))[c(3,2,1)])
+
 rld_df$PeakID <- rownames(rld_df)
 rld_df_melt <- reshape2::melt(rld_df)
-levels(rld_df_melt$Corr_group)
 
-ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group)) + geom_boxplot() + stat_compare_means()
+
+my_comparisons <- list( c("Negative", "None"), c("None", "Positive"), c("Positive", "Negative"))
+
+ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group, group = Corr_group)) + geom_boxplot() + stat_compare_means(method = "t.test",comparisons = my_comparisons)
 
 ggsave(filename = "Exports/Positive_vs_Negative_vs_None_strong_correlation_H3K27Ac_Levels.eps", width = 5, height = 7)
 ```
