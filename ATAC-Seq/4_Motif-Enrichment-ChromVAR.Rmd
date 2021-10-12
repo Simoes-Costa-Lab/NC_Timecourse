@@ -11,7 +11,7 @@ library(Matrix)
 library(SummarizedExperiment)
 library(BiocParallel)
 library(TFBSTools)
-register(BPPARAM = MulticoreParam(workers = 32, progressbar = TRUE))
+register(BPPARAM = MulticoreParam(workers = 16, progressbar = TRUE))
 library(BSgenome.Ggallus.ENSEMBL.galGal6)
 library(JASPAR2020)
 library(ggsci)
@@ -20,8 +20,8 @@ library(ggplot2)
 library(DESeq2)
 
 #Using dba.oject Samples_ATAC
-samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
-var_obj <- dba(samples_ATAC, bSummarizedExperiment = T)
+# samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
+var_obj <- dba(samples_ATAC_filt, bSummarizedExperiment = T)
 names(var_obj@assays) <- c("scores", "RPKM", "counts","cRPKM","cReads")
 var_obj <- addGCBias(var_obj, genome = BSgenome.Ggallus.ENSEMBL.galGal6)
 head(rowData(var_obj))
@@ -35,7 +35,7 @@ dev <- computeDeviations(var_obj, motif_ix)
 dev@NAMES <- paste0(dev@NAMES,"_",TFBSTools::name(motifs))
 variability <- computeVariability(dev)
 plotVariability(variability, n = 5, use_plotly = F)
-ggsave(filename = "Exports/Chick_NC_ATAC_chromVAR_Variability.eps", width = 8, height = 6)
+ggsave(filename = "Exports/Chick_NC_ATAC_chromVAR_Variability_filt.eps", width = 8, height = 6)
 tsne_dev <- deviationsTsne(dev, shiny = T, threshold = 1.5, perplexity = 4)
 pca <- dba.plotPCA(samples_ATAC, attributes = DBA_CONDITION)
 x <- pca$panel.args[[1]]$x
@@ -84,7 +84,7 @@ NR2F2 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "NR2F2", shin
 
 
 cowplot::plot_grid(g + theme(legend.position = "none"), sox2$SOX2 + theme(legend.position = "none"), oct4_sox2$`Pou5f1::Sox2`+ theme(legend.position = "none"), POU5F1$POU5F1+ theme(legend.position = "none")) 
-ggsave(file = "./Exports/Sox2_Oct4_chromVAR_noLegend.eps", device = "eps", width = 6, height = 4)
+ggsave(file = "./Exports/Sox2_Oct4_chromVAR_noLegend_filt.eps", device = "eps", width = 6, height = 4)
 ```
 
 # Working with raw chromVAR scores

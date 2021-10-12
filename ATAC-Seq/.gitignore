@@ -25,9 +25,13 @@
 # Homer results
 *_HOMER/
 
-#Ignore images
+# Ignore images
 *.png
 *.eps
+*.pdf
+
+# Ignore bed files
+*.bed
 
 #Big Imports
 ./Imports/Phastcons_77vert_25bpWindows.gr
