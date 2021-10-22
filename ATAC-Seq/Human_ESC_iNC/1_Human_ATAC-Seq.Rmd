@@ -87,7 +87,7 @@ for (i in seq(length(bamFiles))){
 
 # ESC vs D5 NC Analysis
 ```{r creating db object, echo=TRUE, eval=FALSE}
-NC_dba <- dba(sampleSheet="ESC_SampleSheet_Master.csv")
+NC_dba <- dba(sampleSheet="ESC_SampleSheet_CombinedPeaks_NC_Myo.csv")
 NC_dba <- dba.count(NC_dba, bParallel = T)
 # All ESC vs NC
 #NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$NC)
@@ -97,290 +97,178 @@ NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D3)
 NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D5)
 # D3 vs D5
 NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$D5)
-# ESC vs Mel
-NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$Mel)
-# Mel vs D3
-NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$Mel)
-# Mel vs D5
-NC_dba <- dba.contrast(NC_dba, NC_dba$masks$Mel, NC_dba$masks$D5)
+# ESC vs Myo
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$Myo)
+# Myo vs D3
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$Myo)
+# Myo vs D5
+NC_dba <- dba.contrast(NC_dba, NC_dba$masks$Myo, NC_dba$masks$D5)
 
 NC_dba <- dba.analyze(NC_dba, bParallel = F)
 
-ESC_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 1, th = 0.00001))
-ESC_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 2, th = 0.00001))
-D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 3, th = 0.00001))
-ESC_vs_Mel <- as.data.frame(dba.report(NC_dba, contrast = 4, th = 0.00001))
-Mel_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 5, th = 0.00001))
-Mel_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 6, th = 0.00001))
+ESC_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 1, th = 1e-6))
+ESC_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 2, th = 1e-6))
+D3_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 3, th = 1e-6))
+ESC_vs_Myo <- as.data.frame(dba.report(NC_dba, contrast = 4, th = 1e-6))
+Myo_vs_D3 <- as.data.frame(dba.report(NC_dba, contrast = 5, th = 1e-6))
+Myo_vs_D5 <- as.data.frame(dba.report(NC_dba, contrast = 6, th = 1e-6))
 
 ESC_vs_D3$PeakID <- paste0(ESC_vs_D3$seqnames, "_", ESC_vs_D3$start, "_", ESC_vs_D3$end)
 ESC_vs_D5$PeakID <- paste0(ESC_vs_D5$seqnames, "_", ESC_vs_D5$start, "_", ESC_vs_D5$end)
 D3_vs_D5$PeakID <- paste0(D3_vs_D5$seqnames, "_", D3_vs_D5$start, "_", D3_vs_D5$end)
-ESC_vs_Mel$PeakID <- paste0(ESC_vs_Mel$seqnames, "_", ESC_vs_Mel$start, "_", ESC_vs_Mel$end)
-Mel_vs_D3$PeakID <- paste0(Mel_vs_D3$seqnames, "_", Mel_vs_D3$start, "_", Mel_vs_D3$end)
-Mel_vs_D5$PeakID <- paste0(Mel_vs_D5$seqnames, "_", Mel_vs_D5$start, "_", Mel_vs_D5$end)
+ESC_vs_Myo$PeakID <- paste0(ESC_vs_Myo$seqnames, "_", ESC_vs_Myo$start, "_", ESC_vs_Myo$end)
+Myo_vs_D3$PeakID <- paste0(Myo_vs_D3$seqnames, "_", Myo_vs_D3$start, "_", Myo_vs_D3$end)
+Myo_vs_D5$PeakID <- paste0(Myo_vs_D5$seqnames, "_", Myo_vs_D5$start, "_", Myo_vs_D5$end)
 
 write.csv(ESC_vs_D3, file = "Exports/ESC_vs_D3.csv", row.names = F)
 write.csv(ESC_vs_D5, file = "Exports/ESC_vs_D5.csv", row.names = F)
 write.csv(D3_vs_D5, file = "Exports/D3_vs_D5.csv", row.names = F)
-write.csv(ESC_vs_Mel, file = "Exports/ESC_vs_Mel.csv", row.names = F)
-write.csv(Mel_vs_D3, file = "Exports/Mel_vs_D3.csv", row.names = F)
-write.csv(Mel_vs_D5, file = "Exports/Mel_vs_D5.csv", row.names = F)
+write.csv(ESC_vs_Myo, file = "Exports/ESC_vs_Myo.csv", row.names = F)
+write.csv(Myo_vs_D3, file = "Exports/Myo_vs_D3.csv", row.names = F)
+write.csv(Myo_vs_D5, file = "Exports/Myo_vs_D5.csv", row.names = F)
 
 All_Unique_PeakIDs <- unique(c(ESC_vs_D3$PeakID, ESC_vs_D5$PeakID,
-                        D3_vs_D5$PeakID, ESC_vs_Mel$PeakID,
-                        Mel_vs_D3$PeakID, Mel_vs_D5$PeakID))
+                        D3_vs_D5$PeakID, ESC_vs_Myo$PeakID,
+                        Myo_vs_D3$PeakID, Myo_vs_D5$PeakID))
 
 All_Unique_PeakIDs.df <- data.frame(chr = stringr::str_split(All_Unique_PeakIDs, pattern = "_", simplify = T)[,1], start = stringr::str_split(All_Unique_PeakIDs, pattern = "_", simplify = T)[,2], end = stringr::str_split(All_Unique_PeakIDs, pattern = "_", simplify = T)[,3])
 
-All_Unique_PeakIDs.df <- All_Unique_PeakIDs.df[!rownames(All_Unique_PeakIDs.df) %in% c(2236, 28474, 36692),]
-
-write.table(All_Unique_PeakIDs.df, file = "Exports/Human_ESC_to_Mel_Differential_Peaks.bed",
+write.table(All_Unique_PeakIDs.df, file = "Exports/Human_ESC_to_Myo_Differential_Peaks.bed",
             sep = "\t",row.names = F, col.names = F, quote = F)
 
-# Make other PCA plot
-dba.plotPCA(NC_dba)
-meta_dataframe <- as.data.frame(NC_dba$class)
-pca <- dba.plotPCA(NC_dba)
-x <- pca$panel.args[[1]]$x
-y <- pca$panel.args[[1]]$y
-pca_mat <- as.data.frame(matrix(c(x,y), nrow = 6, ncol = 2, byrow = F))
-colnames(pca_mat) <- c("PC1","PC2")
-rownames(pca_mat) <- colnames(meta_dataframe)
-
-pca_mat$timepoint <- factor(c("ES","ES","NC3","NC3",
-                       "NC5","NC5"),
-                       levels = c("ES","NC3","NC5"))
-g <- ggplot(pca_mat, aes(x=PC1, y=PC2, color=timepoint)) + 
-  geom_point(size = 4, alpha = 1) + 
-  scale_color_npg() +
-  labs(x = "PC1 64%" ,y = "PC2 22%") +
-  theme(text=element_text(color="black", size = 10, face = "bold"),
-        line=element_line(color="black", size = 2),
-        axis.ticks = element_line(color = "black", size = 1),
-        panel.background = element_blank(),
-        panel.border = element_rect(fill=NA, color = "black", size = 2),
-        axis.text = element_text(color="black", size = 10, face = "bold"),
-        legend.key = element_blank()
-  )
-
-g
-
-#ggsave('./Exports/Human_ESC-to-iNC-PCA.eps', units = 'in', height = 4, width = 6, device = "eps")
-```
-
-## Exporting enriched peaksets.
-```{r}
-NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
-
-library(qdapTools)
-NC_res_ann_df <- as.data.frame(NC_res_ann)
-txs <- as.data.frame(transcripts(ensembl_human_annotation))
-genes <- as.data.frame(genes(ensembl_human_annotation))
-txs_lookup <- txs[,c("tx_id_version","gene_id")]
-genes_lookup <- genes[,c("gene_id","gene_name")]
-NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
-NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
-NC_res_ann_df$peakID <- paste0(NC_res_ann_df$seqnames, "_",NC_res_ann_df$start,"_",NC_res_ann_df$end)
-
-
-D5_NC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, desc(Fold)) 
-D5_ESC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, Fold) 
-
-D5_NC_Enriched_5k.gr <- makeGRangesFromDataFrame(D5_NC_Enriched_5k)
-D5_ESC_Enriched_5k.gr <- makeGRangesFromDataFrame(D5_ESC_Enriched_5k)
-
-export.bed(D5_NC_Enriched_5k.gr, con = "Exports/D5_NC_Enriched_5k.bed")
-export.bed(D5_ESC_Enriched_5k.gr, con = "Exports/D5_ESC_Enriched_5k.bed")
-```
-
-## Run homer on ESC and NC enriched peaks
-```{bash}
-findMotifsGenome.pl D5_ESC_Enriched_5k.bed hg38 D5_ESC_Enriched_5k_HOMER -p 31
-
-findMotifsGenome.pl D5_NC_Enriched_5k.bed hg38 D5_NC_Enriched_5k_HOMER -p 31
-```
-
-Results of this show strong Oct4, Sox2, and Oct4::Sox2 enrichment in ESC, good.
-And a lot of GATA2 results in D5 NC.
-
-# ESC vs D3 NC Analysis
-```{r}
-# ESC vs D3
-NC_dba$contrasts=NULL
-# ESC Enriched positive LogFC, D3 enriched Negative.
-NC_dba <- dba.contrast(NC_dba, NC_dba$masks$ES, NC_dba$masks$D3)
-NC_dba <- dba.analyze(NC_dba, bParallel = T)
-NC_res <- dba.report(NC_dba)
-
-NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
-
-library(qdapTools)
-NC_res_ann_df <- as.data.frame(NC_res_ann)
-txs <- as.data.frame(transcripts(ensembl_human_annotation))
-genes <- as.data.frame(genes(ensembl_human_annotation))
-txs_lookup <- txs[,c("tx_id_version","gene_id")]
-genes_lookup <- genes[,c("gene_id","gene_name")]
-NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
-NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
-NC_res_ann_df$peakID <- paste0(NC_res_ann_df$seqnames, "_",NC_res_ann_df$start,"_",NC_res_ann_df$end)
-
-D3_NC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, desc(Fold)) 
-D3_ESC_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, Fold) 
-
-D3_NC_Enriched_5k.gr <- makeGRangesFromDataFrame(D3_NC_Enriched_5k)
-D3_ESC_Enriched_5k.gr <- makeGRangesFromDataFrame(D3_ESC_Enriched_5k)
-
-export.bed(D3_NC_Enriched_5k.gr, con = "Exports/D3_NC_Enriched_5k.bed")
-export.bed(D3_ESC_Enriched_5k.gr, con = "Exports/D3_ESC_Enriched_5k.bed")
-```
-
-## Run homer on ESC and NC enriched peaks
-```{bash}
-findMotifsGenome.pl D3_NC_Enriched_5k.bed hg38 D3_NC_Enriched_5k_HOMER -p 31
-
-findMotifsGenome.pl D3_ESC_Enriched_5k.bed hg38 D3_ESC_Enriched_5k_HOMER -p 31
-```
-
-# D3 vs D5 NC Analysis
-```{r}
-# ESC vs D3
-NC_dba$contrasts=NULL
-# D3 Enriched positive LogFC, D5 enriched Negative.
-NC_dba <- dba.contrast(NC_dba, NC_dba$masks$D3, NC_dba$masks$D5)
-NC_dba <- dba.analyze(NC_dba, bParallel = T)
-NC_res <- dba.report(NC_dba)
-
-NC_res_ann <- annotatePeak(NC_res, TxDb = TxDb_hg38)
-
-library(qdapTools)
-NC_res_ann_df <- as.data.frame(NC_res_ann)
-txs <- as.data.frame(transcripts(ensembl_human_annotation))
-genes <- as.data.frame(genes(ensembl_human_annotation))
-txs_lookup <- txs[,c("tx_id_version","gene_id")]
-genes_lookup <- genes[,c("gene_id","gene_name")]
-NC_res_ann_df$ENSEMBL <- lookup(NC_res_ann_df$transcriptId, txs_lookup)
-NC_res_ann_df$Symbol <- lookup(NC_res_ann_df$ENSEMBL, genes_lookup)
-NC_res_ann_df$peakID <- paste0(NC_res_ann_df$seqnames, "_",NC_res_ann_df$start,"_",NC_res_ann_df$end)
-
-D3_vs_D5_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, desc(Fold)) 
-D5_vs_D3_Enriched_5k <- top_n(NC_res_ann_df, n = 5000, Fold) 
-
-D3_vs_D5_Enriched_5k.gr <- makeGRangesFromDataFrame(D3_vs_D5_Enriched_5k)
-D5_vs_D3_Enriched_5k.gr <- makeGRangesFromDataFrame(D5_vs_D3_Enriched_5k)
-
-export.bed(D3_vs_D5_Enriched_5k.gr, con = "Exports/D3_vs_D5_Enriched_5k.bed")
-export.bed(D5_vs_D3_Enriched_5k.gr, con = "Exports/D5_vs_D3_Enriched_5k.bed")
-```
-
-## Run homer on ESC and NC enriched peaks
-```{bash}
-findMotifsGenome.pl D3_NC_Enriched_5k.bed hg38 D3_NC_Enriched_5k_HOMER -p 31
-
-findMotifsGenome.pl D3_ESC_Enriched_5k.bed hg38 D3_ESC_Enriched_5k_HOMER -p 31
+All_Unique_PeakIDs.df <- read.delim("Exports/Human_ESC_to_Myo_Differential_Peaks.bed", header = F)
+All_Unique_PeakIDs <- paste0(All_Unique_PeakIDs.df$V1, "_", 
+                             All_Unique_PeakIDs.df$V2, "_",
+                             All_Unique_PeakIDs.df$V3)
 ```
 
 ## Normalized counts via DESeq2
 While we have used diffbind to generate peaksets, we do not have an easy way to generate normalized counts directly from the diffbind object. Therefore, we must transform it into a DESeq2 object to generate a set of normalized counts for additional analysis.
+
 ```{r DESeq2, echo=TRUE}
-NC_dba <- dba(sampleSheet="ESC_SampleSheet_Master.csv")
-NC_dba <- dba.count(NC_dba, bParallel = T)
-dba.plotPCA(NC_dba)
 # Running DeSeq to get Rlog counts
 library(DESeq2)
+library(pheatmap)
 summarized_experiment2 <- dba(NC_dba, bSummarizedExperiment = T)
 summarized_experiment2@assays@data$scores <- summarized_experiment2@assays@data$Reads
 #order of counts not correct.
 dds_experiment2 <- DESeqDataSet(summarized_experiment2, design = ~ Condition)
 dds_experiment2 <- DESeq(dds_experiment2)
-dds_results <- results(dds_experiment2, contrast = c("Condition","D0","D5"))
 
-rownames(dds_results) <- paste0(NC_dba$peaks[[1]]$Chr,"_",NC_dba$peaks[[1]]$Start,"_",NC_dba$peaks[[1]]$End)
-rld <- rlog(dds_experiment2, blind = FALSE)
+rlog_human_ATAC <- rlog(dds_experiment2, blind = F)
+rlog_human_ATAC.df <- as.data.frame(assay(rlog_human_ATAC))
 
-rownames(assay(rld)) <- paste0(NC_dba$peaks[[1]]$Chr,"_",NC_dba$peaks[[1]]$Start,"_",NC_dba$peaks[[1]]$End)
-rld_df <- data.frame(row.names = paste0(NC_dba$peaks[[1]]$Chr,"_",NC_dba$peaks[[1]]$Start,"_",NC_dba$peaks[[1]]$End),assay(rld))
+rownames(rlog_human_ATAC.df) <- paste0(NC_dba$peaks[[1]]$Chr,"_",NC_dba$peaks[[1]]$Start,"_",NC_dba$peaks[[1]]$End)
 
-write.table(rld_df, file = "./Exports/Rlog_counts_All_Human_ESC-NC_ATAC_Peaks", quote = F, sep = "\t", row.names = T)
+write.table(rlog_human_ATAC.df, file = "./Exports/Rlog_counts_All_Human_ESC-NC_Myo_ATAC_Peaks.txt", quote = F, sep = "\t", row.names = T)
 
-library(pheatmap)
+rlog_human_ATAC.df <- read.delim("./Exports/Rlog_counts_All_Human_ESC-NC_Myo_ATAC_Peaks.txt")
 
-rld_df_avg <- data.frame(ES_D0 = rowMeans(rld_df[c('ATAC_ES_D0_1', 'ATAC_ES_D0_2')], na.rm=TRUE),
-                         NC_D3 = rowMeans(rld_df[c('ATAC_NC_D3_1', 'ATAC_NC_D3_2')], na.rm=TRUE),
-                         NC_D5 = rowMeans(rld_df[c('ATAC_NC_D5_1', 'ATAC_NC_D5_2')], na.rm=TRUE),
-                         NC_D14 = rowMeans(rld_df[c('ATAC_Myo_D14_1', 'ATAC_Myo_D14_2')], na.rm=TRUE)) 
+human_ATAC_avg <- data.frame(ES_D0 = rowMeans(rlog_human_ATAC.df[c('ATAC_ES_D0_1', 'ATAC_ES_D0_2')], na.rm=TRUE),
+                         NC_D3 = rowMeans(rlog_human_ATAC.df[c('ATAC_NC_D3_1', 'ATAC_NC_D3_2')], na.rm=TRUE),
+                         NC_D5 = rowMeans(rlog_human_ATAC.df[c('ATAC_NC_D5_1', 'ATAC_NC_D5_2')], na.rm=TRUE),
+                         NC_D14 = rowMeans(rlog_human_ATAC.df[c('ATAC_Myo_D14_1', 'ATAC_Myo_D14_2')], na.rm=TRUE)) 
 
-write.table(rld_df_avg, file = "./Exports/Rlog_counts_Avg_All_Human_ESC-NC_ATAC_Peaks", quote = F, sep = "\t", row.names = T)
+write.table(human_ATAC_avg, file = "./Exports/Rlog_counts_Avg_All_Human_ESC-NC_Myo_ATAC_Peaks.txt", quote = F, sep = "\t", row.names = T)
 
-deseq2_peakset <- as.data.frame(dds_results) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
-dds_results2 <- results(dds_experiment2, contrast = c("Condition","D3","D5"))
-deseq2_peakset2 <- as.data.frame(dds_results2) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
-dds_results3 <- results(dds_experiment2, contrast = c("Condition","D0","D3"))
-deseq2_peakset3 <- as.data.frame(dds_results3) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
-dds_results4 <- results(dds_experiment2, contrast = c("Condition","D5","Diff-14"))
-deseq2_peakset4 <- as.data.frame(dds_results4) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
-dds_results5 <- results(dds_experiment2, contrast = c("Condition","D3","Diff-14"))
-deseq2_peakset5 <- as.data.frame(dds_results5) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
-dds_results6 <- results(dds_experiment2, contrast = c("Condition","D0","Diff-14"))
-deseq2_peakset6 <- as.data.frame(dds_results6) %>% rownames_to_column() %>% dplyr::filter(padj < 1e-5)
 
-unique_peaks <- unique(c(deseq2_peakset$rowname,deseq2_peakset2$rowname, 
-                         deseq2_peakset3$rowname, deseq2_peakset4$rowname,
-                         deseq2_peakset5$rowname, deseq2_peakset6$rowname))
+human_ATAC_subset <- rlog_human_ATAC.df[rownames(rlog_human_ATAC.df) %in% All_Unique_PeakIDs,]
 
-rld_df_subset <- subset(rld_df, rownames(rld_df) %in% unique_peaks)
-rld_df_subset <- rld_df_subset[,c(1,2,7,8,9,10,5,6)]
-ATAC_clusters = pheatmap(rld_df_subset,
-                         cluster_cols = F, scale = "row",
-                         show_rownames = F,show_colnames = T, cluster_rows = T, cutree_rows = 4,
-                         color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250))
+human_ATAC_subset <- human_ATAC_subset[,c("ATAC_ES_D0_1","ATAC_ES_D0_2","ATAC_NC_D3_1","ATAC_NC_D3_2","ATAC_NC_D5_1","ATAC_NC_D5_2","ATAC_Myo_D14_1","ATAC_Myo_D14_2")]
+
+ATAC_clusters = pheatmap(human_ATAC_subset,
+                         cluster_cols = F,
+                         scale = "row",
+                         show_rownames = F,
+                         show_colnames = T,
+                         cluster_rows = T,
+                         cutree_rows = 6, color=colorRampPalette(colors=c("#0584BC","#FFFFFF","#E45649"))(250))
 
 #Re-order original data (genes) to match ordering in heatmap (top-to-bottom)
-rownames(rld_df_subset[ATAC_clusters$tree_row[["order"]],])
+rownames(human_ATAC_subset[ATAC_clusters$tree_row[["order"]],])
 #6 groups
-clusters_4 <- data.frame(
-  peak = names(sort(cutree(ATAC_clusters$tree_row, k=4))),
-  cluster = as.character(sort(cutree(ATAC_clusters$tree_row, k=4))))
+clusters_6 <- data.frame(
+  peak = names(sort(cutree(ATAC_clusters$tree_row, k=6))),
+  cluster = as.character(sort(cutree(ATAC_clusters$tree_row, k=6))))
 
-# Cluster 1 is only D5
-# Cluster 2 is only ESC
-# Cluster 3 is D3-D5 enriched
-# Cluster 4 is ESC-D3 enriched
 
-row_annotation <- data.frame(cluster = clusters_4$cluster, row.names = clusters_4$peak)
-pheatmap(rld_df_subset, annotation_row = row_annotation, 
+row_annotation <- data.frame(cluster = clusters_6$cluster, row.names = clusters_6$peak)
+
+pheatmap(human_ATAC_subset, annotation_row = row_annotation, 
                          cluster_cols = F, scale = "row",
-                         show_rownames = F,show_colnames = T, cluster_rows = T, cutree_rows = 4,
-                         color=colorRampPalette(colors=c("#0797B3","#FFFFFF","#4FA14E"))(250),
+                         show_rownames = F,show_colnames = T, cluster_rows = T, cutree_rows = 6,
+                         color=colorRampPalette(colors=c("#0584BC","#FFFFFF","#E45649"))(250),
          filename = "./Exports/Rlog_Counts_Human_DeSeq2_ATAC_peaks.pdf", width = 8, height = 6)
-library(stringr)
-clusters_bed <- clusters_4 %>%
-  tidyr::separate(col = peak, sep = "_", into = c("chr","start","end"))
-clusters_bed$start <- as.numeric(clusters_bed$start)
-clusters_bed$end <- as.numeric(clusters_bed$end)
 
-clusters_bed <- as.data.frame(clusters_bed[!is.na(clusters_bed),])
-
-cluster_1 <- clusters_bed %>% dplyr::filter(cluster == 1) %>% dplyr::select(everything(), -cluster)
-write.table(cluster_1, file = "./Exports/DeSeq2_ATAC_Cluster_1.bed",
-            sep = "\t",row.names = F, col.names = F, quote = F)
-
-cluster_2 <- clusters_bed %>% dplyr::filter(cluster == 2) %>% dplyr::select(everything(), -cluster)
-write.table(cluster_2, file = "./Exports/DeSeq2_ATAC_Cluster_2.bed",
-            sep = "\t",row.names = F, col.names = F, quote = F)
-
-cluster_3 <- clusters_bed %>% dplyr::filter(cluster == 3) %>% dplyr::select(everything(), -cluster)
-write.table(cluster_3, file = "./Exports/DeSeq2_ATAC_Cluster_3.bed",
-            sep = "\t",row.names = F, col.names = F, quote = F)
-
-cluster_4 <- clusters_bed %>% dplyr::filter(cluster == 4) %>% dplyr::select(everything(), -cluster)
-write.table(cluster_4, file = "./Exports/DeSeq2_ATAC_Cluster_4.bed",
-            sep = "\t",row.names = F, col.names = F, quote = F)
 ```
 
-```{bash eval=FALSE, include=FALSE}
-findMotifsGenome.pl DeSeq2_ATAC_Cluster_1.bed hg38 DeSeq2_ATAC_Cluster_1_HOMER -p 62
-findMotifsGenome.pl DeSeq2_ATAC_Cluster_2.bed hg38 DeSeq2_ATAC_Cluster_2_HOMER -p 62
-findMotifsGenome.pl DeSeq2_ATAC_Cluster_3.bed hg38 DeSeq2_ATAC_Cluster_3_HOMER -p 62
-findMotifsGenome.pl DeSeq2_ATAC_Cluster_4.bed hg38 DeSeq2_ATAC_Cluster_4_HOMER -p 62
+# Properties of ATAC clusters?
+I want to demonstrate enrichment of the pluripotency program in Cluster 2/3, neural crest identity in Cluster 5/6/4, and myo identity in Cluster 1.
+
+```{r}
+row_annotation2 <- row_annotation %>% rownames_to_column() %>% mutate(chr = stringr::str_split(rowname, pattern = "_", simplify = T)[,1],
+                                                    start = stringr::str_split(rowname, pattern = "_", simplify = T)[,2],
+                                                    end = stringr::str_split(rowname, pattern = "_", simplify = T)[,3]) 
+
+
+
+(row_annotation2 %>% dplyr::filter(cluster == 1) %>% dplyr::select(-rowname, -cluster))
+
+write.table((row_annotation2 %>% dplyr::filter(cluster == 1) %>% dplyr::select(-rowname, -cluster)),
+            file = "Exports/Cluster1_Myo.bed", row.names = F, col.names = F, sep = "\t", quote = F)
+write.table((row_annotation2 %>% dplyr::filter(cluster %in% c(2,3)) %>% dplyr::select(-rowname, -cluster)),
+            file = "Exports/Clusters-2-3_ESC.bed", row.names = F, col.names = F, sep = "\t", quote = F)
+write.table((row_annotation2 %>% dplyr::filter(cluster %in% c(4,5,6)) %>% dplyr::select(-rowname, -cluster)),
+            file = "Exports/Clusters-4-5-6_NC.bed", row.names = F, col.names = F, sep = "\t", quote = F)
+
 ```
+
+
+```{bash, EVAL=FALSE}
+findMotifsGenome.pl Cluster1_Myo.bed /data/Austin/workdir/genome/hg38.fa Cluster1_Myo_MYO_HOMER -nomotif -p 15
+findMotifsGenome.pl Clusters-2-3_ESC.bed /data/Austin/workdir/genome/hg38.fa Clusters-2-3_Myo_ESC_HOMER -nomotif -p 15
+findMotifsGenome.pl Clusters-4-5-6_NC.bed /data/Austin/workdir/genome/hg38.fa Clusters-4-5-6_Myo_NC_HOMER -nomotif -p 15
+
+```
+
+Running NucleoATAC to determine occupancy around Sox2/Oct4 shared regions and things.
+It recommends broad peaks (maybe a 1-2kb?) to call occupancy around.
+
+First combine all of the stage-specific nodupes BAMs All Sox2 peaks extend.
+```{bash}
+conda activate py37
+samtools merge -@ 16 ATAC_ES_D0_merged.bam ATAC_ES_D0_1_toGRCh38_sorted_nodups.bam ATAC_ES_D0_2_toGRCh38_sorted_nodups.bam
+samtools merge -@ 16 ATAC_NC_D3_merged.bam ATAC_NC_D3_1_toGRCh38_sorted_nodups.bam  ATAC_NC_D3_2_toGRCh38_sorted_nodups.bam
+samtools merge -@ 16 ATAC_NC_D5_merged.bam ATAC_NC_D5_1_toGRCh38_sorted_nodups.bam  ATAC_NC_D5_2_toGRCh38_sorted_nodups.bam
+samtools merge -@ 16 ATAC_Myo_D14_merged.bam ATAC_Myo_D14_1_toGRCh38_sorted_nodups.bam  ATAC_Myo_D14_2_toGRCh38_sorted_nodups.bam
+
+samtools index -@ 16 ATAC_ES_D0_merged.bam
+samtools index -@ 16 ATAC_NC_D3_merged.bam
+samtools index -@ 16 ATAC_NC_D5_merged.bam
+samtools index -@ 16 ATAC_Myo_D14_merged.bam
+```
+
+Then get peaks of interest
+1. All Human ESC to iNC Sox2 Peaks
+2. ESC enriched Sox2 Peaks
+3. NC enriched Sox2 Peaks
+
+Then widen them to 2kb
+```{bash}
+awk -F '\t' '{X=1000; mid=(int($2)+int($3))/2;printf("%s\t%d\t%d\n",$1,(mid-X<0?0:mid-X),mid+X);}' All_Sox2_Peaks.bed > All_Sox2_Peaks_2kwide.bed
+```
+
+Then call nucleo atac
+
+```{bash}
+conda activate nucleo
+cd /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/NucleoATAC
+
+nucleoatac run --cores 16 \
+--bed /home/ash274/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/All_Sox2_Peaks_2kwide.bed \
+--bam /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_ES_D0_merged.bam \
+--fasta /data/Austin/workdir/genome/hg38.fa \
+--out ATAC_ES_D0_All_Sox2_Peaks_NucleoATAC
+```
+
+

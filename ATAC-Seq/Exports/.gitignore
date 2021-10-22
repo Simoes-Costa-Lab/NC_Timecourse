@@ -3,3 +3,9 @@ ENSEMBL_101_TSS_sort.bed
 ENSEMBL_101_genes.bed
 ENSEMBL_101_genes_sort.bed
 Closest_5_genes_peaks.bed
+ATAC_PCA.eps
+NC_GRN_ATAC-Peaks.pdf
+NC_GRN_ATAC-Peaks_lessthan75kb.pdf
+Rlog_counts_All_ATAC_Peaks
+Rlog_counts_avergae_All_ATAC_Peaks
+top_18k_peaks_heatmap.pdf

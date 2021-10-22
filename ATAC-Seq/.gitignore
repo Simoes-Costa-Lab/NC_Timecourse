@@ -1,33 +1,28 @@
 # History files
 .Rhistory
 .Rapp.history
-
 # Session Data files
 .RData
-
 # User-specific files
 .Ruserdata
-
 # RStudio files
 .Rproj.user/
-
 # knitr and R markdown default cache directories
 *_cache/
 /cache/
-
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
-
+*.html
 # R Environment Variables
 .Renviron
-
 # Homer results
 *_HOMER/
-
-#Ignore images
+# Ignore images
 *.png
 *.eps
-
+*.pdf
+# Ignore bed files
+*.bed
 #Big Imports
 ./Imports/Phastcons_77vert_25bpWindows.gr

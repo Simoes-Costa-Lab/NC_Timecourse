@@ -15,6 +15,30 @@ findMotifsGenome.pl late_peaks_uniq.bed/data/Debbie/Organized_NC_ATAC_and_Sox2-O
 findMotifsGenome.pl mid_peaks_uniq.bed/data/Debbie/Organized_NC_ATAC_and_Sox2-Oct4/ATAC/Diffbind_data/Gallus_gallus.GRCg6a.dna.toplevel.fa /data/Debbie/final_analysis_files/ATAC_midvsearly_uniq_homer_200 -size 200 -bg early_peaks_uniq.bed -p 16
 ```
 
+
+Now, let's see how our less wonderful whole-embryo specific peaks look compared to the early peakset of neural crest. (run in ./Exports)
+
+Let's find out what peaks are specific to WE early.
+```{r}
+HH6_m_1 <- import(con ="/data/Austin/workdir/NC_Timecourse_Data/Negative_ATAC/Peaks/10869_10099_100378_HGHMCBGXB_A_HH6_AP2aE_ATAC_GFPneg_1_TCCTCTAC_togalGal6_noPG_nodups.bam_peaks.narrowPeak")
+
+HH6_m_2 <- import(con ="/data/Austin/workdir/NC_Timecourse_Data/Negative_ATAC/Peaks/10869_10099_100378_HGHMCBGXB_A_HH6_AP2aE_ATAC_GFPneg_2_CTAGTACG_togalGal6_noPG_nodups.bam_peaks.narrowPeak")
+
+HH8_m_1 <- import(con ="/data/Austin/workdir/NC_Timecourse_Data/Negative_ATAC/Peaks/HH8m_2_R1_t_noPG_nodups.bam_peaks.narrowPeak")
+
+combined_minus_peaks <- reduce(c(HH6_m_1,HH6_m_2,HH8_m_1))
+
+pie <- ChIPpeakAnno::makeVennDiagram(Peaks = list(HH6_m_1, HH6_m_2,HH8_m_1),
+                                     NameOfPeaks = c("HH6_1","HH6_2","HH6_1"))
+```
+
+```{bash}
+findMotifsGenome.pl early_peaks_uniq.bed ENSEMBL_galGal6_99 early_NC_vs_WE -bg WE_early_peaks_uniq.bed -p 62
+
+findMotifsGenome.pl early_peaks_uniq.bed ENSEMBL_galGal6_99 early_NC_general -p 62
+```
+
+
 ```{r}
 RNAseq_TF = subset(Annotated_Rlog_Positive_Averages, Annotated_Rlog_Positive_Averages$TF_Status == "Transcription Factor")
 RNAseq_TF =subset(RNAseq_TF, RNAseq_TF$HH6 >=2)

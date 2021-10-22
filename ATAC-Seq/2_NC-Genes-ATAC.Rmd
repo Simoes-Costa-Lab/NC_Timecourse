@@ -18,15 +18,21 @@ library(pheatmap)
 library(stringr)
 library(dplyr)
 library(ggplot2)
+library(BiocParallel)
+library(qdapTools)
+library(ImpulseDE2)
+library(readr)
+library(cowplot)
 
 #Annotating all ATAC peaks
-samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp_2.RDS")
-ATAC_all_peaks = readPeakFile("Imports/all_ATAC_400bp_fixed.bed")
+samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_filt.RDS")
+ATAC_all_peaks = readRDS("./Exports/ATAC_Filtered_Peaks.gr.RDS")
 TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 101)
 
 ATAC_all_peaks_anno = annotatePeak(ATAC_all_peaks, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db")
-#ATAC_all_peaks_anno.df = data.frame(ATAC_all_peaks_anno)
+ATAC_all_peaks_anno.df = data.frame(ATAC_all_peaks_anno)
 
+saveRDS(ATAC_all_peaks_anno.df, file = "ATAC_all_peaks_anno.RDS")
 GRN_Genes <- read.csv(file = "./Imports/GRN_Genes.csv", header = F)
 colnames(GRN_Genes) <- c("Symbol","ENSEMBL")
 #combining with counts peaks
@@ -34,18 +40,15 @@ colnames(GRN_Genes) <- c("Symbol","ENSEMBL")
 
 # TMM Normalized counts
 normCounts <- dba.peakset(samples_ATAC, bRetrieve=TRUE, DataType=DBA_DATA_FRAME)
-normCounts$START = normCounts$START + 1
-
 colnames(normCounts)[1:3] = c("seqnames", "start", "end")
 
 ATAC_all_score_anno = merge(normCounts, ATAC_all_peaks_anno.df, by = c("seqnames", "start", "end"))
 
-ATAC_all_score_anno$start = ATAC_all_score_anno$start - 1
 #Determining ATAC peaks around NC genes
 NC_peaks = subset(ATAC_all_score_anno, ATAC_all_score_anno$geneId %in% GRN_Genes$ENSEMBL)
 
 
-NC_peaks$number = c(1:461)
+NC_peaks$number = c(1:738)
 NC_peaks_score = data.frame(NC_peaks[,4:17],
                             SYMBOL = NC_peaks$SYMBOL,
                             number = NC_peaks$number,
@@ -89,212 +92,128 @@ pheatmap(NC_peaks_avg[abs(NC_peaks_score$distance) < 75,],
          width = 4.5,
          height = 10, filename = "./Exports/NC_GRN_ATAC-Peaks_lessthan75kb.pdf")
 
-
-# Rewrite early module
-early_genes <- c("MSX1", "PAX7", "SALL1","OTX2","LIN28A","NANOG",
-                 "POU4F3", "SP5","DMBX1","GATA3","HAND2","TFAP2C",
-                 "MSX2", "ZIC3", "ZIC1", "GBX2", "PAX3", "PRDM1",
-                 "LHX5","Pou5f3")
-
-early_genes <- c("MSX1", "PAX7","LIN28A","NANOG",
-                 "SP5","DMBX1","GATA3","ZIC3", "ZIC1", "GBX2", "PAX3",
-                 "Pou5f3")
-
-logic <- str_split(rownames(NC_peaks_avg), pattern = "_", simplify = T)[,1] %in% early_genes
-early_module_avg = NC_peaks_avg[logic,]
-early_module_avg$Enhancer <- rownames(early_module_avg)
-early_melt <- melt(early_module_avg, id.vars = c("Enhancer"), measure.vars = c(1,2,3,4,5,6,7))
-
-early_melt <- early_melt %>% group_by(Enhancer) %>% mutate(scaled_val = scale(value))
-
-lin <- lm(scaled_val ~ Enhancer, data = early_melt)
-lin$qr
-
-early_melt$chopped_time <- str_split(early_melt$variable, pattern = "HH", simplify = T)[,2]
-
-# Throw out poor correlations?
-early_melt <- early_melt %>% group_by(Enhancer) %>% mutate(correlation = cor(as.numeric(chopped_time), scaled_val))
-
-early_melt$direction <- ifelse(early_melt$correlation > 0.5,"Positive",
-                               ifelse(early_melt$correlation < -0.5, "Negative","Poor Correlation"))
-
-ggplot(early_melt, aes(variable, scaled_val)) + 
-  geom_point(aes(group = Enhancer)) + 
-  geom_line(aes(group = Enhancer, color = direction)) + 
-  geom_smooth(method="lm") + 
-  facet_wrap(facets = vars(direction), ncol = 1) +
-  theme()
-
-
-good_early_enhancers <- early_melt[early_melt$direction == "Negative",]
-unique(good_early_enhancers$Enhancer)
-
-pheatmap(early_module_avg[unique(good_early_enhancers$Enhancer),1:7],
-         cluster_cols = F,
-         scale = "row",
-         show_rownames = T,
-         fontsize_row = 6,
-         border_color = NA,
-         color = colorRampPalette(colors = c("#0797B3","#FFFFFF","#4FA14E"))(250),
-         clustering_method = "complete",
-         width = 5,
-         height = 12, filename = "./Exports/Early_NC_Module_ATAC-Peaks.pdf")
-
-
-# Let's see if we can get good middle enhancers by fitting a quadratic model?
-
-summary(test)$adj.r.squared
-early_melt2 <- early_melt %>% mutate(quad = summary(lm(scaled_val ~ poly(as.numeric(chopped_time), degree = 2)))$adj.r.squared)
-
-early_melt2$quad_fit <- ifelse(early_melt2$direction == "Poor Correlation" & early_melt2$quad > 0.5,
-                               "Quadratic Fit", early_melt2$direction)
-
-ggplot(early_melt2, aes(variable, scaled_val)) + 
-  geom_point(aes(group = Enhancer)) + 
-  geom_line(aes(group = Enhancer, color = quad_fit)) + 
-  geom_smooth(method="lm") + 
-  facet_wrap(facets = vars(quad_fit), ncol = 1) +
-  theme()
-
-middle_module = c("SNAI2","FOXD3","CSRNP1","SOX1O","RXRG","MYC","ZEB2","MYCN","ETS1","MEF2C","SOX5","TFAP2B","LMO4","COL2A1","SOX9","TWIST2","TFAP2A","SLIT3")
-logic <- str_split(rownames(NC_peaks_avg), pattern = "_", simplify = T)[,1] %in% middle_module
-middle_module_avg = NC_peaks_avg[logic,]
-
-pheatmap(middle_module_avg, cluster_cols = F, scale = "row",
-         show_rownames = T, fontsize_row = 8, cellheight = 10)
-
-Late_module = c("MITF","TYR","TH","TWIST2","PHOX2B","MEF2C","DCT","EBF1")
-logic <- str_split(rownames(NC_peaks_avg), pattern = "_", simplify = T)[,1] %in% Late_module
-Late_module_avg = NC_peaks_avg[logic,]
-
-pheatmap(Late_module_avg, cluster_cols = F, scale = "row",
-         show_rownames = T, fontsize_row = 8, cellheight = 10)
-```
-
-This is looking pretty good for the previously established GRN genes, but what about TF's that we identified from our RNA-Seq analysis? It may help to link the datasets together better.
-
-Additionally, maybe throw in a promoter overlap and RNA-Seq correlation plot?
-Could compare Log2 ATAC Counts vs Log2 TPM RNA-Seq counts
-
-Summary of last time. 
-pearson correlation from tpm and rpm of RNA-Seq and ATAC-Seq is between 40-60% from what I've seen. This may differ at timepoints.
-```{r}
-setwd(dir = "/data/Debbie/Sox2_Oct4_project/exports/Fig1/BAM")
-rawCounts <- dba.count(samples_ATAC, peaks = ATAC_all_peaks,
-                       score = DBA_SCORE_READS)
-
-# Raw counts
-rawCounts_df <- dba.peakset(rawCounts, bRetrieve=TRUE, DataType=DBA_DATA_FRAME)
-colnames(rawCounts_df)[1:3] = c("seqnames", "start", "end")
-
-ATAC_Counts_Anno = merge(rawCounts_df, ATAC_all_peaks_anno.df, by = c("seqnames", "start", "end"))
-```
-
-```{r}
-# Get peak counts over promoters
-gene_promoters <- trim(promoters(TxDb_galGal6, upstream = 1000, downstream = 1000))
-
-prom_peaks <- ATAC_Counts_Anno[ATAC_all_peaks %over% gene_promoters,]
-
-prom_peak_score = data.frame(prom_peaks[,4:17],
-                            SYMBOL = prom_peaks$SYMBOL,
-                            geneID = prom_peaks$geneId,
-                            number = c(1:length(prom_peaks$geneId)),
-                            distance = round(prom_peaks$distanceToTSS/1000, digits = 1)
-                            )
-
-rownames(prom_peak_score) <- paste0(prom_peak_score$geneID,"_",prom_peak_score$number,
-                                    "_", prom_peak_score$distance)
-
-counts <- prom_peak_score[,1:14]
-counts[is.na(counts)] <- 0
-prom_peak_score[,1:14] <- counts
-
-cor(prom_peak_score$HH6_1, prom_peak_score$HH6_2)
-
-ggplot(prom_peak_score, aes(HH6_1, HH6_2)) + geom_point() + 
-  geom_smooth(method = "lm", show.legend = T) + lims(x = c(0, 1000), y = c(0,1000))
-
-prom_peak_avg <- data.frame(HH6 = rowMeans(prom_peak_score[c('HH6_1', 'HH6_2')], na.rm=TRUE),
-                         HH8 = rowMeans(prom_peak_score[c('HH8_1', 'HH8_2')], na.rm=TRUE),
-                         HH10 = rowMeans(prom_peak_score[c('HH10_1', 'HH10_2')], na.rm=TRUE),
-                         HH12 = rowMeans(prom_peak_score[c('HH12_1', 'HH12_2')], na.rm=TRUE),
-                         HH14 = rowMeans(prom_peak_score[c('HH14_1', 'HH14_2')], na.rm=TRUE),
-                         HH16 = rowMeans(prom_peak_score[c('HH16_2', 'HH16_1')], na.rm=TRUE),
-                         geneID = prom_peaks$geneId)
-
-# Get raw counts for genes.
-raw_count_genes <- read.csv(file = "~/local_git/NC_Timecourse/RNA-Seq/Exports/Raw_RNA-Seq_Counts.csv", row.names = 1)
-raw_count_genes$Chick_ENSEMBL <- rownames(raw_count_genes)
-# Remove peaks that don't have a gene from RNA-Seq.
-
-prom_peak_avg_filt <- prom_peak_avg[prom_peak_score$geneID %in% raw_count_genes$Chick_ENSEMBL,]
-
-# Collapse (mean) values for each gene
-
-prom_peak_avg_filt_2 <- prom_peak_avg_filt %>% 
-  group_by(geneID) %>% 
-  summarise(HH6_av = mean(HH6),
-            HH8_av = mean(HH8),
-            HH10_av = mean(HH10),
-            HH12_av = mean(HH12),
-            HH14_av = mean(HH14),
-            HH16_av = mean(HH16))
-
-
-raw_count_genes_filt <- subset(raw_count_genes, raw_count_genes$Chick_ENSEMBL %in% prom_peak_avg_filt_2$geneID)
-
-raw_count_genes_filt_tpm <- raw_count_genes_filt[,1:42]/(colSums(raw_count_genes_filt[,1:42])/1000000)
-raw_count_genes_filt_tpm <- raw_count_genes_filt_tpm[order(rownames(raw_count_genes_filt_tpm)),]
-# Get transcript lengths for these genes
-
-genes <- genes(TxDb_galGal6)
-ens_to_length <- data.frame(ENSEMBL = genes$gene_id,
-                            width = genes@ranges@width)
-
-raw_count_genes_filt$length <- qdapTools::lookup(terms = rownames(raw_count_genes_filt), ens_to_length)
-
-tmm_genes_filt <- as.data.frame(NOISeq::tmm(raw_count_genes_filt[,1:42],
-            long = raw_count_genes_filt$length,
-            lc = 0, k = 0, refColumn = 1,
-            logratioTrim = 0.3, sumTrim = 0.05, doWeighting = TRUE, Acutoff = -1e+10))
-
-tmm_genes_filt <- tmm_genes_filt[order(rownames(tmm_genes_filt)),]
-
-# Construct an x/y for every timepoint. Probably only need to show one but check them all? Maybe trend?
-cor(prom_peak_avg_filt_2$HH10_av, raw_count_genes_filt_tpm$HH10_mGFP_2_GTAGAG)
-
-hh6_comparison <- data.frame(rpm_atac = prom_peak_avg_filt_2$HH6_av,
-                             tpm_rna = raw_count_genes_filt_tpm$HH6v3_pos_CGATGT)
-
-cor(hh6_comparison$rpm_atac, hh6_comparison$tpm_rna)
-
-ggplot(hh6_comparison, aes(rpm_atac, tpm_rna)) + geom_point() + 
-  geom_smooth(method = "lm", show.legend = T) +
-  lims(x = c(0, 600), y = c(0,1000))
-
-# Try filtering.
-# on ATAC
-upper <- quantile(hh6_comparison$rpm_atac, 0.98)
-lower <- 1
-hh6_comparison_filt <- hh6_comparison[hh6_comparison$rpm_atac < upper,]
-hh6_comparison_filt <- hh6_comparison[hh6_comparison$rpm_atac > lower,]
-
-upper_rna <- quantile(hh6_comparison$tpm_rna, 0.98)
-lower_rna <- 1
-hh6_comparison_filt <- hh6_comparison[hh6_comparison$tpm_rna < upper_rna,]
-hh6_comparison_filt <- hh6_comparison[hh6_comparison$tpm_rna > lower_rna,]
-cor(hh6_comparison_filt$rpm_atac, hh6_comparison_filt$tpm_rna)
-
-ggplot(hh6_comparison_filt, aes(rpm_atac, tpm_rna)) + geom_point() + 
-  geom_smooth(method = "lm", show.legend = T) +
-  lims(x = c(0, 600), y = c(0,1000))
-
 ```
 
 ## Importing diffTF results
 I used (with great difficulty) the program diffTF to perform integration of our ATAC-Seq and RNA-Seq data. This program scans peaks for TFBS's, and then associates the accessibility of those sites in aggregate to the RNA-Seq expression levels of eligible genes. Thus, it is able to classify each transcription factor as an activator, repressor, or undetermined. Undetermined genes may have both activities, or no real specific activity.
 
+```{r}
+# Here's an idea, just run ImpulseDE2 on the timecourse ATAC-Seq data, then correlate each gene's peaks and find ones that match the RNA-Seq model.
+#The annotation data has to be modified for this tool.
+samples_ATAC2 <- dba.count(samples_ATAC, peaks=NULL, score=DBA_SCORE_READS)
+counts <- dba.peakset(samples_ATAC2, bRetrieve=TRUE, DataType=DBA_DATA_FRAME)
+
+rownames(counts) <- paste0(counts$CHR,"-", counts$START, "-", counts$END)
+counts <- as.matrix(counts[,4:17])
+counts <- counts[,1:12]
+anno2 <- data.frame(Sample = colnames(counts),
+                    Condition = "case",
+                    Time = c(6,6,8,8,10,10,12,12,14,14,16,16),
+                    Batch = "B_NULL")
+
+
+impulse_obj2 <- runImpulseDE2(
+  matCountData = counts,
+  dfAnnotation = anno2,
+  boolCaseCtrl = F,
+  vecConfounders = NULL,
+  boolIdentifyTransients = T,
+  scaNProc = 16)
+
+impulse_obj2$dfImpulseDE2Results
+
+head(impulse_obj2$dfImpulseDE2Results)
+res2 <- impulse_obj2$dfImpulseDE2Results
+
+saveRDS(impulse_obj2, file = "Exports/ATAC-Seq-Impulse.RDS")
+lsgplotsGenes2 <- plotGenes(
+  vecGeneIDs       = NULL,
+  scaNTopIDs       = 10,
+  objectImpulseDE2 = impulse_obj2,
+  boolCaseCtrl     = F,
+  boolSimplePlot   = T,
+  dirOut           = NULL,
+  strFileName      = NULL,
+  vecRefPval       = NULL, 
+  strNameRefMethod = NULL)
+
+lsgplotsGenes2[[1]]
+```
+
+1. Retrieve gene impulse model
+2. For every peak for that gene, find the correlation
+3. Get a set of random peaks that are not for that gene and find the average correlation for unrelated peaks. Did this, it is 0! 
+4. Report, maybe determine some sort of cutoff?
+```{r}
+# So one way is to increase the annotation of our ATAC_all_peaks_anno. 
+# We want to bump it out to the 5 nearest genes. 
+# Currently our function looks for peakIDs that are annotated by a certain gene.
+# We should look for the nearest 5 genes for each peak and add each as a new row.
+# We can use bedtools closest to accomplish this.
+TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 101)
+genes <- promoters(genes(TxDb_galGal6),
+          upstream=1500, downstream=500)
+genes <- trim(genes)
+
+export.bed(object = genes, con = "Exports/ENSEMBL_101_TSS.bed")
+
+# Now annotate the peaks with the nearest 5 genes.
+```
+
+```{bash, eval = FALSE}
+awk '{ if ($2 > 0) { print } }' ./Exports/ENSEMBL_101_TSS.bed > ./Exports/ENSEMBL_101_TSS_filt.bed
+bedtools sort -i ./Exports/ENSEMBL_101_TSS_filt.bed > ./Exports/ENSEMBL_101_TSS_sort.bed
+
+bedtools closest -k 5 -D b -b ./Exports/ENSEMBL_101_TSS_sort.bed -a ./Exports/ATAC_Filtered_Peaks.bed > ./Exports/ATAC_Filtered_Peaks_Closest_5_genes.bed
+```
+
+
+```{r}
+source(file = "Peak-Gene-Fitting_2.R")
+register(BPPARAM = MulticoreParam(progressbar = T, workers = 12, stop.on.error = F))
+impulse_obj <- readRDS("../RNA-Seq/Exports/impulse_obj.RDS")
+impulse_obj_ATAC <- readRDS("Exports/ATAC-Seq-Impulse.RDS")
+ATAC_all_peaks_anno.df <- readRDS("Exports/ATAC_all_peaks_anno.RDS")
+closest_5_genes <- read.delim("Exports/ATAC_Filtered_Peaks_Closest_5_genes.bed", sep ="\t", header = F)
+colnames(closest_5_genes) <- c("peakChr","peakStart",
+                               "peakStop","peakStrand",
+                               "peakWidth","peakScore",
+                               "tssChr","tssStart","tssStop",
+                               "geneId","geneScore",
+                               "GeneStrand","distanceToTSS")
+# Shift start +1 bp to match ATAC obj.
+closest_5_genes$peakStart <- closest_5_genes$peakStart + 1
+
+closest_5_genes$PeakID <- paste0(closest_5_genes$peakChr,
+                                 "-",closest_5_genes$peakStart,"-",
+                                 closest_5_genes$peakStop)
+closest_5_genes$geneId <- as.character(closest_5_genes$geneId)
+GRN_Genes <- read.csv(file = "./Imports/GRN_Genes.csv", header = F)
+colnames(GRN_Genes) <- c("Symbol","ENSEMBL")
+GenesUniverse <- read_csv("../RNA-Seq/Imports/GenesUniverse.csv")
+TC_NC_Enriched <- read_csv("../RNA-Seq/Exports/ddsTC_Condition_WE_vc_NC_Enriched.csv")
+TC_NC_Enriched_TF <- subset(TC_NC_Enriched, TC_NC_Enriched$TF_Status == "Transcription Factor")
+
+#Window25bp.gr <- readRDS(file = "Imports/Phastcons_77vert_25bpWindows.gr.RDS")
+# GRN_enhancers <- RunMultipleGenes(genelist = as.character(GRN_Genes$ENSEMBL))
+```
+
+```{r eval=FALSE, include=FALSE}
+# Remove rows with NA PeakIDs.
+All_Genes_Tests <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL)
+All_Genes_Tests <- All_Genes_Tests[!is.na(All_Genes_Tests$PeakID),]
+summary(All_Genes_Tests$PeakID %in% closest_5_genes$PeakID)
+
+saveRDS(All_Genes_Tests, file = "Exports/All_Genes_Tests.RDS")
+All_Genes_Tests <- readRDS(file = "Exports/All_Genes_Tests.RDS")
+
+TC_NC_Enriched_Enhancers <- subset(All_Genes_Tests, All_Genes_Tests$gene %in% TC_NC_Enriched$Chick_ENSEMBL)
+write_csv(All_Genes_Tests, path = "Exports/All_Genes_Tests.csv", col_names = T)
+write_csv(TC_NC_Enriched_Enhancers, path = "Exports/TC_NC_Enriched_Enhancers.csv", col_names = T)
+```
+
+
+## Comparison of DiffTF activator/repressor call to trrust database.
 ```{r}
 library(readr)
 library(qdapTools)
@@ -340,301 +259,7 @@ report$conflict <- ifelse(report$NC_timecourse_call == "activator" & report$rep_
                           "conflict", "expected")
 ```
 
-##  Let's plot some things.
-Timecourse RNA-Seq expression of the activators and repressors
-Next to the chromvar scores for each time.
-
-This ended up not looking very good...
-```{r}
-library(pheatmap)
-library(stringr)
-library(ggplot2)
-library(heatmaply)
-library(RColorBrewer)
-
-Annotated_Rlog_Positive_Averages <- read_csv("../RNA-Seq/Exports/Annotated_Rlog_Positive_Averages.csv")
-Rlog_counts_avergae_All_ATAC_Peaks <- read.delim("~/local_git/NC_Timecourse/ATAC-Seq/Exports/Rlog_counts_avergae_All_ATAC_Peaks")
-
-chromVAR_Z_Score <- as.data.frame(read_csv("Exports/chromVAR_Z-Score.csv"))
-rownames(chromVAR_Z_Score) <- chromVAR_Z_Score$X1
-chromVAR_Z_Score$X1 <- NULL
-
-names <- data.frame(ID =
-str_split(rownames(chromVAR_Z_Score), "_", simplify = T)[,1],
-name = 
-str_split(rownames(chromVAR_Z_Score), "_", simplify = T)[,2]
-)
-all_timepoints_summary$TF_and_Symbol <- paste0(all_timepoints_summary$TF, "_",qdapTools::lookup(all_timepoints_summary$TF, names))
-all_timepoints_summary[all_timepoints_summary$classification_q0.1 == "activator" | all_timepoints_summary$classification_q0.1 == "repressor",]$TF
-
-timepoint_sub_1 <- all_timepoints_summary[all_timepoints_summary$classification_q0.1 == "activator",]
-timepoint_sub_2 <- all_timepoints_summary[all_timepoints_summary$classification_q0.1 == "repressor",]
-
-chromVAR_Z_Score_onerep <- chromVAR_Z_Score[,c("HH6_1","HH8_2","HH10_1","HH12_2","HH14_1","HH16_1","HH18_1")]
-
-act <- chromVAR_Z_Score_onerep[rownames(chromVAR_Z_Score_onerep) %in% timepoint_sub_1$TF_and_Symbol,]
-rep <- chromVAR_Z_Score_onerep[rownames(chromVAR_Z_Score_onerep) %in% timepoint_sub_2$TF_and_Symbol,]
-
-act_hm <- pheatmap(act, cluster_cols = F, scale = "row",
-         border_color = NA, show_rownames = F,
-         color = brewer.pal(250, "PRGn"),
-         main = "Activators - chromVAR", filename = "Exports/diffTF_activators_chromVAR.pdf")
-
-rep_hm <- pheatmap(rep, cluster_cols = F, scale = "row",
-         border_color = NA, show_rownames = F,
-         color = brewer.pal(250, "PRGn"),
-         main = "Repressors - chromVAR", filename = "Exports/diffTF_repressors_chromVAR.pdf")
-
-# Okay so now what about their expression.
-trans_table
-
-act_exp <- str_split(rownames(act), pattern = "_", simplify = T)[,1]
-act_exp <- lookup(terms = act_exp, key.match = as.data.frame(trans_table[,c(3,2)]))
-act_average_expression <- Annotated_Rlog_Positive_Averages[Annotated_Rlog_Positive_Averages$Chick_ENSEMBL %in% act_exp,]
-rownames(act_average_expression) <- act_average_expression$Chick_ENSEMBL
-act_average_expression <- act_average_expression[act_exp,]
-
-rep_exp <- str_split(rownames(rep), pattern = "_", simplify = T)[,1]
-rep_exp <- lookup(terms = rep_exp, key.match = as.data.frame(trans_table[,c(3,2)]))
-rep_average_expression <- Annotated_Rlog_Positive_Averages[Annotated_Rlog_Positive_Averages$Chick_ENSEMBL %in% rep_exp,]
-rownames(rep_average_expression) <- rep_average_expression$Chick_ENSEMBL
-rep_average_expression <- rep_average_expression[rep_exp,]
-
-pheatmap(act_average_expression[,3:8], cluster_cols = F, scale = "row",
-         border_color = NA, show_rownames = F, cluster_rows = act_hm$tree_row,
-         color = rev(brewer.pal(250, "RdGy")),
-         main = "Activators - RNA-Seq", filename = "Exports/diffTF_activators_RNA-Seq.pdf")
-
-pheatmap(rep_average_expression[,3:8], cluster_cols = F, scale = "row",
-         border_color = NA, show_rownames = F, cluster_rows = rep_hm$tree_row,
-         color = rev(brewer.pal(250, "RdGy")),
-         main = "Repressors - RNA-Seq", filename = "Exports/diffTF_repressors_RNA-Seq.pdf")
-```
-
-So theoretically, I can use cor() to measure the similarity of two lines aka lines of best fit from both my Impulse results and ATAC-Seq peaks. Maybe I can use this to find peaks with similar dynamics as the gene in a more robust way.
-```{r}
-# Here's an idea, just run ImpulseDE2 on the timecourse ATAC-Seq data, then correlate each gene's peaks and find ones that match the RNA-Seq model.
-#The annotation data has to be modified for this tool.
-
-samples_ATAC2 <- dba.count(samples_ATAC, peaks=NULL, score=DBA_SCORE_READS)
-counts <- dba.peakset(samples_ATAC2, bRetrieve=TRUE, DataType=DBA_DATA_FRAME)
-
-rownames(counts) <- paste0(counts$CHR,"-", counts$START, "-", counts$END)
-counts <- as.matrix(counts[,4:17])
-counts <- counts[,1:12]
-anno2 <- data.frame(Sample = colnames(counts),
-                    Condition = "case",
-                    Time = c(6,6,8,8,10,10,12,12,14,14,16,16),
-                    Batch = "B_NULL")
-
-
-impulse_obj2 <- runImpulseDE2(
-  matCountData = counts,
-  dfAnnotation = anno2,
-  boolCaseCtrl = F,
-  vecConfounders = NULL,
-  boolIdentifyTransients = T,
-  scaNProc = 16)
-
-impulse_obj2$dfImpulseDE2Results
-
-head(impulse_obj2$dfImpulseDE2Results)
-res2 <- impulse_obj2$dfImpulseDE2Results
-
-saveRDS(impulse_obj2, file = "Exports/ATAC-Seq-Impulse.RDS")
-lsgplotsGenes2 <- plotGenes(
-  vecGeneIDs       = NULL,
-  scaNTopIDs       = 10,
-  objectImpulseDE2 = impulse_obj2,
-  boolCaseCtrl     = F,
-  boolSimplePlot   = T,
-  dirOut           = NULL,
-  strFileName      = NULL,
-  vecRefPval       = NULL, 
-  strNameRefMethod = NULL)
-
-lsgplotsGenes2[[1]]
-
-```
-1. Retrieve gene impulse model
-2. For every peak for that gene, find the correlation
-3. Get a set of random peaks that are not for that gene and find the average correlation for unrelated peaks. Did this, it is 0! 
-4. Report, maybe determine some sort of cutoff?
-```{r}
-library(GenomicFeatures)
-library(rtracklayer)
-# So one way is to increase the annotation of our ATAC_all_peaks_anno. 
-# We want to bump it out to the 5 nearest genes. 
-# Currently our function looks for peakIDs that are annotated by a certain gene.
-# We should look for the nearest 5 genes for each peak and add each as a new row.
-# We can use bedtools closest to accomplish this.
-TxDb_galGal6 <- makeTxDbFromEnsembl(organism = "Gallus gallus", release = 101)
-genes <- promoters(genes(TxDb_galGal6),
-          upstream=1500, downstream=500)
-genes <- trim(genes)
-
-export.bed(object = genes, con = "Exports/ENSEMBL_101_TSS.bed")
-
-# Now annotate the peaks with the nearest 5 genes.
-```
-
-```{bash, eval = FALSE}
-bedtools sort -i ./Exports/ENSEMBL_101_TSS.bed > ./Exports/ENSEMBL_101_TSS_sort.bed
-
-bedtools closest -k 5 -D b -b ./Exports/ENSEMBL_101_TSS_sort.bed -a ./Imports/all_ATAC_400bp_fixed.bed > ./Exports/Closest_5_genes_peaks.bed
-```
-
-
-```{r}
-library(BiocParallel)
-library(qdapTools)
-library(ImpulseDE2)
-library(readr)
-library(ggplot2)
-library(dplyr)
-library(rtracklayer)
-library(cowplot)
-library(stringr)
-source(file = "Peak-Gene-Fitting.R")
-
-register(BPPARAM = MulticoreParam(progressbar = T, workers = 12, stop.on.error = F))
-impulse_obj <- readRDS("../RNA-Seq/Exports/impulse_obj.RDS")
-impulse_obj2 <- readRDS("Exports/ATAC-Seq-Impulse.RDS")
-ATAC_all_peaks_anno.df <- readRDS("Exports/ATAC_all_peaks_anno.RDS")
-closest_5_genes <- read.delim("Exports/Closest_5_genes_peaks.bed", sep ="\t", header = F)
-colnames(closest_5_genes) <- c("peakChr","peakStart",
-                               "peakStop","peakWidth",
-                               "peakStrand",
-                               "tssChr","tssStart","tssStop",
-                               "geneId","GeneOverlaps",
-                               "GeneStrand","distanceToTSS")
-closest_5_genes$PeakID <- paste0(closest_5_genes$peakChr,
-                                 "-",closest_5_genes$peakStart,"-",
-                                 closest_5_genes$peakStop)
-GRN_Genes <- read.csv(file = "./Imports/GRN_Genes.csv", header = F)
-colnames(GRN_Genes) <- c("Symbol","ENSEMBL")
-GenesUniverse <- read_csv("../RNA-Seq/Imports/GenesUniverse.csv")
-TC_NC_Enriched <- read_csv("../RNA-Seq/Exports/ddsTC_Condition_WE_vc_NC_Enriched.csv")
-TC_NC_Enriched_TF <- subset(TC_NC_Enriched, TC_NC_Enriched$TF_Status == "Transcription Factor")
-
-#Window25bp.gr <- readRDS(file = "Imports/Phastcons_77vert_25bpWindows.gr.RDS")
-#GRN_enhancers <- RunMultipleGenes(genelist = as.character(GRN_Genes$ENSEMBL))
-```
-
-```{r eval=FALSE, include=FALSE}
-All_Genes_1 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[1:7000])
-All_Genes_2 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[5001:10000])
-All_Genes_3 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[10001:15000])
-All_Genes_4 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[15001:20000])
-All_Genes_5 <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL[20001:24356])
-
-#All_Genes_Tests <- rbind(All_Genes_1, All_Genes_2, All_Genes_3, All_Genes_4, All_Genes_5)
-# Remove rows with NA PeakIDs.
-All_Genes_Tests <- RunMultipleGenes(genelist = GenesUniverse$Chick_ENSEMBL)
-All_Genes_Tests <- All_Genes_Tests[!is.na(All_Genes_Tests$PeakID),]
-summary(All_Genes_Tests$PeakID %in% closest_5_genes$PeakID)
-
-saveRDS(All_Genes_Tests, file = "Exports/All_Genes_Tests.RDS")
-All_Genes_Tests <- readRDS(file = "Exports/All_Genes_Tests.RDS")
-
-TC_NC_Enriched_Enhancers <- subset(All_Genes_Tests, All_Genes_Tests$gene %in% TC_NC_Enriched$Chick_ENSEMBL)
-write_csv(All_Genes_Tests, path = "Exports/All_Genes_Tests.csv", col_names = T)
-write_csv(TC_NC_Enriched_Enhancers, path = "Exports/TC_NC_Enriched_Enhancers.csv", col_names = T)
-
-```
-
-
-```{r}
-# Investigate -.6 to -1 spearman to .6-1 spearman genomic annotation
-# First label Introns
-All_Genes_Tests$annotation2 <- ifelse(grepl("Intron", All_Genes_Tests$annotation), "Intron", All_Genes_Tests$annotation)
-
-All_Genes_Tests$annotation2 <- ifelse(grepl("Exon", All_Genes_Tests$annotation2), "Exon", All_Genes_Tests$annotation2)
-
-neg_cor <- summary(as.factor(All_Genes_Tests[All_Genes_Tests$spearman <= -0.6,"annotation2"]))
-
-pos_cor <- summary(as.factor(All_Genes_Tests[All_Genes_Tests$spearman >= 0.6,"annotation2"]))
-
-neg_cor <- (neg_cor/sum(neg_cor))*100
-pos_cor <- (pos_cor/sum(pos_cor))*100
-
-data.frame(rbind(neg_cor,pos_cor))
-
-lsgplotsGenes1 <- plotGenes(
-  vecGeneIDs       = "ENSGALG00000040069",
-  scaNTopIDs       = NULL,
-  objectImpulseDE2 = impulse_obj,
-  boolCaseCtrl     = F,
-  boolSimplePlot   = T,
-  dirOut           = NULL,
-  strFileName      = NULL,
-  vecRefPval       = NULL, 
-  strNameRefMethod = NULL)
-
-lsgplotsGenes2 <- plotGenes(
-  vecGeneIDs       = "8-15106902-15107301",
-  scaNTopIDs       = NULL,
-  objectImpulseDE2 = impulse_obj2,
-  boolCaseCtrl     = F,
-  boolSimplePlot   = T,
-  dirOut           = NULL,
-  strFileName      = NULL,
-  vecRefPval       = NULL, 
-  strNameRefMethod = NULL)
-
-p <- cowplot::plot_grid(lsgplotsGenes1[[1]], lsgplotsGenes2[[1]], ncol = 1)
-
-custom_plotGenes <- edit(plotGenes)
-res_list <- list()
-
-for (peak in subset(TC_NC_Enriched_enhancers, TC_NC_Enriched_enhancers$Symbol == "BARHL2")$PeakID) {
-  res_list[peak] <- custom_plotGenes(
-  vecGeneIDs       = peak,
-  scaNTopIDs       = NULL,
-  objectImpulseDE2 = impulse_obj2,
-  boolCaseCtrl     = F,
-  boolSimplePlot   = T,
-  dirOut           = NULL,
-  strFileName      = NULL,
-  vecRefPval       = NULL, 
-  strNameRefMethod = NULL)
-}
-
-gene_plot <- custom_plotGenes(
-  vecGeneIDs       = "ENSGALG00000040069",
-  scaNTopIDs       = NULL,
-  objectImpulseDE2 = impulse_obj,
-  boolCaseCtrl     = F,
-  boolSimplePlot   = T,
-  dirOut           = NULL,
-  strFileName      = NULL,
-  vecRefPval       = NULL, 
-  strNameRefMethod = NULL)
-
-combined <- plot_grid(plotlist= c(gene_plot,res_list), ncol = 1)
-
-ggsave2(plot = combined, filename = "Exports/Correlation_Plots/BARHL2_Peaks.pdf",width = 4, height = 55, limitsize = F)
-
-
-gene_fit <-
-      getDfFit(
-        vecGeneIDs = "ENSGALG00000000059",
-        objectImpulseDE2 = impulse_obj,
-        boolCaseCtrl = T,
-        boolSimplePlot = T
-      )
-
-peak_fit <- 
-  getDfFit(
-        vecGeneIDs = "11-18842359-18842758",
-        objectImpulseDE2 = impulse_obj2,
-        boolCaseCtrl = F,
-        boolSimplePlot = T
-      )
-
-cor(gene_fit$value[1:100], peak_fit$value, method = "spearman")
-```
-
+## Neural Crest TF Enhancers
 Let's visualize the enriched TF's called by the RNA-Seq analysis and their associated potential enhancers.
 
 ```{r}
@@ -647,10 +272,10 @@ TC_NC_Enriched_TF_enhancers$rank <- seq(length(TC_NC_Enriched_TF_enhancers$PeakI
 # Let's plot 
 
 TC_NC_Enriched_TF_enhancers %>% ggplot(aes(x= rank, y=spearman)) + 
-  geom_rect(inherit.aes = F, aes(xmin = 1, xmax= 684, ymin=0.8, ymax = 1)) +
-  geom_rect(inherit.aes = F,aes(xmin = 685, xmax= 1059, ymin=0.6, ymax = 0.8)) +
-  geom_rect(inherit.aes = F,aes(xmin = 2719, xmax= 3033, ymin=-0.6, ymax = -0.8)) +
-  geom_rect(inherit.aes = F,aes(xmin = 3034, xmax= max(rank), ymin= -0.8, ymax = -1)) +
+  geom_rect(inherit.aes = F, aes(xmin = 1, xmax= 661, ymin=0.8, ymax = 1)) +
+  geom_rect(inherit.aes = F,aes(xmin = 662, xmax= 1012, ymin=0.6, ymax = 0.8)) +
+  geom_rect(inherit.aes = F,aes(xmin = 2579, xmax= 2899, ymin=-0.6, ymax = -0.8)) +
+  geom_rect(inherit.aes = F,aes(xmin = 2900, xmax= max(rank), ymin= -0.8, ymax = -1)) +
   geom_point(col="#0A98B4", size=1) +   # Draw points
   labs(title = "Peak-Gene Correlation", y = "Spearman Correlation", x = "Ranked Peaks") +
   theme(axis.text.x = element_blank(),
@@ -661,7 +286,7 @@ TC_NC_Enriched_TF_enhancers %>% ggplot(aes(x= rank, y=spearman)) +
 ggsave(filename = "Exports/Enhancer-Gene-Correlation_ddsTC_Enriched_TFs.eps",
        width = 8, height = 6)
 
-# Strong+ (684), Moderate+ (374), Moderate- (314), Strong- (492)
+# Strong+ (661), Moderate+ (351), Moderate- (321), Strong- (462)
 TC_NC_Enriched_TF_enhancers.gr <- Signac::StringToGRanges(TC_NC_Enriched_TF_enhancers$PeakID)
 TC_NC_Enriched_TF_enhancers.gr
 TC_NC_Enriched_TF_enhancers_anno <- annotatePeak(TC_NC_Enriched_TF_enhancers.gr, tssRegion = c(-1000,1000), TxDb = TxDb_galGal6, annoDb = "org.Gg.eg.db", assignGenomicAnnotation = T)
@@ -671,11 +296,12 @@ TC_NC_Enriched_TF_enhancers_anno_df$PeakID <- paste0(TC_NC_Enriched_TF_enhancers
 
 TC_NC_Enriched_TF_enhancers_anno_df <- TC_NC_Enriched_TF_enhancers_anno_df %>% mutate(spearman = lookup(PeakID, TC_NC_Enriched_TF_enhancers[,c("PeakID","spearman")]))
 
-
+write_delim(TC_NC_Enriched_TF_enhancers_anno_df, path = "Exports/TC_NC_Enriched_TF_Enhancers_Annotated.txt", delim = "\t", col_names = T)
 ```
-Investigate H3K27Ac at highly correlated vs lowly correlated in Neural-crest enriched genes.
 
-Now with closest 5 genes.
+# Incorporation of H3K27Ac Data
+Investigate H3K27Ac at highly correlated vs lowly correlated in Neural-crest enriched genes.
+Is there evidence of greater chromatin activation in highly positively correlated elements?
 ```{r}
 library(DiffBind)
 library(DESeq2)
@@ -690,9 +316,9 @@ H3K27Ac_corr <- dba.peakset(NULL,peaks=strong_correlates.gr,
                             sampID="Epi_1",tissue="Epi",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Epiblast_vs_NF_CR/BAM/H3K27ac_Epi_R1_toGalGal6_nodups.bam")
 
 H3K27Ac_corr <- dba.peakset(H3K27Ac_corr,peaks=strong_correlates.gr,
-                            sampID="NF_1",tissue="NF",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104544_HVGL5BGXB_HH9WE_H3K27Ac_1_GTGAAACG_R1_toGalGal6.bam")
+                            sampID="WE_1",tissue="WE",factor="CR",condition="H3K27AC",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104544_HVGL5BGXB_HH9WE_H3K27Ac_1_GTGAAACG_R1_toGalGal6.bam")
 H3K27Ac_corr <- dba.peakset(H3K27Ac_corr,peaks=strong_correlates.gr,
-                            sampID="NF_2",tissue="NF",factor="CR",condition="H3K27AC",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104545_HVGL5BGXB_HH9WE_H3K27Ac_2_GTGGCCTT_R1_toGalGal6.bam")
+                            sampID="WE_2",tissue="WE",factor="CR",condition="H3K27AC",replicate=2, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Other_CR_Sox2-Oct4Proj/BAM/11046_10331_104545_HVGL5BGXB_HH9WE_H3K27Ac_2_GTGGCCTT_R1_toGalGal6.bam")
 
 H3K27Ac_corr <- dba.count(H3K27Ac_corr, bParallel = T)
 pca <- dba.plotPCA(H3K27Ac_corr, attributes = DBA_TISSUE)
@@ -717,86 +343,19 @@ Corr_group$group <- as.factor(ifelse(Corr_group$spearman > 0.8, "Positive", ifel
 
 Corr_group$group <- factor(Corr_group$group, levels = levels(Corr_group$group)[c(3,2,1)])
 
-rld_df$Corr_group <- qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")])
+rld_df$Corr_group <- factor(qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")]),
+                            levels = levels(as.factor(qdapTools::lookup(rownames(rld_df), Corr_group[,c("PeakID","group")])))[c(3,2,1)])
+
 rld_df$PeakID <- rownames(rld_df)
 rld_df_melt <- reshape2::melt(rld_df)
-levels(rld_df_melt$Corr_group)
-ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group)) + geom_boxplot() + stat_compare_means()
+
+
+my_comparisons <- list( c("Negative", "None"), c("None", "Positive"), c("Positive", "Negative"))
+
+ggplot(rld_df_melt, mapping = aes(x = Corr_group, y = value, color = Corr_group, group = Corr_group)) + geom_boxplot() + stat_compare_means(method = "t.test",comparisons = my_comparisons)
 
 ggsave(filename = "Exports/Positive_vs_Negative_vs_None_strong_correlation_H3K27Ac_Levels.eps", width = 5, height = 7)
 ```
-
-No longer using annotation.
-
-```{r}
-library(stringr)
-
-TC_NC_Enriched_TF_enhancers_anno_df
-
-TC_NC_Type <- TC_NC_Enriched_TF_enhancers_anno_df[TC_NC_Enriched_TF_enhancers_anno_df$spearman > 0.6, "annotation"]
-
-summary(as.factor(TC_NC_Type))
-
-Type_summary <- data.frame(Type = c("UTR", 
-                    "Distal Intergenic",
-                    "Downstream",
-                    "Intragenic",
-                    "Promoter"),
-           Count = c(21,399,31,469,139))
-# total of 1059
-#2.0%, 37.7%, 2.9%, 44.3%, 13.1%
-# Compute the position of labels
-Type_summary <- Type_summary %>% 
-  arrange(desc(Type)) %>%
-  mutate(prop = Count / sum(Type_summary$Count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-# Basic piechart
-ggplot(Type_summary, aes(x="", y=prop, fill=Type)) +
-  geom_bar(stat="identity", width=1, color="white") +
-  coord_polar("y", start=0) +
-  theme_void() + 
-  theme(legend.position="none") +
-  
-  geom_text(aes(y = ypos, label = Type), color = "white", size=4) +
-  scale_fill_brewer(palette="Set1")
-
-ggsave(filename = "Exports/Moderate_and_strong_pos_correlation_anno.pdf", height = 4, width = 5)
-
-TC_NC_Type2 <- TC_NC_Enriched_TF_enhancers_anno_df[TC_NC_Enriched_TF_enhancers_anno_df$spearman < -0.6, "annotation"]
-
-summary(as.factor(TC_NC_Type2))
-
-Type_summary2 <- data.frame(Type = c(
-                    "UTR",
-                    "Distal Intergenic",
-                    "Downstream",
-                    "Intragenic",
-                    "Promoter"),
-           Count = c(12,307,22,345,122))
-# 808 total.
-# 1.5%,38%, 2.7%, 42.7%, 15.1%
-
-# Compute the position of labels
-Type_summary2 <- Type_summary2 %>% 
-  arrange(desc(Type)) %>%
-  mutate(prop = Count / sum(Type_summary2$Count) *100) %>%
-  mutate(ypos = cumsum(prop)- 0.5*prop )
-
-# Basic piechart
-ggplot(Type_summary2, aes(x="", y=prop, fill=Type)) +
-  geom_bar(stat="identity", width=1, color="white") +
-  coord_polar("y", start=0) +
-  theme_void() + 
-  theme(legend.position="none") +
-  
-  geom_text(aes(y = ypos, label = Type), color = "white", size=4) +
-  scale_fill_brewer(palette="Set1")
-
-ggsave(filename = "Exports/Moderate_and_strong_neg_correlation_anno.pdf", height = 4, width = 5)
-```
-
-
 Analysis of neural-crest related enhancers. Does the ATAC signal decrease over time for peaks associated with NC GRN genes compared to the same amount of random associated peaks?
 
 ```{r}
@@ -806,6 +365,7 @@ library(ggplot2)
 library(heatmaply)
 library(RColorBrewer)
 library(reshape2)
+library(tibble)
 
 Annotated_Rlog_Positive_Averages <- read_csv("../RNA-Seq/Exports/Annotated_Rlog_Positive_Averages.csv")
 Rlog_counts_avergae_All_ATAC_Peaks <- read.delim("~/local_git/NC_Timecourse/ATAC-Seq/Exports/Rlog_counts_avergae_All_ATAC_Peaks")
@@ -840,8 +400,7 @@ nc_corr_melt$source <- "NC_GRN"
 rand_corr_melt$source <- "Random_Genes"
 
 combined_melt <- rbind(nc_corr_melt, rand_corr_melt)
-ggplot(combined_melt, aes(x = variable, y = value, color = source)) + geom_boxplot()
-ggplot(rand_corr_melt, aes(x = variable, y = value)) + geom_boxplot()
-
+ggplot(combined_melt, aes(x = variable, y = value, color = source)) + geom_boxplot() + stat_compare_means(method = "t.test", hide.ns = F, label = "p.signif")
+ggsave(filename = "Exports/NC_GRN_Enhancers_vs_random_Accessibility_over_time.pdf", width = 7, height = 5)
 ```
 

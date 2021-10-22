@@ -76,6 +76,7 @@ colData <- colData %>% mutate(Group = factor(paste0(Condition,"_",Time)))
 
 write.csv(colData, file = "./Exports/colData.csv")
 head(colData)
+
 ```
 
 ### Begin DESeq2 Analysis
@@ -91,7 +92,19 @@ bad_samples <- c("6_pos_lib_ATCACG", "8_pos_lib_CGATGT",
                  "HH10_mGFP_1_ATGTCA", "6_neg_lib_TGACCA",
                  "8_neg_lib_ACAGTG", "HH12_mGFP_1_GTGAAA")
 dds <- dds[,!(colnames(dds) %in% bad_samples)]
-                              
+    
+# Export filtered FeatureCounts
+filt_counts <- as.data.frame(dds@assays@data$counts)
+colnames(filt_counts) <- dds$Group
+
+
+filt_counts <- filt_counts %>% tibble::rownames_to_column()
+colnames(filt_counts)[1] <- "ENSEMBL"
+
+write.table(filt_counts, file = "Imports/featureCountsFiltered.txt", quote = F,
+            sep = "\t", row.names = F, col.names = T)
+
+
 #Filter out genes lowly detected.
 keep <- rowSums(counts(dds)) >= 25
 dds <- dds[keep,]

@@ -76,3 +76,9 @@ None of these look great at all...
 plotProfile -m Sox2_Oct4_enriched_rep2.mat.gz -out Sox2_Oct4_enriched_rep2.eps
 ```
 
+```{bash}
+plotHeatmap -m /data/Debbie/heatmap_files/Oct4_Sox2_distinct_peaks.mat.gz -out Oct4_Sox2_distinct_peaks_redblu.eps --colorList "#0584BC","#FFFFFF","#E45649" --dpi 600 
+
+plotProfile -m /data/Debbie/heatmap_files/Oct4_Sox2_distinct_peaks.mat.gz -out Oct4_Sox2_distinct_peaks_redblu_2.eps --colors bwr --plotType heatmap --dpi 600 
+```
+

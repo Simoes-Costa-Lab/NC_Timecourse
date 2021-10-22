@@ -35,6 +35,7 @@ v3 <- makeVennDiagram(Peaks=list(Sox2_NC_D5_R1,Sox2_NC_D5_R2),
 
 v4 <- makeVennDiagram(Peaks=list(Sox2_Myo_D14_R1,Sox2_Myo_D14_R2),
                        NameOfPeaks=c("Sox2_Myo_D14_R1","Sox2_Myo_D14_R2"))
+test <- c(Sox2_NC_D0_R1, Sox2_NC_D0_R2)
 
 D0_Sox2_Peaks <- reduce(c(Sox2_NC_D0_R1, Sox2_NC_D0_R2))
 D5_Sox2_Peaks <- reduce(c(Sox2_NC_D5_R1, Sox2_NC_D5_R2))
@@ -227,6 +228,7 @@ onemotifs_plot + stat_compare_means(method = "t.test")
 cowplot::plot_grid(nomotifs_plot + stat_compare_means(method = "t.test")
 ,onemotifs_plot + stat_compare_means(method = "t.test")
 ,ncol = 2, labels = c("No Motifs", "One+ Motif"))
+
 ```
 
 Alright, so there is a statistically significant drop in the H3K27Ac signal of Sox2 peaks (like 80,000) from D0 to D5 of iNC. However, with either one or two motifs, the significance goes away. ~ 580 in the two combined. I quantified signal at Sox2 peaks, but I could also try to find overlapping regular H3K27Ac peaks, but I think it would be very similar.
@@ -234,6 +236,14 @@ Alright, so there is a statistically significant drop in the H3K27Ac signal of S
 Let's try with ATAC.
 
 ```{r}
+All_Dimer_Counts <- read.delim("Exports/All_Dimer_Counts.bed", header = F)
+colnames(All_Dimer_Counts) <- c("seqnames","start","stop","strand","c1","strand2","motif_count")
+summary(as.factor(All_Dimer_Counts$motif_count))
+
+All_Dimer_Counts.gr <- makeGRangesFromDataFrame(All_Dimer_Counts)
+All_Dimer_Counts.gr$motif_count <- All_Dimer_Counts$motif_count
+
+
 ATAC_Signal <- dba.peakset(NULL,peaks=All_Dimer_Counts.gr,
                             sampID="ESC_D0_1",tissue="ESC",factor="ATAC",condition="D0",replicate=1, bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BAM/ATAC_ES_D0_1_toGRCh38_sorted_nodups.bam")
 
@@ -292,6 +302,7 @@ library(ggplot2)
 library(ggpubr)
 rld_df_tomelt <- rld_df[,c(10,11,12,13)]
 rld_df_tomelt$PeakID <- rownames(rld_df_tomelt)
+
 rld_df_melt <- reshape2::melt(rld_df_tomelt)
 rld_df_melt$motif_count <- qdapTools::lookup(rld_df_melt$PeakID, All_Dimer_Counts[,c("PeakID","motif_count")])
 
@@ -311,12 +322,59 @@ onemotifs_plot
 
 
 cowplot::plot_grid(nomotifs_plot,onemotifs_plot,ncol = 2, labels = c("No Motifs", "One+ Motif"))
+
+# New plot
+# Rlog ATAC counts for D0, D3, and D5 at Dual motifs in hESCs, iNCCs, and no dual motif (all sox2 peaks)
+
+# What ATAC peaks overlap Sox2 CUT&RUN
+All_Sox2_Peaks.gr <- import.bed(con = "Exports/All_Sox2_Peaks.bed")
+All_Sox2_Peaks.df <- as.data.frame(All_Sox2_Peaks.gr)
+All_Sox2_Peaks.df$PeakID <- paste0(All_Sox2_Peaks.df$seqnames, "_", All_Sox2_Peaks.df$start -1 , "_", All_Sox2_Peaks.df$end)
+
+NC_Specific_motifs.gr <- import.bed(con = "Exports/NC_Specific_motifs.bed")
+NC_Specific_motifs.df <- as.data.frame(NC_Specific_motifs.gr)
+NC_Specific_motifs.df$PeakID <- paste0(NC_Specific_motifs.df$seqnames, "_", NC_Specific_motifs.df$start -1 , "_", NC_Specific_motifs.df$end)
+
+ESC_Specific_motifs.gr <- import.bed(con = "Exports/ESC_Specific_motifs.bed")
+ESC_Specific_motifs.df <- as.data.frame(ESC_Specific_motifs.gr)
+ESC_Specific_motifs.df$PeakID <- paste0(ESC_Specific_motifs.df$seqnames, "_", ESC_Specific_motifs.df$start -1 , "_", ESC_Specific_motifs.df$end)
+
+
+rld_df_melt$motif2 <- ifelse(rld_df_melt$PeakID %in% ESC_Specific_motifs.df$PeakID, "DualMotif_hESC",
+       ifelse(rld_df_melt$PeakID %in% NC_Specific_motifs.df$PeakID, "DualMotif_hiNCCs", "No_DualMotif"))
+
+rld_df_melt$motif2 <- as.factor(rld_df_melt$motif2)
+
+subset_rld <- rld_df_melt[rld_df_melt$variable %in% c("NC_D0_Avg",
+                                                      "NC_D3_Avg",
+                                                      "NC_D5_Avg"),]
+
+subset_rld$Comparison <- paste0(subset_rld$variable, "_", subset_rld$motif2)
+
+symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), symbols = c("****", "***", "**", "*", "ns"))
+
+ggplot(subset_rld, aes(x = motif2, y = value, color = variable, group = Comparison)) + geom_boxplot(outlier.alpha = 0.8) 
+
+ggsave(filename = "Exports/Enriched_Motifs_Over_Time.eps")
+# Individual one-sided t-tests for the following groups
+# D0 DualMotif_hESCs vs D5 DualMotif_hESCs
+t.test(x = subset_rld[subset_rld$Comparison == "NC_D0_Avg_DualMotif_hESC",3],
+       y = subset_rld[subset_rld$Comparison == "NC_D5_Avg_DualMotif_hESC",3],
+       alternative = "greater")
+# p-value = 0.002831 
+
+# D0 DualMotif_hiNCCs vs D5 DualMotif_hiNCCs
+t.test(x = subset_rld[subset_rld$Comparison == "NC_D0_Avg_DualMotif_hiNCCs",3],
+       y = subset_rld[subset_rld$Comparison == "NC_D5_Avg_DualMotif_hiNCCs",3],
+       alternative = "less")
+# p-value = 0.000122
+
+stat_compare_means(method = "t.test", symnum.args = symnum.args,comparisons = list(c("NC_D0_Avg_DualMotif_hESC", "NC_D5_Avg_DualMotif_hESC")))
+
 ```
 
-So it looks like ATAC-Seq also shows that there isn't a decrease in signal over time. I want to see how the Sox2-bound peaks with motifs change over time in a tornado-plot style.
-
-```{bash eval=FALSE}
-# Let's see the Sox2 signal at Sox2 peaks with or without the motif at d0, d3, d5
+So it looks like ATAC-Seq also shows that there isn't a decrease in signal over time. I want to see how the Sox2-bound peaks with motifs change over time in a tornado-plot style
+```{bash eval=FALSE# Let's see the Sox2 signal at Sox2 peaks with or without the motif at d0, d3, d5
 
 cd /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BW
 

@@ -81,7 +81,7 @@ server <- function(input, output, session) {
       {if (length(input$g) != 0) stat_summary(fun = mean, geom = 'line', size=1.5)} +
       
       
-      {if (input$log & length(input$g) != 0)
+      {if (input$log & length(input$g) == 1)
         annotate("text", label = paste0("Log2FC ", round(get_geneinfo(input$g[[1]])[1,2],2),
                                         " Padj ", round(get_geneinfo(input$g[[1]])[1,3],4)),
                  x = 11, y = as.numeric(max(get_geneinfo(input$g[[1]])[,7])) + 2) 
