@@ -9,13 +9,16 @@ library(DiffBind)
 library(rtracklayer)
 library(pheatmap)
 library(ggpubr)
+library(DESeq2)
+library(RColorBrewer)
+ATAC_all_peaks = readRDS("./Exports/ATAC_Filtered_Peaks.gr.RDS")
 
 setwd("/data/Debbie/final_analysis_files/")
 
 ATAC_OE <-
   dba.peakset(
     NULL,
-    peaks = "all_ATAC_400bp_fixed.bed" ,
+    peaks = ATAC_all_peaks ,
     sampID = "Control1",
     tissue = "NC",
     factor = "HH14",
@@ -29,7 +32,7 @@ ATAC_OE <-
 ATAC_OE <-
   dba.peakset(
     ATAC_OE,
-    peaks = "all_ATAC_400bp_fixed.bed"  ,
+    peaks = ATAC_all_peaks  ,
     sampID = "OE1",
     tissue = "NC",
     factor = "HH14",
@@ -43,7 +46,7 @@ ATAC_OE <-
 ATAC_OE <-
   dba.peakset(
     ATAC_OE,
-    peaks = "all_ATAC_400bp_fixed.bed",
+    peaks = ATAC_all_peaks,
     sampID = "Control2",
     tissue = "NC",
     factor = "HH14",
@@ -57,7 +60,7 @@ ATAC_OE <-
 ATAC_OE <-
   dba.peakset(
     ATAC_OE,
-    peaks = "all_ATAC_400bp_fixed.bed",
+    peaks = ATAC_all_peaks,
     sampID = "OE2",
     tissue = "NC",
     factor = "HH14",
@@ -73,6 +76,7 @@ ATAC_OE <- dba.count(ATAC_OE, filter = 1, score = DBA_SCORE_RPKM)
 
 
 ```{r}
+setwd("/data/Debbie/final_analysis_files/")
 ATAC_OE.mat <- dba.peakset(ATAC_OE, bRetrieve = T, DataType = DBA_DATA_FRAME)
 
 rownames(ATAC_OE.mat) <- paste0(ATAC_OE.mat$CHR, "_", ATAC_OE.mat$START, "_", ATAC_OE.mat$END)
@@ -90,25 +94,31 @@ Differential_matrix_up = subset(ATAC_OE.mat,
                                 rownames(ATAC_OE.mat) %in% rownames(Differential_regions_up))
 OE_regions_up = data.frame(Differential_matrix_up[1:3])
 
-export(OE_regions_up, con = "./Exports/OE_regions_up.bed", format = "BED")
+export(OE_regions_up, con = "OE_regions_up.bed", format = "BED")
 
-rlog(ATAC_OE)
+summarized_experiment_OE <- dba(ATAC_OE, bSummarizedExperiment = T)
+summarized_experiment_OE@assays@data$scores <- summarized_experiment_OE@assays@data$Reads
+#order of counts not correct.
+dds_experiment2 <- DESeqDataSet(summarized_experiment_OE, design = ~ Condition)
+dds_experiment2 <- DESeq(dds_experiment2)
+dds_results <- results(dds_experiment2)
 
-heatmap_matrix = data.frame(
-  Differential_matrix$Control1,
-  Differential_matrix$Control2,
-  Differential_matrix$OE1,
-  Differential_matrix$OE2
-)
-colnames(heatmap_matrix) = c("Control1", "Control2", "OE1", "OE2")
-View(Differential_matrix)
+rld <- rlog(dds_experiment2, blind = FALSE)
+Rlog_OE_Matrix <- assay(rld)
+
+ATAC_OE.df <- as.data.frame(ATAC_OE$peaks)
+ATAC_OE.df$PeakID <- paste0(ATAC_OE.df$Chr, "_", ATAC_OE.df$Start, "_", ATAC_OE.df$End)
+
+rownames(Rlog_OE_Matrix) <- ATAC_OE.df$PeakID
+
+Rlog_OE_Matrix_sub <- Rlog_OE_Matrix[rownames(Rlog_OE_Matrix) %in% rownames(Differential_regions),]
 
 pheatmap(
-  heatmap_matrix,
+  Rlog_OE_Matrix_sub,
   color = colorRampPalette(rev(brewer.pal(
     n = 5, name = "RdBu"
   )))(100),
-  cluster_cols = F,
+  cluster_cols = T,
   scale = "row",
   show_rownames = F,
   show_colnames = T,
@@ -394,6 +404,7 @@ ATAC_OE_Sox2 <-
     ,
     peak.caller = "narrowpeak"
   )
+
 ATAC_OE_Sox2 <-
   dba.count(ATAC_OE_Sox2, filter = 1, score = DBA_SCORE_TMM_READS_FULL_CPM)
 ATAC_OE_Sox2.mat <-
@@ -420,8 +431,3 @@ compare_means(value ~ group, data = ATAC_OE_all, method = "t.test")
 
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

@@ -19,9 +19,8 @@ library(DiffBind)
 library(ggplot2)
 library(DESeq2)
 
-#Using dba.oject Samples_ATAC
-# samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_400bp.RDS")
-var_obj <- dba(samples_ATAC_filt, bSummarizedExperiment = T)
+samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_filt.RDS")
+var_obj <- dba(samples_ATAC, bSummarizedExperiment = T)
 names(var_obj@assays) <- c("scores", "RPKM", "counts","cRPKM","cReads")
 var_obj <- addGCBias(var_obj, genome = BSgenome.Ggallus.ENSEMBL.galGal6)
 head(rowData(var_obj))
@@ -36,7 +35,7 @@ dev@NAMES <- paste0(dev@NAMES,"_",TFBSTools::name(motifs))
 variability <- computeVariability(dev)
 plotVariability(variability, n = 5, use_plotly = F)
 ggsave(filename = "Exports/Chick_NC_ATAC_chromVAR_Variability_filt.eps", width = 8, height = 6)
-tsne_dev <- deviationsTsne(dev, shiny = T, threshold = 1.5, perplexity = 4)
+tsne_dev <- deviationsTsne(dev, shiny = F, threshold = 1.5, perplexity = 4)
 pca <- dba.plotPCA(samples_ATAC, attributes = DBA_CONDITION)
 x <- pca$panel.args[[1]]$x
 y <- pca$panel.args[[1]]$y

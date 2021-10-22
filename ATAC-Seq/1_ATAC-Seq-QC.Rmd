@@ -292,16 +292,6 @@ bedtools intersect -wa -a mid_peaks_filt.bed -b early_peaks_filt.bed late_peaks_
 bedtools intersect -wa -a late_peaks_filt.bed -b early_peaks_filt.bed mid_peaks_filt.bed -v | uniq > late_peaks_filt_uniq.bed
 ```
 
-```{bash}
-#Differential motif :Homer
-findMotifsGenome.pl early_peaks_filt_uniq.bed /data/Austin/workdir/genome/Gallus_gallus.GRCg6a.dna.toplevel.fa ~/local_git/NC_Timecourse/ATAC-Seq/Exports/Early_vs_Late_Peaks_Filt_HOMER -size 200 -bg late_peaks_filt_uniq.bed -p 16
-
-findMotifsGenome.pl late_peaks_uniq.bed /data/Austin/workdir/genome/Gallus_gallus.GRCg6a.dna.toplevel.fa ~/local_git/NC_Timecourse/ATAC-Seq/Exports/Late_vs_Early_Peaks_Filt_HOMER -size 200 -bg early_peaks_filt_uniq.bed -p 16
-
-findMotifsGenome.pl mid_peaks_filt_uniq.bed /data/Austin/workdir/genome/Gallus_gallus.GRCg6a.dna.toplevel.fa ~/local_git/NC_Timecourse/ATAC-Seq/Exports/Mid_vs_Early_Peaks_Filt_HOMER -size 200 -bg early_peaks_filt_uniq.bed -p 16
-```
-
-
 In another analysis of this data, we will look at the LRT test of ATAC peaks to see if they also pull out similar HOMER enrichment/variable peaks, etc.
 ```{r}
 summarized_experiment3 <- dba(samples_ATAC_filt, bSummarizedExperiment = T)
@@ -362,17 +352,6 @@ LRT_Late_bed <- anno_df %>% rownames_to_column() %>% tidyr::separate(rowname, se
 export(LRT_Early_bed, con = "./Exports/LRT_Early.bed", format= "BED")
 export(LRT_Mid_bed, con = "./Exports/LRT_Mid.bed", format= "BED")
 export(LRT_Late_bed, con = "./Exports/LRT_Late.bed", format= "BED")
-```
-
-
-```{bash}
-#Differential motif :Homer
-findMotifsGenome.pl LRT_Early.bed /data/Austin/workdir/genome/Gallus_gallus.GRCg6a.dna.toplevel.fa ~/local_git/NC_Timecourse/ATAC-Seq/Exports/LRT_Early_vs_Late_Peaks_HOMER -size 200 -bg LRT_Late.bed -p 16
-
-findMotifsGenome.pl LRT_Mid.bed /data/Austin/workdir/genome/Gallus_gallus.GRCg6a.dna.toplevel.fa ~/local_git/NC_Timecourse/ATAC-Seq/Exports/LRT_Mid_vs_Late_Peaks_HOMER -size 200 -bg LRT_Late.bed -p 16
-
-findMotifsGenome.pl LRT_Late.bed /data/Austin/workdir/genome/Gallus_gallus.GRCg6a.dna.toplevel.fa ~/local_git/NC_Timecourse/ATAC-Seq/Exports/LRT_Late_vs_Early_Peaks_HOMER -size 200 -bg LRT_Early.bed -p 16
-
 ```
 
 Let's visualize the signal at these peak sets across our samples.
