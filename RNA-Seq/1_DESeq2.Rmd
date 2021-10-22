@@ -16,6 +16,7 @@ Check out the MultiQC report that was generated to identify any outliers in sequ
 ### Load the libraries required
 
 This analysis was performed on a 16 core machine running Ubuntu 18.04 LTS. Certain parameters may need to be updated based on your operating system and available CPUs.
+
 ```{r Loading Libraries, message=FALSE, include=TRUE}
 library(tidyr)
 library(edgeR)

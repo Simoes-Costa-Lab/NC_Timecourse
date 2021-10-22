@@ -491,7 +491,6 @@ Sox2_res <- as.data.frame(dba.report(Sox2_Signal_OE))
 ```
 
 
-
 Look at All Sox2 peaks vs ESC dimer locations vs NC dimer locations in regular SOX2 CUT&RUN and OE
 
 ```{bash}
