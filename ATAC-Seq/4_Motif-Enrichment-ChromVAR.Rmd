@@ -19,8 +19,11 @@ library(DiffBind)
 library(ggplot2)
 library(DESeq2)
 
+
 samples_ATAC <- readRDS(file = "./Exports/samples_ATAC_filt.RDS")
-var_obj <- dba(samples_ATAC, bSummarizedExperiment = T)
+
+var_obj <- dba(samples_ATAC_filt, bSummarizedExperiment = T)
+
 names(var_obj@assays) <- c("scores", "RPKM", "counts","cRPKM","cReads")
 var_obj <- addGCBias(var_obj, genome = BSgenome.Ggallus.ENSEMBL.galGal6)
 head(rowData(var_obj))
@@ -84,6 +87,8 @@ NR2F2 <- plotDeviationsTsne(dev, tsne = pca_mat, annotation_name = "NR2F2", shin
 
 cowplot::plot_grid(g + theme(legend.position = "none"), sox2$SOX2 + theme(legend.position = "none"), oct4_sox2$`Pou5f1::Sox2`+ theme(legend.position = "none"), POU5F1$POU5F1+ theme(legend.position = "none")) 
 ggsave(file = "./Exports/Sox2_Oct4_chromVAR_noLegend_filt.eps", device = "eps", width = 6, height = 4)
+
+
 ```
 
 # Working with raw chromVAR scores
@@ -101,4 +106,3 @@ rownames(chromvar_zscore) <- names(dev)
 
 write.csv(chromvar_zscore, file = "Exports/chromVAR_Z-Score.csv", row.names = T)
 ```
-

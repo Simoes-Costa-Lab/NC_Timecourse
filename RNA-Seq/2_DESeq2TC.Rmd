@@ -190,3 +190,13 @@ library(feather)
 write_feather(Rlog_app, path = "./Exports/Rlog_for_RNA-Seq-App.feather")
 ```
 
+Let's look at overlap of RNA-Binding proteins.
+```{r}
+WE_vs_NC <- read_csv(file = "./Exports/ddsTC_Condition_WE_vc_NC_All.csv")
+RNA_binding <- read_csv(file = "./Imports/GO_term_summary_20210914_165412.csv")
+RNA_binding$Symbol <- toupper(RNA_binding$Symbol)
+
+RNA_binding_DEG <- WE_vs_NC[WE_vs_NC$Symbol %in% RNA_binding$Symbol,]
+```
+
+

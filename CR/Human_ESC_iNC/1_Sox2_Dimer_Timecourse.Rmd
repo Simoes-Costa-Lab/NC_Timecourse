@@ -53,6 +53,43 @@ makeVennDiagram(Peaks=list(All_Sox2_Peaks, Sox2_Myo_D14_R1,Sox2_Myo_D14_R2),
 export.bed(object = All_Sox2_Peaks, con = "./Exports/All_Sox2_Peaks.bed")
 
 ```
+Let's do a quick differential binding analysis to find Sox2 binding that is specific to ESC and Sox2 binding specific to NC.
+```{r}
+library(DiffBind)
+Candidate_peaks <- c(D0_Sox2_Peaks, D5_Sox2_Peaks)
+
+Sox2_Signal <- dba.peakset(NULL,peaks=Candidate_peaks,
+                      sampID="ESC_D0_1",tissue="ESC",
+                      factor="CR",condition="D0",
+                      replicate=1,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/H1_std_Sox2hg38_filt.bam")
+
+Sox2_Signal <- dba.peakset(Sox2_Signal,peaks=Candidate_peaks,
+                      sampID="ESC_D0_2",tissue="ESC",
+                      factor="CR",condition="D0",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/H1_Sox2_auto_ACAGTG_hg38_filt.bam")
+
+Sox2_Signal <- dba.peakset(Sox2_Signal,peaks=Candidate_peaks,
+                      sampID="NC_D5_1",tissue="NC",
+                      factor="CR",condition="D5",
+                      replicate=1,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/Sox2_gt_NC_1hg38_filt_nodups.bam")
+
+Sox2_Signal <- dba.peakset(Sox2_Signal,peaks=Candidate_peaks,
+                      sampID="NC_D5_2",tissue="NC",
+                      factor="CR",condition="D5",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/Sox2_gt_NC_2hg38_filt_nodups.bam")
+
+Sox2_Signal <- dba.count(Sox2_Signal, bParallel = T)
+dba.plotPCA(Sox2_Signal, attributes = DBA_CONDITION)
+Sox2_Signal <- dba.contrast(Sox2_Signal, contrast = c("Tissue","ESC","NC"))
+Sox2_Signal <- dba.analyze(Sox2_Signal)
+Sox2_res <- as.data.frame(dba.report(Sox2_Signal))
+readr::write_delim(Sox2_res, file = "Exports/Sox2_Differential_ESCvNC.csv", delim = ",",
+                   col_names = T)
+```
 
 Now annotate these peaks with the number of Oct4::Sox2 JASPAR (MA142.1) binding sites they have.
 ```{bash, eval = FALSE}
@@ -155,7 +192,7 @@ dds_experiment2 <- DESeqDataSet(summarized_experiment2, design = ~ Condition)
 dds_experiment2 <- DESeq(dds_experiment2)
 dds_results <- results(dds_experiment2)
 rld <- rlog(dds_experiment2, blind = FALSE)
-rownames(assay(rld)) <- paste0(H3K27Ac_Signal$peaks[[1]]$Chr,"_",H3K27Ac_Signal$peaks[[1]]$Start,"_",H3K27Ac_Signal$peaks[[1]]$End)
+# rownames(assay(rld)) <- paste0(H3K27Ac_Signal$peaks[[1]]$Chr,"_",H3K27Ac_Signal$peaks[[1]]$Start,"_",H3K27Ac_Signal$peaks[[1]]$End)
 rld_df <- data.frame(row.names = paste0(H3K27Ac_Signal$peaks[[1]]$Chr,"_",H3K27Ac_Signal$peaks[[1]]$Start,"_",H3K27Ac_Signal$peaks[[1]]$End),
            assay(rld))
 
@@ -368,3 +405,97 @@ plotHeatmap -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_with
 
 gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o  ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_heatmap.png ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_heatmap.eps
 ```
+
+```{r Looking at nearby genes}
+library(rtracklayer)
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+library(org.Hs.eg.db)
+
+ESC_Specific_motifs <- import.bed("Exports/ESC_Specific_motifs.bed")
+NC_Specific_motifs <- import.bed("Exports/NC_Specific_motifs.bed")
+
+ESC_Specific_motifs_anno <- annotatePeak(ESC_Specific_motifs,
+                                         TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene,
+                                         annoDb = "org.Hs.eg.db")
+ESC_Specific_motifs_anno <- as.data.frame(ESC_Specific_motifs_anno)
+
+NC_Specific_motifs_anno <- annotatePeak(NC_Specific_motifs,
+                                         TxDb = TxDb.Hsapiens.UCSC.hg38.knownGene,
+                                         annoDb = "org.Hs.eg.db")
+NC_Specific_motifs_anno <- as.data.frame(NC_Specific_motifs_anno)
+```
+
+## Looking at H1 to iNC induction from TFAP2A Overexpression
+How does Sox2 CUT&RUN change from H1 to H1+TFAP2A? Gain of Sox2 binding at NC-Specific Dimer motifs?
+
+```{r}
+library(DiffBind)
+Candidate_peaks <- c(D0_Sox2_Peaks, D5_Sox2_Peaks)
+# WT Sox2
+Sox2_Signal_OE <- dba.peakset(NULL,peaks=Candidate_peaks,
+                      sampID="ESC_D0_1",tissue="ESC",
+                      factor="WT",condition="D0",
+                      replicate=1,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/H1_std_Sox2hg38_filt.bam")
+
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="ESC_D0_2",tissue="ESC",
+                      factor="WT",condition="D0",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/H1_Sox2_auto_ACAGTG_hg38_filt.bam")
+
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="NC_D5_1",tissue="NC",
+                      factor="WT",condition="D5",
+                      replicate=1,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/Sox2_gt_NC_1hg38_filt_nodups.bam")
+
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="NC_D5_2",tissue="NC",
+                      factor="WT",condition="D5",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/Sox2_gt_NC_2hg38_filt_nodups.bam")
+
+# TFAP2A Overexpression induction
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="ESC_D5_GFP_OE_1",tissue="ESC",
+                      factor="GFP",condition="D5",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147164_HGHM3BGXK_H1_GFP_Sox2_1_AGTTCCGT_R1_toGRCh38_nodups.bam")
+
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="ESC_D5_GFP_OE_2",tissue="ESC",
+                      factor="GFP",condition="D5",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147165_HGHM3BGXK_H1_GFP_Sox2_2_ATGTCAGA_R1_toGRCh38_nodups.bam")
+
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="ESC_D5_TFAP2A_OE_1",tissue="NC",
+                      factor="TFAP2A",condition="D5",
+                      replicate=1,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147166_HGHM3BGXK_H1_hTFAP2A_Sox2_1_CCGTCCGC_R1_toGRCh38_nodups.bam")
+
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+                      sampID="ESC_D5_TFAP2A_OE_2",tissue="NC",
+                      factor="TFAP2A",condition="D5",
+                      replicate=2,
+                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147167_HGHM3BGXK_H1_hTFAP2A_Sox2_2_GTAGAGAT_R1_toGRCh38_nodups.bam")
+
+
+Sox2_Signal_OE <- dba.count(Sox2_Signal_OE, bParallel = T)
+dba.plotPCA(Sox2_Signal_OE, attributes = DBA_CONDITION)
+Sox2_Signal_OE <- dba.contrast(Sox2_Signal_OE, contrast = c("Tissue","ESC","NC"))
+Sox2_Signal_OE <- dba.analyze(Sox2_Signal_OE)
+Sox2_res <- as.data.frame(dba.report(Sox2_Signal_OE))
+```
+
+
+Look at All Sox2 peaks vs ESC dimer locations vs NC dimer locations in regular SOX2 CUT&RUN and OE
+
+```{bash}
+computeMatrix reference-point -S  ATAC_ES_D0_1_toGRCh38_sorted_nodups.bw ATAC_NC_D3_1_toGRCh38_sorted_nodups.bw ATAC_NC_D5_2_toGRCh38_sorted_nodups.bw -R ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_Specific_motifs.bed ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/NC_Specific_motifs.bed -b 1000 -a 1000 -bs 10 -o ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif.mat.gz --missingDataAsZero --referencePoint center --numberOfProcessors 62
+
+plotProfile -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif.mat.gz -out ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_profile.eps --plotType heatmap --dpi 600 
+```
+

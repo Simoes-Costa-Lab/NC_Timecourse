@@ -16,6 +16,7 @@ Check out the MultiQC report that was generated to identify any outliers in sequ
 ### Load the libraries required
 
 This analysis was performed on a 16 core machine running Ubuntu 18.04 LTS. Certain parameters may need to be updated based on your operating system and available CPUs.
+
 ```{r Loading Libraries, message=FALSE, include=TRUE}
 library(tidyr)
 library(edgeR)
@@ -45,7 +46,7 @@ library(org.Gg.eg.db)
 library(clusterProfiler)
 library(viridis)
 library(qdapTools)
-register(MulticoreParam(12)) # Set this to number of CPUs.
+register(MulticoreParam(32)) # Set this to number of CPUs.
 ```
 
 ### Read in the results of the featureCounts
@@ -249,10 +250,12 @@ DESeq2_Analyze <- function(timepoint = "", dds, genes.universe = genes.universe,
 
 ## Retrieve Specific comparisons using this function
 ```{r Retrieve Pairwise Comparisons}
-DESeq2_Analyze("6", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 0.1)
+# HH10_res <- DESeq2_Analyze("10", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 0.1)
+# write_csv(HH10_res[[2]], file = "HH10_DE.csv")
 
 NC6_NC16 <- DESeq2_Analyze(timepoint = "16", second_timepoint = "6", versusWE = F, dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = F, testBP = F, plotVolc = TRUE, labelPadj = 1e-8)
-NC6_NC16[[1]]
+
+NC6_NC16[[2]]
 ggsave()
 DESeq2_Analyze("8", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.00001)
 DESeq2_Analyze("10", dds, genes.universe = genes.universe, Padj = 0.05, L2fc = 1.5, testMF = TRUE, testBP = TRUE, plotVolc = TRUE, labelPadj = 0.001)
