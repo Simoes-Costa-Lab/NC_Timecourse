@@ -374,7 +374,9 @@ stat_compare_means(method = "t.test", symnum.args = symnum.args,comparisons = li
 ```
 
 So it looks like ATAC-Seq also shows that there isn't a decrease in signal over time. I want to see how the Sox2-bound peaks with motifs change over time in a tornado-plot style
-```{bash eval=FALSE# Let's see the Sox2 signal at Sox2 peaks with or without the motif at d0, d3, d5
+
+```{bash eval=FALSE}
+# Let's see the Sox2 signal at Sox2 peaks with or without the motif at d0, d3, d5
 
 cd /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BW
 
@@ -388,7 +390,6 @@ plotHeatmap -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_v
 
 gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o  ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif_heatmap.png ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Sox2_CR_dual_vs_no_motif_heatmap.eps
 ```
-
 
 ```{bash eval=FALSE}
 # Let's see the ATAC signal at ESC or NC specific peaks with the dimer motif.
@@ -426,70 +427,132 @@ NC_Specific_motifs_anno <- annotatePeak(NC_Specific_motifs,
 NC_Specific_motifs_anno <- as.data.frame(NC_Specific_motifs_anno)
 ```
 
-## Looking at H1 to iNC induction from TFAP2A Overexpression
-How does Sox2 CUT&RUN change from H1 to H1+TFAP2A? Gain of Sox2 binding at NC-Specific Dimer motifs?
 
 ```{r}
 library(DiffBind)
-Candidate_peaks <- c(D0_Sox2_Peaks, D5_Sox2_Peaks)
-# WT Sox2
-Sox2_Signal_OE <- dba.peakset(NULL,peaks=Candidate_peaks,
-                      sampID="ESC_D0_1",tissue="ESC",
-                      factor="WT",condition="D0",
-                      replicate=1,
-                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/H1_std_Sox2hg38_filt.bam")
-
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
-                      sampID="ESC_D0_2",tissue="ESC",
-                      factor="WT",condition="D0",
-                      replicate=2,
-                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/H1_Sox2_auto_ACAGTG_hg38_filt.bam")
-
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
-                      sampID="NC_D5_1",tissue="NC",
-                      factor="WT",condition="D5",
-                      replicate=1,
-                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/Sox2_gt_NC_1hg38_filt_nodups.bam")
-
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
-                      sampID="NC_D5_2",tissue="NC",
-                      factor="WT",condition="D5",
-                      replicate=2,
-                      bamReads="/data/Austin/workdir/NC_Timecourse_Data/Human_ESC_iNC_CR/BAM/Sox2_gt_NC_2hg38_filt_nodups.bam")
 
 # TFAP2A Overexpression induction
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+Sox2_Signal_OE <- dba.peakset(NULL,peaks="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/Peaks/12793_10099_147164_HGHM3BGXK_H1_GFP_Sox2_1_AGTTCCGT_R1_toGRCh38_nodups.bam_peaks.narrowPeak", peak.format = "narrow",
                       sampID="ESC_D5_GFP_OE_1",tissue="ESC",
                       factor="GFP",condition="D5",
                       replicate=2,
                       bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147164_HGHM3BGXK_H1_GFP_Sox2_1_AGTTCCGT_R1_toGRCh38_nodups.bam")
 
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/Peaks/12793_10099_147165_HGHM3BGXK_H1_GFP_Sox2_2_ATGTCAGA_R1_toGRCh38_nodups.bam_peaks.narrowPeak", peak.format = "narrow",
                       sampID="ESC_D5_GFP_OE_2",tissue="ESC",
                       factor="GFP",condition="D5",
                       replicate=2,
                       bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147165_HGHM3BGXK_H1_GFP_Sox2_2_ATGTCAGA_R1_toGRCh38_nodups.bam")
 
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/Peaks/12793_10099_147166_HGHM3BGXK_H1_hTFAP2A_Sox2_1_CCGTCCGC_R1_toGRCh38_nodups.bam_peaks.narrowPeak", peak.format = "narrow",
                       sampID="ESC_D5_TFAP2A_OE_1",tissue="NC",
                       factor="TFAP2A",condition="D5",
                       replicate=1,
                       bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147166_HGHM3BGXK_H1_hTFAP2A_Sox2_1_CCGTCCGC_R1_toGRCh38_nodups.bam")
 
-Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks=Candidate_peaks,
+Sox2_Signal_OE <- dba.peakset(Sox2_Signal_OE,peaks="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/Peaks/12793_10099_147167_HGHM3BGXK_H1_hTFAP2A_Sox2_2_GTAGAGAT_R1_toGRCh38_nodups.bam_peaks.narrowPeak", peak.format = "narrow",
                       sampID="ESC_D5_TFAP2A_OE_2",tissue="NC",
                       factor="TFAP2A",condition="D5",
                       replicate=2,
                       bamReads="/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_SOX2-CR/BAM/12793_10099_147167_HGHM3BGXK_H1_hTFAP2A_Sox2_2_GTAGAGAT_R1_toGRCh38_nodups.bam")
 
 
-Sox2_Signal_OE <- dba.count(Sox2_Signal_OE, bParallel = T)
-dba.plotPCA(Sox2_Signal_OE, attributes = DBA_CONDITION)
-Sox2_Signal_OE <- dba.contrast(Sox2_Signal_OE, contrast = c("Tissue","ESC","NC"))
+Sox2_Signal_OE <- dba.count(Sox2_Signal_OE, bParallel = T, summits = F)
+dba.plotPCA(Sox2_Signal_OE, attributes = c(DBA_CONDITION, DBA_FACTOR))
+Sox2_Signal_OE <- dba.contrast(Sox2_Signal_OE, contrast = c("Factor","TFAP2A","GFP"))
 Sox2_Signal_OE <- dba.analyze(Sox2_Signal_OE)
-Sox2_res <- as.data.frame(dba.report(Sox2_Signal_OE))
+All_Sox2 <- as.data.frame(dba.report(Sox2_Signal_OE, th = 1))
+Sox2_res <- as.data.frame(dba.report(Sox2_Signal_OE, bUsePval = F, th = 0.05))
+TFAP2A_OE_SOX2 <- Sox2_res[Sox2_res$Fold>0,]
+GFP_OE_SOX2 <- Sox2_res[Sox2_res$Fold<0,]
+
+TFAP2A_OE_SOX2$PeakID <- paste0(TFAP2A_OE_SOX2$seqnames,"_",TFAP2A_OE_SOX2$start, "_",TFAP2A_OE_SOX2$end)
+TFAP2A_OE_SOX2$strand <- "+"
+
+write_tsv(TFAP2A_OE_SOX2[,c("seqnames","start","end","PeakID","Fold","strand")],
+          file = "Exports/Sox2_peaks_enrichedinTFAP2AOE.bed",
+          col_names = F)
+
+# Let's make a volcano plot for fun.
+# We could scan the top hits and label those that have the dimer motif!
+
+Sox2_Labeled <- All_Sox2 %>% mutate(threshold = ifelse(Fold > 0.5 & FDR < 0.01, "A", ifelse(Fold < -0.5 & FDR < 0.01, "B", "C")))
+
+# test homer round 2 with selective cutoff.
+TFAP2A_OE_SOX2_Selective <- Sox2_Labeled[Sox2_Labeled$threshold == "A",]
+TFAP2A_OE_SOX2_Selective$PeakID <- paste0(TFAP2A_OE_SOX2_Selective$seqnames,"_",TFAP2A_OE_SOX2_Selective$start, "_",TFAP2A_OE_SOX2_Selective$end)
+TFAP2A_OE_SOX2_Selective$strand <- "+"
+
+write_tsv(TFAP2A_OE_SOX2_Selective[,c("seqnames","start","end","PeakID","Fold","strand")],
+          file = "Exports/Selective_Sox2_peaks_enrichedinTFAP2AOE.bed",
+          col_names = F)
+TFAP2A_OE_SOX2_Selective.gr <- makeGRangesFromDataFrame(TFAP2A_OE_SOX2_Selective)
+
+g <- ggplot(data = Sox2_Labeled, aes(x = Fold, y = -log10(FDR))) +
+        geom_point(aes(color = threshold), size = 1, alpha = 1) +
+        scale_color_manual(values = c("A" = "#e45649", "B" = "#0584bc", "C" = "#d3d2d6")) +
+        ggtitle("SOX2 C&R Analysis") +
+        theme_classic() +
+        xlab("Log2 Fold Change") +
+        ylab(paste0("-Log10 Adj. p value")) +
+        theme(legend.position = "none")
+g
+
+
+ggsave(filename = paste0("./Exports/TFAP2A_OE2_SOX2_CR_Volcano_labeled.png"), plot = g, width = 4, height = 4, device = "png")
+
+ggsave(filename = paste0("./Exports/TFAP2A_OE2_SOX2_CR_Volcano_labeled.pdf"), plot = g, width = 4, height = 4, device = "pdf")
 ```
 
+```{bash}
+bedtools getfasta -fi /data/Austin/workdir/genome/hg38/dna/hg38.fa -bed Selective_Sox2_peaks_enrichedinTFAP2AOE.bed -fo Selective_Sox2_peaks_enrichedinTFAP2AOE.fa
+fimo --thresh 1e-2 -o Dimer_in_Selective_Sox2_peaks ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Imports/MA0142.1.meme Selective_Sox2_peaks_enrichedinTFAP2AOE.fa
+```
+
+Recreate volcano with labeling.
+```{r}
+fimo_res <- read_delim("~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/Dimer_in_Selective_Sox2_peaks/fimo.tsv", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+fimo_res$PeakID <- paste0(str_split(fimo_res$sequence_name, pattern = ":", simplify = T)[,1],
+                          "-",str_split(fimo_res$sequence_name, pattern = ":", simplify = T)[,2])
+# 99th quartile of Motif score
+fimo_res_sig <- fimo_res[fimo_res$score > 12,]
+
+Sox2_Labeled$PeakID <- paste0(Sox2_Labeled$seqnames, "-",Sox2_Labeled$start, "-", Sox2_Labeled$end)
+
+Sox2_Labeled$dimerlabel <- as.factor(ifelse(Sox2_Labeled$PeakID %in% fimo_res_sig$PeakID, "Dimer","No Dimer"))
+
+summary(Sox2_Labeled$dimerlabel)
+  a[order(as.character(a$sortkey)),]
+Sox2_Labeled <- Sox2_Labeled[order(Sox2_Labeled$dimerlabel, decreasing = T),]
+
+g2 <- ggplot(data = Sox2_Labeled, aes(x = Fold, y = -log10(FDR))) +
+        geom_point(aes(color = dimerlabel, order = order), size = 1, alpha = 1) +
+        scale_color_manual(values = c("Dimer" = "#e45649", "No Dimer" = "#d3d2d6")) +
+        ggtitle("SOX2 C&R Analysis 99th % Dimer motif labeled") +
+        theme_classic() +
+        xlab("Log2 Fold Change") +
+        ylab(paste0("-Log10 Adj. p value")) +
+        theme(legend.position = "none")
+g2
+ggsave(filename = paste0("./Exports/TFAP2A_OE2_SOX2_CR_Volcano_Dimer.png"), width = 4, height = 4, device = "png")
+
+ggsave(filename = paste0("./Exports/TFAP2A_OE2_SOX2_CR_Volcano_Dimer.pdf"), width = 4, height = 4, device = "pdf")
+```
+
+```{bash}
+# Peaks that increase in SOX2 binding upon TFAP2A Overexpression
+findMotifsGenome.pl Sox2_peaks_enrichedinTFAP2AOE.bed /data/Austin/workdir/genome/hg38/dna/hg38.fa TFAP2AOE_Enriched_SOX2CR -p 32
+
+# Selective Peaks that increase in SOX2 binding upon TFAP2A Overexpression
+findMotifsGenome.pl Selective_Sox2_peaks_enrichedinTFAP2AOE.bed /data/Austin/workdir/genome/hg38/dna/hg38.fa Selective_TFAP2AOE_Enriched_SOX2CR -p 62
+
+# All SOX2 peaks captured from previous CR's
+findMotifsGenome.pl Replicate_Sox2_Peaks.bed /data/Austin/workdir/genome/hg38/dna/hg38.fa Background_SOX2CR -p 32
+```
+
+Let's look at peaks
 
 Look at All Sox2 peaks vs ESC dimer locations vs NC dimer locations in regular SOX2 CUT&RUN and OE
 
@@ -498,4 +561,5 @@ computeMatrix reference-point -S  ATAC_ES_D0_1_toGRCh38_sorted_nodups.bw ATAC_NC
 
 plotProfile -m ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif.mat.gz -out ~/local_git/NC_Timecourse/CR/Human_ESC_iNC/Exports/ESC_vs_NC_withmotif_profile.eps --plotType heatmap --dpi 600 
 ```
+
 

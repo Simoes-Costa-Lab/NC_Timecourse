@@ -30,6 +30,13 @@ ah <- AnnotationHub()
 qr <- query(ah, c("EnsDb", "Homo sapiens"))
 ensembl_human_annotation <- qr[["AH95744"]]
 register(MulticoreParam(32)) # Set this to number of CPUs.
+
+GenesUniverse <- read_csv(file = "Imports/GenesUniverse.csv")
+GenesUniverse$Human_ENSEMBL <- mapIds(org.Hs.eg.db, keys = as.character(GenesUniverse$Human_Entrezid),
+                                      keytype = "ENTREZID", column = "ENSEMBL", multiVals = "first")
+GenesUniverse$Human_ENSEMBL <- as.character(GenesUniverse$Human_ENSEMBL)
+GenesUniverse$Human_ENSEMBL[which(GenesUniverse$Human_ENSEMBL == "NULL")] <- NA
+GenesUniverse <- as.data.frame(GenesUniverse)
 ```
 
 ```{r}
@@ -101,15 +108,16 @@ negative_factors <- c("SIX3","LHX2","OLIG3","FEZF1","SOX21","SIX6","HESX1")
 
 restest_title <- "TFA2A_OE"
 
-restest3 <- restest %>% mutate(threshold = ifelse(log2FoldChange >= 1 & padj < 0.05, "A", ifelse(log2FoldChange <= -1 & padj < 0.05, "B", "C")))
-      g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
+restest3 <- restest %>% mutate(threshold = ifelse(log2FoldChange >= 1.5 & padj < 0.05, "A", ifelse(log2FoldChange <= -1.5 & padj < 0.05, "B", "C")))
+
+g <- ggplot(data = restest3, aes(x = log2FoldChange, y = -log10(padj))) +
         geom_point(aes(color = threshold), size = 1, alpha = 1) +
         scale_color_manual(values = c("A" = "#e45649", "B" = "#0584bc", "C" = "#d3d2d6")) +
         geom_text_repel(data=restest3[restest3$Symbol %in% c(positive_factors, negative_factors),],
                         aes(label = Symbol), box.padding = 0.2, segment.color = "#393a42", segment.size = 0.5, color = "#393a42") +
         ggtitle(restest_title) +
         #scale_x_continuous(limits = c(-6,6)) +
-        geom_vline(xintercept = c(-1,1), linetype = "longdash", color = "black", size = 0.4) +
+        geom_vline(xintercept = c(-1.5,1.5), linetype = "longdash", color = "black", size = 0.4) +
         theme_classic() +
         xlab("Log2 Fold Change") +
         ylab(paste0("-Log10 Adj. p value, 0.001 Labeled")) +
@@ -123,17 +131,12 @@ g
       
 
 ggsave(filename = paste0("./Exports/",restest_title,"_labeled.png"), plot = g, width = 5, height = 4, device = "png")
-ggsave(filename = paste0("./Exports/",restest_title,"_labeled.svg"), plot = g, width = 5, height = 4, device = "svg")
+ggsave(filename = paste0("./Exports/",restest_title,"_labeled.pdf"), plot = g, width = 5, height = 4, device = "pdf")
 
 ```
 
 Let's investigate how the NC GRN looks compared to random 250 genes.
 ```{r}
-GenesUniverse <- read_csv(file = "Imports/GenesUniverse.csv")
-GenesUniverse$Human_ENSEMBL <- mapIds(org.Hs.eg.db, keys = as.character(GenesUniverse$Human_Entrezid),
-                                      keytype = "ENTREZID", column = "ENSEMBL")
-GenesUniverse$Human_ENSEMBL[which(GenesUniverse$Human_ENSEMBL == "NULL")] <- NA
-
 GRN_Genes <- read_delim(file = "/home/ash274/local_git/NC_Timecourse/ATAC-Seq/Imports/GRN_Genes.tsv",
                       col_names = F, delim = "    ")
 
@@ -172,6 +175,12 @@ timecourse_featurecounts <- read_delim(file = "/data/Jackie/NCinduction_TimeCour
 rownames(timecourse_featurecounts) <- timecourse_featurecounts$Geneid
 timecourse_metadata <- read_csv("/data/Jackie/NCinduction_TimeCourse/RNA_TC_human/RNA_seq_metadata.csv")
 
+timecourse_dat <- as.data.frame(timecourse_featurecounts[,7:18])
+rownames(timecourse_dat) <- timecourse_featurecounts$Geneid
+colnames(timecourse_dat) <- c("D3_2","D4_2","D5_2","D0_1",
+                              "D1_1","D2_1","D3_1","D4_1",
+                              "D5_1","D0_2","D1_2","D2_2")
+
 timecourse_meta2 <- data.frame(data = colnames(timecourse_dat),
                                Condition = c("D3","D4","D5","D0",
                                              "D1","D2","D3","D4",
@@ -179,11 +188,6 @@ timecourse_meta2 <- data.frame(data = colnames(timecourse_dat),
                                Replicate = c("2","2","2","1",
                                              "1","1","1","1",
                                              "1","2","2","2"))
-timecourse_dat <- as.data.frame(timecourse_featurecounts[,7:18])
-rownames(timecourse_dat) <- timecourse_featurecounts$Geneid
-colnames(timecourse_dat) <- c("D3_2","D4_2","D5_2","D0_1",
-                              "D1_1","D2_1","D3_1","D4_1",
-                              "D5_1","D0_2","D1_2","D2_2")
 
 featureCounts <- read.delim("~/local_git/NC_Timecourse/RNA-Seq/Imports/TFAP2A-OE2_featureCounts.txt", comment.char="#")
 
@@ -208,11 +212,29 @@ dat_filt <- dat[rownames(dat) %in% rownames(timecourse_dat),]
 summary(rownames(dat_filt) == rownames(timecourse_dat))
 combined_dat <- cbind(timecourse_dat, dat_filt)
 
+# Now make D0 and either D3 or D5.
+combined_dat <- combined_dat[,c("D0_1","D0_2","D5_1","D5_2",
+                                "HGHM3BGXK_H1_GFP_RNAs1","HGHM3BGXK_H1_GFP_RNAs2",
+                                "HGHM3BGXK_H1_Ap2A_RNAs1","HGHM3BGXK_H1_Ap2A_RNAs2")]
+
+combined_metadata <- combined_metadata[combined_metadata$Condition %in% c("D0","D5","GFP_OE","AP2A_OE"),]
+
+# For D0/3/5
+# combined_metadata <- combined_metadata[c(3,6,4,1,5,2,7,8,9,10),]
+
+# For D0/3
+# combined_metadata <- combined_metadata[c(2,4,3,1,5,6,7,8),]
+
+# For D0/5
+combined_metadata <- combined_metadata[c(2,4,3,1,5,6,7,8),]
+
+combined_metadata$data == colnames(combined_dat)
+
 combined_dds <- DESeqDataSetFromMatrix(countData = combined_dat,
                               colData = combined_metadata,
-                              design= ~Condition)
+                              design= ~Condition + 0)
 #Filter out genes lowly detected.
-keep <- rowSums(counts(combined_dds)) >= 15
+keep <- rowSums(counts(combined_dds)) >= 10
 combined_dds <- combined_dds[keep,]
 
 
@@ -221,25 +243,20 @@ combined_dds <- DESeq(combined_dds, parallel = TRUE)
 #Check out the counts
 bp1 <-boxplot(log10(counts(combined_dds,normalized=TRUE)+1))
 
-vstcombined_dds <- varianceStabilizingTransformation(combined_dds)
-pcaAll <- plotPCA(vstcombined_dds, intgroup = c("Condition"), returnData=TRUE)
-pcaAllVar <- attr(pcaAll, "percentVar")
-
-combined_dds <- rlog( combined_dds, blind = T )
-rv <- rowVars(assay(combined_dds))
+combined_dds_rlog <- rlog( combined_dds, blind = T )
+rv <- rowVars(assay(combined_dds_rlog))
 # select the ntop genes by variance
 select <- order(rv, decreasing=TRUE)[seq_len(min(750, length(rv)))]
 # perform a PCA on the data in assay(x) for the selected genes
-pca <- prcomp(t(assay(combined_dds)[select,]))
-
-
+pca <- prcomp(t(assay(combined_dds_rlog)[select,]))
 pca_df <- as.data.frame(pca$x)
-pca_df$Condition <- combined_dds$Condition
+pca_df$Condition <- combined_dds_rlog$Condition
+
 g <- ggplot(pca_df, aes(x=PC2, y=PC3, color=Condition)) + 
   geom_point(size = 4, alpha = .75) + 
   scale_color_npg() +
   ggtitle("pcaALL") +
-  labs(x = paste(c("PC2","%"),round(pcaAllVar[2]*100)) ,y = paste(c("PC3","%"), round(pcaAllVar[6]*100))) +
+  labs(x = c("PC2 14.2%"),y = c("PC3 9.2%")) +
   theme(text=element_text(color="black", size = 10, face = "bold"),
         line=element_line(color="black", size = 2),
         axis.ticks = element_line(color = "black", size = 1),
@@ -249,79 +266,63 @@ g <- ggplot(pca_df, aes(x=PC2, y=PC3, color=Condition)) +
         #legend.key = element_blank()
   )
 g
+ggsave("Exports/TFAP2A_OE_RNA_PCA_D0-D5.png", width = 6, height = 4)
+ggsave("Exports/TFAP2A_OE_RNA_PCA_D0-D5.pdf", width = 6, height = 4)
+
+# Highest Discriminating PC3 Genes
+PC3 <- as.data.frame(pca$rotation[,3])
+colnames(PC3) <- "value"
+PC3$Human_ENSEMBL <- rownames(PC3)
+top_100_PC3 <- PC3 %>% slice_max(value, n = 100)
+top_100_PC3 <- merge(top_100_PC3, GenesUniverse, all.x = T)
+```
+Let's compare the enrichment of TFAP2A-OE genes within each of these samples.
+
+```{r}
+library(ggpubr)
+
+TFAP2A_OE_Genes <- restest %>% dplyr::filter(log2FoldChange > 1.5 & padj < 0.01)
+
+# 1000 Random not significant genes
+Random_1000 <- restest %>% dplyr::filter(padj > 0.05) %>% slice_sample(n = 1000)
+
+rlog_counts <- assay(combined_dds_rlog)
+colnames(rlog_counts) <- colData(combined_dds_rlog)$data
+
+rlog_counts_melted <- melt(rlog_counts)
+rlog_counts_melted$Group <- ifelse(rlog_counts_melted$Var1 %in% rownames(TFAP2A_OE_Genes),
+                                   "TFAP2A-OE_Enriched",
+                                   ifelse(rlog_counts_melted$Var1 %in% rownames(Random_1000),"Control",
+                                          "Other"))
+rlog_counts_melted$Factor <- rlog_counts_melted$Var2
+levels(rlog_counts_melted$Factor) <- c("D0","D0","D5","D5","GFP-OE","GFP-OE","TFAP2A-OE","TFAP2A-OE")
+rlog_counts_melted$Factor <- relevel(rlog_counts_melted$Factor, ref = "GFP-OE")
+rlog_counts_melted$Factor <- relevel(rlog_counts_melted$Factor, ref = "TFAP2A-OE")
+
+
+my_comparisons <- list( c("D0", "D5"), c("D0", "GFP-OE"), c("TFAP2A-OE","D5"), c("TFAP2A-OE","GFP-OE")
+                        , c("D5","GFP-OE"))
+
+ggplot(rlog_counts_melted %>% dplyr::filter(Group == "TFAP2A-OE_Enriched"), aes(Factor, value)) + geom_boxplot(aes(fill = Factor)) + theme(axis.text.x = element_blank()) + stat_compare_means(comparisons = my_comparisons, method.args = list(alternative = "two.sided")) + scale_fill_brewer(palette = "Set1") + ggtitle("Enrichment of TFAP2A-OE induced gene expression as compared to wild type.") + xlab("RNA-Seq Library") + ylab("Rlog Counts")
+
+ggsave(file = "Exports/TFAP2A_OE_Comparison_D5.png", width = 6, height = 3.5)
+ggsave(file = "Exports/TFAP2A_OE_Comparison_D5.pdf", width = 6, height = 3.5)
 
 ```
 
-Let's compare the expression of early NC genes.
-
-
+Integrate TFAP2A-OE ATAC samples.
 ```{r}
-bamFiles <- list.files(path = "/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/BAM",
-                       pattern = "_sorted_nodups.bam$", full.names = T)
-peakFiles <- list.files(path = "/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/Peaks",
-                        pattern = "_sorted_nodups.bam_peaks.narrowPeak$", full.names = T) 
-
-Perform_ATAC_QC <- function(bam = "", peaks = "") {
-  reads1 <-
-    readGAlignmentPairs(bam, param = ScanBamParam(
-      mapqFilter = 1,
-      flag = scanBamFlag(isPaired = TRUE, isProperPair = TRUE),
-      what = c("qname", "mapq", "isize")
-    ))
-  idx_tb <- idxstatsBam(bam)
-  idx_tb_filt <- idx_tb[0:25,]
-  read_dist <- idx_tb_filt %>% ggplot(aes(seqnames, mapped, fill = seqnames)) +
-    geom_bar(stat = "identity") + coord_flip()
-  percent.mito <-(idx_tb_filt$mapped[25] / sum(idx_tb_filt$mapped)) * 100
-  #getting insert sizes
-  atacReads_read1 <- GenomicAlignments::first(reads1)
-  insertSizes <- abs(elementMetadata(atacReads_read1)$isize)
-  fragLenPlot <- table(insertSizes) %>%
-    data.frame %>%
-    rename(InsertSize = insertSizes,Count = Freq) %>%
-    mutate(InsertSize = as.numeric(as.vector(InsertSize)),
-           Count =as.numeric(as.vector(Count))) %>% ggplot(aes(x = InsertSize, y = Count)) +
-    geom_line() + xlim(c(0, 800)) + scale_y_continuous(trans='log2', name = "Count Log2") + theme_bw()
-  openRegionPeaks <- import(peaks, format = "narrowPeak")
-  qcRes <-ChIPQCsample(bam, peaks = openRegionPeaks, chromosomes = "chr2",
-       blacklist ="/data/Austin/workdir/genome/hg38/blacklist/UCSC_hg38_blacklist.bed")
-  MacsCalls_1_filteredAnno <- annotatePeak(qcRes, TxDb = TxDb_hg38)
-  output <-list(idx_tb,
-                read_dist,
-                percent.mito,
-                fragLenPlot,
-                MacsCalls_1_filteredAnno)
-  return(output)
-}
-
-#Perform QC on all bam files. Easiest is to run one per bam, but could do for file in bamFiles and return those results in one big list.
-res_list <- list()
-for (i in seq(length(bamFiles))){
-  name <- list.files(path = "/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/BAM",
-                       pattern = "_sorted_nodups.bam$")[i]
-  name <- strsplit(x = name, split = ".bam")[[1]]
-  res_list[[name]] <- Perform_ATAC_QC(bam = bamFiles[i], peaks = peakFiles[i])
-}
-
-```
-
-```{r}
-res_list[1]
-res_list[2]
-res_list[3]
-res_list[4]
-```
-
-```{r}
-OE_dba <- dba(sampleSheet="../ATAC-Seq/Human_ESC_iNC/TFAP2A_OE_samplesheet.csv")
-OE_dba <- dba.count(OE_dba, bParallel = T)
+OE_dba <- dba(sampleSheet="../ATAC-Seq/Human_ESC_iNC/TFAP2A_OE_atATAC_samplesheet.csv")
+OE_dba <- dba.count(OE_dba, bParallel = T, summits = F)
 OE_dba <- dba.contrast(OE_dba, group1 = OE_dba$masks$`TFAP2A-OE`, group2= OE_dba$masks$`GFP-OE`, minMembers = 2)
-OE_dba <- dba.analyze(OE_dba)
+OE_dba <- dba.contrast(OE_dba, group1 = OE_dba$masks$ES, group2= OE_dba$masks$NC, minMembers = 2)
+OE_dba <- dba.analyze(OE_dba, bParallel = T)
 GFP_vs_TFAP2A <- as.data.frame(dba.report(OE_dba, contrast = 1, bUsePval = T))
 GFP_vs_TFAP2A$PeakID <- paste0(GFP_vs_TFAP2A$seqnames, "_", GFP_vs_TFAP2A$start, "_", GFP_vs_TFAP2A$end)
+
 write.csv(GFP_vs_TFAP2A, file = "../ATAC-Seq/Human_ESC_iNC/Exports/GFP_vs_TFAP2A.csv", row.names = F)
 
-TFAP2A_Enriched <- GFP_vs_TFAP2A[GFP_vs_TFAP2A$Fold > 0,]
+TFAP2A_Enriched <- GFP_vs_TFAP2A[GFP_vs_TFAP2A$Fold > 1.5,]
 #TFAP2A_Enriched$seqnames <- stringr::str_split(TFAP2A_Enriched$seqnames, pattern = "chr", simplify = T)[,2]
 TFAP2A_Enriched$strand <- "+"
 write_tsv(TFAP2A_Enriched[,c("seqnames","start","end","PeakID","Fold","strand")],
@@ -331,24 +332,25 @@ write_tsv(TFAP2A_Enriched[,c("seqnames","start","end","PeakID","Fold","strand")]
 background_peaks <- as.data.frame(dba.report(OE_dba, contrast = 1, bUsePval = T, th = 0.4))
 background_peaks$strand <- "+"
 background_peaks$PeakID <- paste0(background_peaks$seqnames, "_", background_peaks$start, "_", background_peaks$end)
-background_peaks <- background_peaks[background_peaks$p.value > 0.05,]
+background_peaks <- background_peaks[background_peaks$p.value > 0.1,]
 write_tsv(background_peaks[,c("seqnames","start","end","PeakID","Fold","strand")],
           file = "../ATAC-Seq/Human_ESC_iNC/Exports/Background_Peaks.bed",
           col_names = F)
 
 
-dba.plotPCA(OE_dba)
+
 meta_dataframe <- as.data.frame(OE_dba$class)
-pca <- dba.plotPCA(OE_dba)
+
+pca <- dba.plotPCA(OE_dba, attributes = c(DBA_TREATMENT, DBA_CONDITION), bLog = F)
 x <- pca$panel.args[[1]]$x
 y <- pca$panel.args[[1]]$y
-pca_mat <- as.data.frame(matrix(c(x,y), nrow = 4, ncol = 2, byrow = F))
+pca_mat <- as.data.frame(matrix(c(x,y), nrow = 8, ncol = 2, byrow = F))
 colnames(pca_mat) <- c("PC1","PC2")
 rownames(pca_mat) <- OE_dba$samples$SampleID
 
 pca_mat$condition <- factor(c("TFAP2A-OE","TFAP2A-OE",
-                              "GFP-OE","GFP-OE"),
-                       levels = c("TFAP2A-OE","GFP-OE"))
+                              "GFP-OE","GFP-OE","ES_D0","ES_D0","NC_D5","NC_D5"),
+                       levels = c("TFAP2A-OE","GFP-OE","ES_D0","NC_D5"))
 g <- ggplot(pca_mat, aes(x=PC1, y=PC2, color=condition)) + 
   geom_point(size = 4, alpha = 1) + 
   scale_color_npg() +
@@ -363,71 +365,60 @@ g <- ggplot(pca_mat, aes(x=PC1, y=PC2, color=condition)) +
   )
 
 g
+
+ggsave("Exports/TFAP2A_OE_ATAC_PCA_D0-D5.png", width = 6, height = 4)
+ggsave("Exports/TFAP2A_OE_ATAC_PCA_D0-D5.pdf", width = 6, height = 4)
 ```
-Let's look to see what the enrichment of early-mid-late peaks looks like in the overexpression data.
+
+Let's look at the accessibility regions enriched from TFAP2A-OE in D0 and D5 WT ATAC.
 
 ```{r}
-# Cluster 1 is only D5
-# Cluster 2 is only ESC
-# Cluster 3 is D3-D5 enriched
-# Cluster 4 is ESC-D3 enriched
+# Top Enriched Peaks in TFAP2A-OE
+TFAP2A_Enriched
 
-Cluster1_peaks <- import.bed("../ATAC-Seq/Human_ESC_iNC/Exports/DeSeq2_ATAC_Cluster_1.bed")
-Cluster1_peaks$PeakID <- paste0(as.character(GenomicRanges::seqnames(Cluster1_peaks)),"_",
-                             start(Cluster1_peaks), "_", end(Cluster1_peaks))
-Cluster2_peaks <- import.bed("../ATAC-Seq/Human_ESC_iNC/Exports/DeSeq2_ATAC_Cluster_2.bed")
-Cluster2_peaks$PeakID <- paste0(as.character(GenomicRanges::seqnames(Cluster2_peaks)),"_",
-                             start(Cluster2_peaks), "_", end(Cluster2_peaks))
-Cluster3_peaks <- import.bed("../ATAC-Seq/Human_ESC_iNC/Exports/DeSeq2_ATAC_Cluster_3.bed")
-Cluster3_peaks$PeakID <- paste0(as.character(GenomicRanges::seqnames(Cluster3_peaks)),"_",
-                             start(Cluster3_peaks), "_", end(Cluster3_peaks))
-Cluster4_peaks <- import.bed("../ATAC-Seq/Human_ESC_iNC/Exports/DeSeq2_ATAC_Cluster_4.bed")
-Cluster4_peaks$PeakID <- paste0(as.character(GenomicRanges::seqnames(Cluster4_peaks)),"_",
-                             start(Cluster4_peaks), "_", end(Cluster4_peaks))
-
-# Create a list of peaks to inquiry
-peaks_of_interest <- c(Cluster1_peaks$PeakID, Cluster2_peaks$PeakID,Cluster3_peaks$PeakID, Cluster4_peaks$PeakID)
-
-peak_groups <- c(early_peaks, mid_peaks, late_peaks)
-peak_groups$score = 50
-seqlevelsStyle(peak_groups) <- "UCSC"
-
-All_ATAC_Peaks <- c(Cluster1_peaks, Cluster2_peaks, Cluster3_peaks, Cluster4_peaks)
-write_delim(as.data.frame(All_ATAC_Peaks)[,1:4], file = "../ATAC-Seq/Human_ESC_iNC/Exports/ATAC_Peaks_to_quant.bed", col_names = F)
-
-
-# I actually need to re-quantify things at these possible locations.
-OE_at_ATAC <- dba(sampleSheet="../ATAC-Seq/Human_ESC_iNC/TFAP2A_OE_atATAC_samplesheet.csv", minOverlap = 1)
-OE_at_ATAC <- dba.count(OE_at_ATAC, filter = 0, bParallel = TRUE, summits = F)
-# Running DeSeq to get Rlog counts
 library(DESeq2)
-summarized_experiment_OE <- dba(OE_at_ATAC, bSummarizedExperiment = T)
-summarized_experiment_OE@assays@data$scores <- summarized_experiment_OE@assays@data$Reads
-#order of counts not correct.
-peak_ID.df <- as.data.frame(summarized_experiment_OE@rowRanges)
-peak_ID.df$PeakID <- paste0(peak_ID.df$seqnames,"_",peak_ID.df$start,"_", peak_ID.df$end)
+OE_ATAC_SE <- dba(OE_dba, bSummarizedExperiment = T)
+OE_ATAC_SE@assays@data$scores <- OE_ATAC_SE@assays@data$Reads
 
-dds_experiment_OE <- DESeqDataSet(summarized_experiment_OE, design = ~ Treatment)
-dds_experiment_OE <- DESeq(dds_experiment_OE)
-dds_results <- results(dds_experiment_OE)
-rld <- rlog(dds_experiment_OE, blind = FALSE)
-rld_df <- as.data.frame(assay(rld))
-rownames(rld_df) <- peak_ID.df$PeakID
+OE_ATAC_dds <- DESeqDataSet(OE_ATAC_SE, design = ~ Condition)
+OE_ATAC_dds <- DESeq(OE_ATAC_dds)
+OE_ATAC_res <- results(OE_ATAC_dds)
+OE_ATAC_rld <- rlog(OE_ATAC_dds, blind = T)
+OE_ATAC_rld_df <- as.data.frame(assay(OE_ATAC_rld))
 
-rld_df$cluster <- ifelse(rownames(rld_df) %in% Cluster1_peaks$PeakID,"Cluster1",
-                         ifelse(rownames(rld_df) %in% Cluster2_peaks$PeakID, "Cluster2",
-                                ifelse(rownames(rld_df) %in% Cluster3_peaks$PeakID,"Cluster3", "Cluster4")))
-rld_df$PeakID <- peak_ID.df$PeakID
+mod_rownames <- as.data.frame(OE_ATAC_SE@rowRanges)
+mod_rownames$PeakID <- paste0(mod_rownames$seqnames, "-", mod_rownames$start, "-", mod_rownames$end)
+OE_ATAC_rld_df$PeakID <- mod_rownames$PeakID
 
-rld_df_filt <- rld_df[rowSums(rld_df[,1:4]) > 0,]
+atac_rlog_counts_melted <- melt(OE_ATAC_rld_df)
+atac_rlog_counts_melted$Group <- ifelse(atac_rlog_counts_melted$PeakID %in% TFAP2A_Enriched$PeakID,
+                                   "TFAP2A-OE_Enriched","Other")
 
-# Violn plot of signal in OE vs GFP at Clusters 1, 2, 3, and 4.
-rld_df_long <- melt(rld_df_filt)
+atac_rlog_counts_melted$Factor <- as.factor(atac_rlog_counts_melted$variable)
 
-g <- ggplot(rld_df_long[rld_df_long$cluster == "Cluster4",], mapping = aes(x = variable, y = value, fill = cluster)) + geom_boxplot()
-g
+levels(atac_rlog_counts_melted$Factor) <- c("TFAP2A-OE","TFAP2A-OE","GFP-OE","GFP-OE","D0","D0","D5","D5")
+atac_rlog_counts_melted$Factor <- relevel(atac_rlog_counts_melted$Factor, ref = "GFP-OE")
+atac_rlog_counts_melted$Factor <- relevel(atac_rlog_counts_melted$Factor, ref = "TFAP2A-OE")
+
+
+my_comparisons <- list( c("D0", "D5"), c("D0", "GFP-OE"), c("TFAP2A-OE","D5"), c("TFAP2A-OE","GFP-OE")
+                        , c("D5","GFP-OE"))
+
+ggplot(atac_rlog_counts_melted, aes(Factor, value)) + geom_boxplot(aes(fill = Factor)) + theme(axis.text.x = element_blank()) + stat_compare_means(comparisons = my_comparisons, method.args = list(alternative = "two.sided")) + scale_fill_brewer(palette = "Set1") + ggtitle("Enrichment of TFAP2A-OE induced gene expression as compared to wild type.") + xlab("ATAC-Seq Library") + ylab("Rlog Counts")s
+
+# Instead, let's look at how these regions change in profile via deeptools.
 ```
+```{bash}
+computeMatrix reference-point -bl /data/Austin/workdir/genome/hg38/blacklist/UCSC_hg38_blacklist.bed -S /data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/BW/12793_10099_147159_HGHM3BGXK_H1_Ap2A_ATAC2_TCCTGAGC_toGRCh38_sorted_nodups.bw /data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/BW/12793_10099_147157_HGHM3BGXK_H1_GFP_ATAC2_CGTACTAG_toGRCh38_sorted_nodups.bw /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BW/ATAC_ES_D0_1_toGRCh38_sorted_nodups.bw /data/Austin/workdir/NC_Timecourse_Data/Human_ESC_ATAC/BW/ATAC_NC_D5_2_toGRCh38_sorted_nodups.bw  -R ~/local_git/NC_Timecourse/ATAC-Seq/Human_ESC_iNC/Exports/TFAP2A_OE_Enriched_Peaks.bed -b 1000 -a 1000 -bs 5 -o TFAP2A_OE_Enriched_Peaks.mat.gz -p 62 --missingDataAsZero --referencePoint center
 
+plotHeatmap -m TFAP2A_OE_Enriched_Peaks.mat.gz -out TFAP2A_OE_Enriched_Peaks.eps --colorList "#0584bc","#ffffff","#e45649" --dpi 600 --heatmapHeight 8
+
+plotHeatmap -m TFAP2A_OE_Enriched_Peaks.mat.gz -out TFAP2A_OE_Enriched_Peaks.pdf --colorList "#0584bc","#ffffff","#e45649" --dpi 600 --heatmapHeight 8
+
+gs -dSAFER -dEPSCrop -r300 -sDEVICE=pngalpha -o TFAP2A_OE_Enriched_Peaks.png TFAP2A_OE_Enriched_Peaks.eps
+
+# Looks good.
+```
 
 Run HOMER on Enriched Peaks
 ```{bash}
@@ -439,27 +430,58 @@ Looking at footprinting
 ## Running HINT-ATAC
 
 ```{bash}
-cd /data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A-OE_ATAC/
+cd /data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/
 mkdir HINT
 
-rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=TFAP2A_1_HINT ./BAM/12697_10099_145243_HVWVNBGXJ_H1_Ap2A_ATAC1_toGRCh38_sorted_nodups.bam ./Peaks/12697_10099_145243_HVWVNBGXJ_H1_Ap2A_ATAC1_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=TFAP2A_1_HINT ./BAM/12793_10099_147158_HGHM3BGXK_H1_Ap2A_ATAC1_AGGCAGAA_toGRCh38_sorted_nodups.bam ./Peaks/12793_10099_147158_HGHM3BGXK_H1_Ap2A_ATAC1_AGGCAGAA_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
 
-rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=TFAP2A_2_HINT ./BAM/12697_10099_145243_H55Y7BGXK_HVWVNBGXJ_H1_Ap2A_ATAC2_toGRCh38_sorted_nodups.bam ./Peaks/12697_10099_145243_H55Y7BGXK_HVWVNBGXJ_H1_Ap2A_ATAC2_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=TFAP2A_2_HINT ./BAM/12793_10099_147159_HGHM3BGXK_H1_Ap2A_ATAC2_TCCTGAGC_toGRCh38_sorted_nodups.bam ./Peaks/12793_10099_147159_HGHM3BGXK_H1_Ap2A_ATAC2_TCCTGAGC_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
 
-rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=GFP_1_HINT ./12697_10099_145243_H55Y7BGXK_HVWVNBGXJ_H1_GFP_ATAC1_toGRCh38_sorted_nodups.bam ./Peaks/12697_10099_145243_H55Y7BGXK_HVWVNBGXJ_H1_GFP_ATAC1_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=GFP_1_HINT ./BAM/12793_10099_147156_HGHM3BGXK_H1_GFP_ATAC1_TAAGGCGA_toGRCh38_sorted_nodups.bam ./Peaks/12793_10099_147156_HGHM3BGXK_H1_GFP_ATAC1_TAAGGCGA_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
 
-rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=GFP_2_HINT ./BAM/12697_10099_145243_H55Y7BGXK_HVWVNBGXJ_H1_GFP_ATAC2_toGRCh38_sorted_nodups.bam ./Peaks/12697_10099_145243_H55Y7BGXK_HVWVNBGXJ_H1_GFP_ATAC2_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT  --output-prefix=GFP_2_HINT ./BAM/12793_10099_147157_HGHM3BGXK_H1_GFP_ATAC2_CGTACTAG_toGRCh38_sorted_nodups.bam ./Peaks/12793_10099_147157_HGHM3BGXK_H1_GFP_ATAC2_CGTACTAG_toGRCh38_sorted_nodups.bam_peaks.narrowPeak
+
+# Compare outputs
+rgt-motifanalysis matching --organism=hg38 --motif-dbs ~/rgtdata/motifs/JASPAR2020-Vert-NonRedundant --rmdup --input-files ./HINT/TFAP2A_1_HINT.bed ./HINT/TFAP2A_2_HINT.bed ./HINT/GFP_1_HINT.bed ./HINT/GFP_2_HINT.bed
+
+
 
 ```
 
-Now we need to compare these hint outputs.
+Test TFAP2A-OE against GFP-OE
+
 ```{bash}
-rgt-motifanalysis matching --organism=hg38 --motif-dbs ~/rgtdata/motifs/JASPAR2020-Vert-NonRedundant --rmdup --input-files ./HINT/TFAP2A_1_HINT.bed ./HINT/TFAP2A_2_HINT.bed ./HINT/GFP_2_HINT.bed ./HINT/GFP_2_HINT.bed
+rgt-hint differential --organism=hg38 --bc --nc 62 \
+--mpbs-files=./match/TFAP2A_1_HINT_mpbs.bed,./match/TFAP2A_2_HINT_mpbs.bed,./match/GFP_1_HINT_mpbs.bed,./match/GFP_2_HINT_mpbs.bed --conditions=TFAP2A_OE,TFAP2A_OE,GFP_OE,GFP_OE --reads-files=./BAM/12793_10099_147158_HGHM3BGXK_H1_Ap2A_ATAC1_AGGCAGAA_toGRCh38_sorted_nodups.bam,./BAM/12793_10099_147159_HGHM3BGXK_H1_Ap2A_ATAC2_TCCTGAGC_toGRCh38_sorted_nodups.bam,./BAM/12793_10099_147156_HGHM3BGXK_H1_GFP_ATAC1_TAAGGCGA_toGRCh38_sorted_nodups.bam,./BAM/12793_10099_147157_HGHM3BGXK_H1_GFP_ATAC2_CGTACTAG_toGRCh38_sorted_nodups.bam --output-location=TFAP2A_OE_VS_GFP_Enriched_Footprinting
+
 ```
 
-Test ESC against D3 NC
+This gave some good results, but let's focus our analysis on those peaks specifically enriched in TFAP2A-OE.
 
 ```{bash}
-rgt-hint differential --organism=hg38 --bc --nc 62 --mpbs-files=./match/Time1_HINT_mpbs.bed,./match/Time7_HINT_mpbs.bed --reads-files=Time1.bam,Time7.bam --conditions=Time1,Time7 --output-location=Time1_vs_Time7
+cd /data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/
+mkdir HINT_TFAP2A_OE2_Enriched
+
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT_TFAP2A_OE2_Enriched  --output-prefix=TFAP2A_1_HINT_TFAP2A_OE2_Enriched ./BAM/12793_10099_147158_HGHM3BGXK_H1_Ap2A_ATAC1_AGGCAGAA_toGRCh38_sorted_nodups.bam ~/local_git/NC_Timecourse/ATAC-Seq/Human_ESC_iNC/Exports/TFAP2A_OE_Enriched_Peaks.bed
+
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT_TFAP2A_OE2_Enriched  --output-prefix=TFAP2A_2_HINT_TFAP2A_OE2_Enriched ./BAM/12793_10099_147159_HGHM3BGXK_H1_Ap2A_ATAC2_TCCTGAGC_toGRCh38_sorted_nodups.bam ~/local_git/NC_Timecourse/ATAC-Seq/Human_ESC_iNC/Exports/TFAP2A_OE_Enriched_Peaks.bed
+
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT_TFAP2A_OE2_Enriched  --output-prefix=GFP_1_HINT_TFAP2A_OE2_Enriched ./BAM/12793_10099_147156_HGHM3BGXK_H1_GFP_ATAC1_TAAGGCGA_toGRCh38_sorted_nodups.bam ~/local_git/NC_Timecourse/ATAC-Seq/Human_ESC_iNC/Exports/TFAP2A_OE_Enriched_Peaks.bed
+
+rgt-hint footprinting --atac-seq --paired-end --organism=hg38 --output-location=./HINT_TFAP2A_OE2_Enriched  --output-prefix=GFP_2_HINT_TFAP2A_OE2_Enriched ./BAM/12793_10099_147157_HGHM3BGXK_H1_GFP_ATAC2_CGTACTAG_toGRCh38_sorted_nodups.bam ~/local_git/NC_Timecourse/ATAC-Seq/Human_ESC_iNC/Exports/TFAP2A_OE_Enriched_Peaks.bed
+
+rgt-motifanalysis matching --organism=hg38 --motif-dbs ~/rgtdata/motifs/JASPAR2020-Vert-NonRedundant --rmdup --input-files  ./HINT_TFAP2A_OE2_Enriched/TFAP2A_1_HINT_TFAP2A_OE2_Enriched.bed ./HINT_TFAP2A_OE2_Enriched/TFAP2A_2_HINT_TFAP2A_OE2_Enriched.bed ./HINT_TFAP2A_OE2_Enriched/GFP_1_HINT_TFAP2A_OE2_Enriched.bed ./HINT_TFAP2A_OE2_Enriched/GFP_2_HINT_TFAP2A_OE2_Enriched.bed 
+
+rgt-hint differential --organism=hg38 --bc --nc 62 \
+--mpbs-files=./match/TFAP2A_1_HINT_TFAP2A_OE2_Enriched_mpbs.bed,./match/TFAP2A_2_HINT_TFAP2A_OE2_Enriched_mpbs.bed,./match/GFP_1_HINT_TFAP2A_OE2_Enriched_mpbs.bed,./match/GFP_2_HINT_TFAP2A_OE2_Enriched_mpbs.bed --conditions=TFAP2A_OE,TFAP2A_OE,GFP_OE,GFP_OE --reads-files=./BAM/12793_10099_147158_HGHM3BGXK_H1_Ap2A_ATAC1_AGGCAGAA_toGRCh38_sorted_nodups.bam,./BAM/12793_10099_147159_HGHM3BGXK_H1_Ap2A_ATAC2_TCCTGAGC_toGRCh38_sorted_nodups.bam,./BAM/12793_10099_147156_HGHM3BGXK_H1_GFP_ATAC1_TAAGGCGA_toGRCh38_sorted_nodups.bam,./BAM/12793_10099_147157_HGHM3BGXK_H1_GFP_ATAC2_CGTACTAG_toGRCh38_sorted_nodups.bam --output-location=TFAP2A_OE_VS_GFP_Enriched_Footprinting
 ```
+
+```{r}
+differential_statistics <- read_delim("/data/Austin/workdir/NC_Timecourse_Data/H1_TFAP2A_OE2_ATAC/TFAP2A_OE_VS_GFP_Enriched_Footprinting/differential_statistics.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+```
+
+# SOX2 CUT&RUN Analysis in TFAP2A vs GFP OE
+In the 1_Sox2_Dimer_Timecourse doc
 

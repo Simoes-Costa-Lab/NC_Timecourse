@@ -491,7 +491,7 @@ ATAC_clusters = pheatmap(subset(rld_df_avg, rownames(rld_df_avg) %in% top_18k_di
 
 #So it renders properly in html doc
 pheatmap(subset(rld_df_avg, rownames(rld_df_avg) %in% top_18k_differential$peakID),
-                         cluster_cols = F, scale = "row", show_rownames = F, show_colnames = T,
+                         cluster_cols = F, scale = "row", show_rownames = F, show_colnames = T)
 
 ```
 
